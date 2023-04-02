@@ -8,27 +8,35 @@ namespace OpenLibrary.NET
     /// </summary>
     public sealed record OLWork : OLContainer
     {
-        [JsonProperty("ID")]
+        [JsonProperty("id")]
         public string ID { get; private set; }
-        [JsonProperty("Data")]
+        [JsonProperty("data")]
         public OLWorkData? Data { get; init; } = null;
-        [JsonProperty("Ratings")]
+        [JsonProperty("ratings")]
         public OLRatingsData? Ratings { get; init; } = null;
-        [JsonProperty("Bookshelves")]
+        [JsonProperty("bookshelves")]
         public OLBookshelvesData? Bookshelves { get; init; } = null;
-        [JsonProperty("Editions")]
-        public ReadOnlyCollection<OLEditionData>? Editions { get; init; } = null;
+        [JsonIgnore]
+        public IReadOnlyList<OLEditionData>? Editions
+        {
+            get => editions == null ? null : new ReadOnlyCollection<OLEditionData>(editions);
+            init { if (value != null) editions = value.ToArray(); }
+        }
+
+        [JsonProperty("editions")]
+        private OLEditionData[]? editions = null;
 
         public OLWork(string id) => ID = id;
 
         public bool Equals(OLWork? work)
         {
             return work != null &&
+                CompareExtensionData(work.extensionData) &&
                 work.ID == ID &&
                 work.Data == Data &&
                 work.Ratings == Ratings &&
                 work.Bookshelves == Bookshelves &&
-                Enumerable.SequenceEqual(work.Editions!, Editions!);
+                SequenceEqual(work.editions, editions);
         }
         public override int GetHashCode() => base.GetHashCode();
     }

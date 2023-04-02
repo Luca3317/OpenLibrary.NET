@@ -13,21 +13,29 @@ namespace OpenLibrary.NET
     /// </summary>
     public sealed record OLAuthor : OLContainer
     {
-        [JsonProperty("ID")]
+        [JsonProperty("id")]
         public string ID { get; private set; }
-        [JsonProperty("Data")]
+        [JsonProperty("data")]
         public OLAuthorData? Data { get; init; } = null;
-        [JsonProperty("Works")]
-        public ReadOnlyCollection<OLWorkData>? Works { get; init; } = null;
+        [JsonIgnore]
+        public IReadOnlyList<OLWorkData>? Works
+        {
+            get => works == null ? null : new ReadOnlyCollection<OLWorkData>(works);
+            init { if (value != null) works = value.ToArray(); }
+        }
+
+        [JsonProperty("works")]
+        private OLWorkData[]? works = null;
 
         public OLAuthor(string id) => ID = id;
 
         public bool Equals(OLAuthor? author)
         {
             return author != null &&
+                CompareExtensionData(author.extensionData) &&
                 author.ID == ID &&
                 author.Data == Data &&
-                Enumerable.SequenceEqual(author.Works!, Works!);
+                SequenceEqual(author.Works!, Works!);
         }
         public override int GetHashCode() => base.GetHashCode();
     }

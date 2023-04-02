@@ -7,10 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-/*
- * TODO
- *  Make backing lists in OLData records arrays
- */
 namespace OpenLibrary.NET
 {
     /// <summary>

@@ -25,11 +25,15 @@ namespace OpenLibrary.NET
         [JsonConverter(typeof(OpenLibraryUtility.Serialization.BioConverter))]
         public string Bio { get; init; } = "";
 
-        [JsonProperty("photos")]
-        private List<int> photosIDs { get; init; } = new List<int>();
-
         [JsonIgnore]
-        public ReadOnlyCollection<int> PhotosIDs => photosIDs.AsReadOnly();
+        public IReadOnlyList<int> PhotosIDs
+        {
+            get => new ReadOnlyCollection<int>(photosIDs);
+            init => photosIDs = value.ToArray();
+        }
+
+        [JsonProperty("photos")]
+        private int[] photosIDs { get; init; } = new int[0];
 
         public bool Equals(OLAuthorData? data)
         {

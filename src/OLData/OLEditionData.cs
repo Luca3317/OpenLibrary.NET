@@ -25,41 +25,70 @@ namespace OpenLibrary.NET
         [JsonProperty("identifiers")]
         public OLEditionIdentifiers Identifiers { get; init; } = new OLEditionIdentifiers();
 
-        public ReadOnlyCollection<string> ISBN { get => new ReadOnlyCollection<string>(new List<string>(isbn10.Concat(isbn13))); }
+        [JsonIgnore]
+        public IReadOnlyList<string> ISBN => new ReadOnlyCollection<string>(new List<string>(isbn10.Concat(isbn13)));
 
         [JsonIgnore]
-        public ReadOnlyCollection<string> ISBN10 => isbn10.AsReadOnly();
+        public IReadOnlyList<string> ISBN10
+        {
+            get => new ReadOnlyCollection<string>(isbn10);
+            init => isbn10 = value.ToArray();
+        }
         [JsonIgnore]
-        public ReadOnlyCollection<string> ISBN13 => isbn13.AsReadOnly();
+        public IReadOnlyList<string> ISBN13
+        {
+            get => new ReadOnlyCollection<string>(isbn13);
+            init => isbn13 = value.ToArray();
+        }
+
+        [JsonIgnore]
+        public IReadOnlyList<string> AuthorKeys
+        {
+            get => new ReadOnlyCollection<string>(authors);
+            init => authors = value.ToArray();
+        }
+        [JsonIgnore]
+        public IReadOnlyList<int> CoverKeys
+        {
+            get => new ReadOnlyCollection<int>(coverKeys);
+            init => coverKeys = value.ToArray();
+        }
+        [JsonIgnore]
+        public IReadOnlyList<string> WorkKeys
+        {
+            get => new ReadOnlyCollection<string>(workKeys);
+            init => workKeys = value.ToArray();
+        }
+        [JsonIgnore]
+        public IReadOnlyList<string> Subjects
+        {
+            get => new ReadOnlyCollection<string>(subjects);
+            init => subjects = value.ToArray();
+        }
+        [JsonIgnore]
+        public IReadOnlyList<string> Publishers
+        {
+            get => new ReadOnlyCollection<string>(publishers);
+            init => publishers = value.ToArray();
+        }
 
         [JsonProperty("isbn_10")]
-        private List<string> isbn10 { get; init; } = new List<string>();
+        private string[] isbn10 { get; init; } = new string[0];
         [JsonProperty("isbn_13")]
-        private List<string> isbn13 { get; init; } = new List<string>();
-
-        [JsonIgnore]
-        public ReadOnlyCollection<string> AuthorKeys => new ReadOnlyCollection<string>(authors);
-        [JsonIgnore]
-        public ReadOnlyCollection<int> CoverKeys => new ReadOnlyCollection<int>(coverKeys);
-        [JsonIgnore]
-        public ReadOnlyCollection<string> WorkKeys => new ReadOnlyCollection<string>(workKeys);
-        [JsonIgnore]
-        public ReadOnlyCollection<string> Subjects => new ReadOnlyCollection<string>(subjects);
-        [JsonIgnore]
-        public ReadOnlyCollection<string> Publishers => new ReadOnlyCollection<string>(publishers);
+        private string[] isbn13 { get; init; } = new string[0];
 
         [JsonProperty("authors")]
         [JsonConverter(typeof(OpenLibraryUtility.Serialization.EditionsAuthorsKeysConverter))]
-        private List<string> authors { get; init; } = new List<string>();
+        private string[] authors { get; init; } = new string[0];
         [JsonProperty("covers")]
-        private List<int> coverKeys { get; init; } = new List<int>();
+        private int[] coverKeys { get; init; } = new int[0];
         [JsonProperty("works")]
         [JsonConverter(typeof(OpenLibraryUtility.Serialization.WorksKeysConverter))]
-        private List<string> workKeys { get; init; } = new List<string>();
+        private string[] workKeys { get; init; } = new string[0];
         [JsonProperty("subjects")]
-        private List<string> subjects { get; init; } = new List<string>();
+        private string[] subjects { get; init; } = new string[0];
         [JsonProperty("publishers")]
-        private List<string> publishers { get; init; } = new List<string>();
+        private string[] publishers { get; init; } = new string[0];
 
         public bool Equals(OLEditionData? data)
         {

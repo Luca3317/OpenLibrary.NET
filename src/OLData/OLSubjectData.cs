@@ -19,10 +19,14 @@ namespace OpenLibrary.NET
         public int WorkCount { get; init; } = -1;
 
         [JsonIgnore]
-        public ReadOnlyCollection<OLWorkData> Works => works.AsReadOnly();
+        public IReadOnlyList<OLWorkData> Works
+        {
+            get => new ReadOnlyCollection<OLWorkData>(works);
+            init => works = value.ToArray();
+        }
 
         [JsonProperty("works")]
-        private List<OLWorkData> works { get; init; } = new List<OLWorkData>();
+        private OLWorkData[] works { get; init; } = new OLWorkData[0];
 
         public bool Equals(OLSubjectData? data)
         {

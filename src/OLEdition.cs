@@ -1,14 +1,5 @@
 ﻿using Newtonsoft.Json;
 
-/*
- * Represent OpenLibrary objects, being aggregates of multiple requests.
- * 
- * TODO
- * tryget in loaders DONE
- * Add builders to these
- * Make loaders sub classes of the objects? ie OLWork.Loader.getratingsasync
- */
-
 namespace OpenLibrary.NET
 {
     /// <summary>
@@ -16,9 +7,9 @@ namespace OpenLibrary.NET
     /// </summary>
     public sealed record OLEdition : OLContainer
     {
-        [JsonProperty("ID")]
+        [JsonProperty("id")]
         public string ID { get; private set; }
-        [JsonProperty("Data")]
+        [JsonProperty("data")]
         public OLEditionData? Data { get; init; } = null;
 
         public OLEdition(string id) => ID = id;
@@ -26,6 +17,7 @@ namespace OpenLibrary.NET
         public bool Equals(OLEdition? edition)
         {
             return edition != null &&
+                CompareExtensionData(edition.extensionData) &&
                 edition.ID == ID &&
                 edition.Data == Data;
         }

@@ -22,23 +22,35 @@ namespace OpenLibrary.NET
         public string Description { get; init; } = "";
 
         [JsonIgnore]
-        public ReadOnlyCollection<string> Subjects => subjects.AsReadOnly();
+        public IReadOnlyList<string> Subjects
+        {
+            get => new ReadOnlyCollection<string>(subjects);
+            init => subjects = value.ToArray();
+        }
         [JsonIgnore]
-        public ReadOnlyCollection<string> AuthorKeys => authors.AsReadOnly();
+        public IReadOnlyList<string> AuthorKeys
+        {
+            get => new ReadOnlyCollection<string>(authors);
+            init => authors = value.ToArray();
+        }
         [JsonIgnore]
-        public ReadOnlyCollection<int> CoverKeys => coverKeys.AsReadOnly();
+        public IReadOnlyList<int> CoverKeys
+        {
+            get => new ReadOnlyCollection<int>(coverKeys);
+            init => coverKeys = value.ToArray();
+        }
 
         [JsonProperty("subjects")]
-        public List<string> subjects { get; set; } = new List<string>();
+        private string[] subjects { get; init; } = new string[0];
         [JsonProperty("authors")]
         [JsonConverter(typeof(OpenLibraryUtility.Serialization.AuthorsKeysConverter))]
-        private List<string> authors { get; set; } = new List<string>();
+        private string[] authors { get; init; } = new string[0];
         [JsonProperty("covers")]
-        private List<int> coverKeys { get; init; } = new List<int>();
+        private int[] coverKeys { get; init; } = new int[0];
 
         // Aliases
         [JsonProperty("subject")]
-        private List<string> subjectsSubjects { init => subjects = value; }
+        private string[] subjectsSubjects { init => subjects = value; }
         //[JsonProperty("cover_id")]
         //private int subjectsCover { init => coverKeys.Add(value); }
 

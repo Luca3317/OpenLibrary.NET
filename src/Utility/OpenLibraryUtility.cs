@@ -170,72 +170,60 @@ namespace OpenLibrary.NET
                 }
             }
 
-            public class WorksKeysConverter : JsonConverter<List<string>>
+            public class WorksKeysConverter : JsonConverter<string[]>
             {
-                public override List<string>? ReadJson(JsonReader reader, Type objectType, List<string>? existingValue, bool hasExistingValue, JsonSerializer serializer)
+                public override string[]? ReadJson(JsonReader reader, Type objectType, string[]? existingValue, bool hasExistingValue, JsonSerializer serializer)
                 {
-                    if (existingValue == null) existingValue = new List<string>();
-
                     if (reader.TokenType == JsonToken.StartArray)
                     {
                         JArray array = JArray.Load(reader);
-
                         if (array.Count == 0) return existingValue;
 
                         if (array[0].Type == JTokenType.String)
                         {
-                            foreach (JToken value in array)
-                                existingValue.Add(value.ToString());
-
-                            return existingValue;
+                            return array.ToObject<string[]>();
                         }
                         else if (array[0].Type == JTokenType.Object)
                         {
+                            List<string> strings = new List<string>();
                             foreach (JToken value in array)
                             {
                                 JToken? authorToken = value["key"];
                                 if (authorToken == null) throw new JsonException();
-                                existingValue.Add(authorToken.ToString());
+                                strings.Add(authorToken.ToString());
                             }
 
-                            return existingValue;
+                            return strings.ToArray();
                         }
                     }
 
                     throw new JsonException();
                 }
 
-                public override void WriteJson(JsonWriter writer, List<string>? value, JsonSerializer serializer)
+                public override void WriteJson(JsonWriter writer, string[]? value, JsonSerializer serializer)
                 {
                     serializer.Serialize(writer, value);
                 }
             }
 
-            public class AuthorsKeysConverter : JsonConverter<List<string>>
+            public class AuthorsKeysConverter : JsonConverter<string[]>
             {
-                public override List<string>? ReadJson(JsonReader reader, Type objectType, List<string>? existingValue, bool hasExistingValue, JsonSerializer serializer)
+                public override string[]? ReadJson(JsonReader reader, Type objectType, string[]? existingValue, bool hasExistingValue, JsonSerializer serializer)
                 {
-                    if (existingValue == null) existingValue = new List<string>();
-
                     if (reader.TokenType == JsonToken.String)
                     {
-                        existingValue.Add(reader.Value!.ToString()!);
-                        return existingValue;
+                        return new string[1] { reader.Value!.ToString()! };
                     }
                     else if (reader.TokenType == JsonToken.StartArray)
                     {
                         JArray array = JArray.Load(reader);
                         if (array[0].Type == JTokenType.String)
                         {
-                            foreach (JToken value in array)
-                            {
-                                existingValue.Add(value.ToString());
-                            }
-
-                            return existingValue;
+                            return array.ToObject<string[]>();
                         }
                         else if (array[0].Type == JTokenType.Object)
                         {
+                            List<string> strings = new List<string>();
                             foreach (JToken value in array)
                             {
                                 JToken? authorToken = value["author"];
@@ -244,58 +232,53 @@ namespace OpenLibrary.NET
                                     authorToken = value["key"];
                                     if (authorToken == null) throw new JsonException();
                                 }
-                                existingValue.Add(authorToken.ToString());
+                                strings.Add(authorToken.ToString());
                             }
 
-                            return existingValue;
+                            return strings.ToArray();
                         }
                     }
 
                     throw new JsonException();
                 }
 
-                public override void WriteJson(JsonWriter writer, List<string>? value, JsonSerializer serializer)
+                public override void WriteJson(JsonWriter writer, string[]? value, JsonSerializer serializer)
                 {
                     serializer.Serialize(writer, value);
                 }
             }
 
-            public class EditionsAuthorsKeysConverter : JsonConverter<List<string>>
+            public class EditionsAuthorsKeysConverter : JsonConverter<string[]>
             {
-                public override List<string>? ReadJson(JsonReader reader, Type objectType, List<string>? existingValue, bool hasExistingValue, JsonSerializer serializer)
+                public override string[]? ReadJson(JsonReader reader, Type objectType, string[]? existingValue, bool hasExistingValue, JsonSerializer serializer)
                 {
-                    if (existingValue == null) existingValue = new List<string>();
-
                     if (reader.TokenType == JsonToken.StartArray)
                     {
                         JArray array = JArray.Load(reader);
-
-                        if (array.Count == 0) return existingValue;
+                        if (array.Count == 0) return new string[0];
 
                         if (array[0].Type == JTokenType.String)
                         {
-                            foreach (JToken value in array)
-                                existingValue.Add(value.ToString());
-
-                            return existingValue;
+                            return array.ToObject<string[]>();
                         }
                         else if (array[0].Type == JTokenType.Object)
                         {
+                            List<string> strings = new List<string>();
                             foreach (JToken value in array)
                             {
                                 JToken? authorToken = value["key"];
-                                if (authorToken == null) throw new JsonException();
-                                existingValue.Add(authorToken.ToString());
+                                if (authorToken == null) if (authorToken == null) throw new JsonException();
+                                strings.Add(authorToken.ToString());
                             }
 
-                            return existingValue;
+                            return strings.ToArray();
                         }
                     }
 
                     throw new JsonException();
                 }
 
-                public override void WriteJson(JsonWriter writer, List<string>? value, JsonSerializer serializer)
+                public override void WriteJson(JsonWriter writer, string[]? value, JsonSerializer serializer)
                 {
                     serializer.Serialize(writer, value);
                 }
