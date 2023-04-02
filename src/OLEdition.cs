@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using System.Security.Cryptography;
+using System.Xml.Linq;
 
 namespace OpenLibrary.NET
 {
@@ -7,12 +9,36 @@ namespace OpenLibrary.NET
     /// </summary>
     public sealed record OLEdition : OLContainer
     {
-        [JsonProperty("id")]
-        public string ID { get; private set; }
-        [JsonProperty("data")]
-        public OLEditionData? Data { get; init; } = null;
+        [JsonIgnore]
+        public string ID => _id;
+        [JsonIgnore]
+        public OLEditionData? Data
+        {
+            get => _data;
+            init => _data = value;
+        }
 
-        public OLEdition(string id) => ID = id;
+        public OLEdition(string id) => _id = id;
+
+        public async Task<(bool, OLEditionData?)> TryGetDataAsync()
+        {
+            try { return (true, await GetDataAsync()); }
+            catch { return (false, null); }
+        }
+        public async Task<OLEditionData?> GetDataAsync()
+        {
+            if (_data == null)
+            {
+                (bool success, var data) = await OLEditionLoader.TryGetDataAsync(_id);
+                if (success) _data = data;
+            }
+            return _data;
+        }
+
+        [JsonProperty("id")]
+        private string _id;
+        [JsonProperty("data")]
+        private OLEditionData? _data = null;
 
         public bool Equals(OLEdition? edition)
         {
