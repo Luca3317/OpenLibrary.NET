@@ -33,4 +33,4 @@ OLWorkData[] works = await OLAuthorLoader.GetWorksAsync("OL7715527A", parameters
 ```
 
 For valid parameters, see the link above.
-Alternatively, see [OpenLibraryUtility](https://github.com/Luca3317/OpenLibrary.NET/blob/main/src/Utility/OpenLibraryUtility.cs).
+Alternatively, see [OpenLibraryUtility's Maps](https://github.com/Luca3317/OpenLibrary.NET/blob/main/docs/Utilities.md#Maps).
