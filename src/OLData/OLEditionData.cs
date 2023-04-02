@@ -90,6 +90,33 @@ namespace OpenLibrary.NET
         [JsonProperty("publishers")]
         private string[] publishers { get; init; } = new string[0];
 
+        /// <summary>
+        /// Holds the various identifiers of an edition.
+        /// </summary>
+        public sealed record OLEditionIdentifiers : OLContainer
+        {
+            [JsonIgnore]
+            public ReadOnlyCollection<string> Goodreads => goodreads.AsReadOnly();
+            [JsonIgnore]
+            public ReadOnlyCollection<string> LibraryThing => libraryThing.AsReadOnly();
+
+            [JsonProperty("goodreads")]
+            private List<string> goodreads { get; init; } = new List<string>();
+            [JsonProperty("librarything")]
+            private List<string> libraryThing { get; init; } = new List<string>();
+
+            public bool Equals(OLEditionIdentifiers? data)
+            {
+                return
+                    data != null &&
+                    CompareExtensionData(data.extensionData) &&
+                    SequenceEqual(this.goodreads, data.goodreads) &&
+                    SequenceEqual(this.libraryThing, data.libraryThing);
+            }
+
+            public override int GetHashCode() => base.GetHashCode();
+        }
+
         public bool Equals(OLEditionData? data)
         {
             return
@@ -110,30 +137,5 @@ namespace OpenLibrary.NET
         }
 
         public override int GetHashCode() => base.GetHashCode();
-
-        /// <summary>
-        /// Holds the various identifiers of an edition.
-        /// </summary>
-        public sealed record OLEditionIdentifiers : OLContainer
-        {
-            public ReadOnlyCollection<string> Goodreads => goodreads.AsReadOnly();
-            public ReadOnlyCollection<string> LibraryThing => libraryThing.AsReadOnly();
-
-            [JsonProperty("goodreads")]
-            private List<string> goodreads { get; init; } = new List<string>();
-            [JsonProperty("librarything")]
-            private List<string> libraryThing { get; init; } = new List<string>();
-
-            public bool Equals(OLEditionIdentifiers? data)
-            {
-                return
-                    data != null &&
-                    CompareExtensionData(data.extensionData) &&
-                    SequenceEqual(this.goodreads, data.goodreads) &&
-                    SequenceEqual(this.libraryThing, data.libraryThing);
-            }
-
-            public override int GetHashCode() => base.GetHashCode();
-        }
     }
 }
