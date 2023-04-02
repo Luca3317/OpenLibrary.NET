@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using OpenLibrary.NET;
+using System.Text.RegularExpressions;
 
 namespace OpenLibrary.NET
 {
@@ -17,6 +18,12 @@ namespace OpenLibrary.NET
         public const string BaseURL = "https://openlibrary.org/";
         public const string BaseURL_Covers = "https://covers.openlibrary.org/";
         #endregion
+
+        // TODO Make more robust; rn will just remove /xyz/
+        public static string ExtractIdFromKey(string key)
+        {
+            return Regex.Replace(key, "[/[a-zA-Z]*/]*", "");
+        }
 
         /* Helper functions for correctly formatting OpenLibrary request URLs. 
          */

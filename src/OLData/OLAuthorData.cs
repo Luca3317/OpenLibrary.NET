@@ -13,6 +13,9 @@ namespace OpenLibrary.NET
     /// </summary>
     public sealed record OLAuthorData : OLContainer
     {
+        [JsonIgnore]
+        public string ID => OpenLibraryUtility.ExtractIdFromKey(Key);
+
         [JsonProperty("key")]
         public string Key { get; init; } = "";
         [JsonProperty("name")]
