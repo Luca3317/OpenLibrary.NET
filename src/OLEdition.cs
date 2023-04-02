@@ -27,11 +27,7 @@ namespace OpenLibrary.NET
         }
         public async Task<OLEditionData?> GetDataAsync()
         {
-            if (_data == null)
-            {
-                (bool success, var data) = await OLEditionLoader.TryGetDataAsync(_id);
-                if (success) _data = data;
-            }
+            if (_data == null) _data = await OLEditionLoader.GetDataAsync(_id);
             return _data;
         }
 

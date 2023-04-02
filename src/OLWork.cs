@@ -50,11 +50,7 @@ namespace OpenLibrary.NET
         }
         public async Task<OLWorkData?> GetDataAsync()
         {
-            if (_data == null)
-            {
-                (bool success, var data) = await OLWorkLoader.TryGetDataAsync(_id);
-                if (success) _data = data;
-            }
+            if (_data == null) _data = await OLWorkLoader.GetDataAsync(_id);
             return _data;
         }
 
@@ -65,11 +61,8 @@ namespace OpenLibrary.NET
         }
         public async Task<OLRatingsData?> GetRatingsAsync()
         {
-            if (_ratings == null)
-            {
-                (bool success, var ratings) = await OLWorkLoader.TryGetRatingsAsync(_id);
-                if (success) _ratings = ratings;
-            }
+            if (_ratings == null) _ratings = await OLWorkLoader.GetRatingsAsync(_id);
+
             return _ratings;
         }
 
@@ -80,11 +73,7 @@ namespace OpenLibrary.NET
         }
         public async Task<OLBookshelvesData?> GetBookshelvesAsync()
         {
-            if (_bookshelves == null)
-            {
-                (bool success, var bookshelves) = await OLWorkLoader.TryGetBookshelvesAsync(_id);
-                if (success) _bookshelves = bookshelves;
-            }
+            if (_bookshelves == null) _bookshelves = await OLWorkLoader.GetBookshelvesAsync(_id);
             return _bookshelves;
         }
 

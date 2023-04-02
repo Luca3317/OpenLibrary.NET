@@ -38,11 +38,7 @@ namespace OpenLibrary.NET
         }
         public async Task<OLAuthorData?> GetDataAsync()
         {
-            if (_data == null)
-            {
-                (bool success, var data) = await OLAuthorLoader.TryGetDataAsync(_id);
-                if (success) _data = data;
-            }
+            if (_data == null) _data = await OLAuthorLoader.GetDataAsync(_id);
             return _data;
         }
 
