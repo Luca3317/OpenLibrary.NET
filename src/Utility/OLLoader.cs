@@ -73,6 +73,26 @@ namespace OpenLibrary.NET
                 "entries"
             );
         }
+
+        public async static Task<(bool, int?)> TryGetEditionsCountAsync(string id)
+        {
+            try { return (true, await GetEditionsCountAsync(id)); }
+            catch { return (false, null); }
+        }
+        public async static Task<int?> GetEditionsCountAsync(string id)
+        {
+            return await OpenLibraryUtility.LoadAsync<int>
+            (
+                OpenLibraryUtility.BuildURL
+                (
+                    OLRequestAPI.Books_Works,
+                    id,
+                    "editions",
+                    new KeyValuePair<string, string>("limit", "0")
+                ),
+                "size"
+            );
+        }
     }
 
     public static class OLEditionLoader
@@ -144,6 +164,26 @@ namespace OpenLibrary.NET
                     parameters
                 ),
                 "entries"
+            );
+        }
+
+        public async static Task<(bool, int?)> TryGetWorksCountAsync(string id)
+        {
+            try { return (true, await GetWorksCountAsync(id)); }
+            catch { return (false, null); }
+        }
+        public async static Task<int?> GetWorksCountAsync(string id)
+        {
+            return await OpenLibraryUtility.LoadAsync<int>
+            (
+                OpenLibraryUtility.BuildURL
+                (
+                    OLRequestAPI.Authors,
+                    id,
+                    "works",
+                    new KeyValuePair<string, string>("limit", "0")
+                ),
+                "size"
             );
         }
     }
