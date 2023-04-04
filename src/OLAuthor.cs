@@ -14,22 +14,21 @@ namespace OpenLibrary.NET
         [JsonIgnore]
         public int WorksRequested => _works == null ? 0 : _works.Count;
         [JsonIgnore]
-        public int? TotalWorks => _totalWorks;
+        public int TotalWorks => _totalWorks;
 
         [JsonIgnore]
-        public OLAuthorData? Data
-        {
-            get => _data;
-            init => _data = value;
-        }
+        public OLAuthorData? Data => _data;
         [JsonIgnore]
-        public IReadOnlyList<OLWorkData>? Works
-        {
-            get => _works == null ? null : new ReadOnlyCollection<OLWorkData>(_works);
-            init { _works = value?.ToList(); }
-        }
+        public IReadOnlyList<OLWorkData>? Works => _works == null ? null : new ReadOnlyCollection<OLWorkData>(_works);
 
+        [JsonConstructor]
         public OLAuthor(string id) => _id = id;
+
+        public OLAuthor(OLAuthorData data)
+        {
+            _id = data.ID;
+            _data = data;
+        }
 
         public async Task<(bool, OLAuthorData?)> TryGetDataAsync()
         {
@@ -49,8 +48,8 @@ namespace OpenLibrary.NET
         }
         public async Task<IReadOnlyList<OLWorkData>?> RequestWorksAsync(int amount)
         {
-            if (_totalWorks != null && _totalWorks > amount)
-                amount = _totalWorks.Value;
+            if (_totalWorks != -1 && _totalWorks > amount)
+                amount = _totalWorks;
 
             if (_works == null)
             {
@@ -86,9 +85,9 @@ namespace OpenLibrary.NET
             try { return (true, await GetTotalWorksCountAsync()); }
             catch { return (false, null); }
         }
-        public async Task<int?> GetTotalWorksCountAsync()
+        public async Task<int> GetTotalWorksCountAsync()
         {
-            if (_totalWorks == null) _totalWorks = await OLAuthorLoader.GetWorksCountAsync(_id);
+            if (_totalWorks == -1) _totalWorks = await OLAuthorLoader.GetWorksCountAsync(_id);
             return _totalWorks;
         }
 
@@ -99,7 +98,7 @@ namespace OpenLibrary.NET
         [JsonProperty("works")]
         private List<OLWorkData>? _works = null;
         [JsonProperty("total_works")]
-        private int? _totalWorks = null;
+        private int _totalWorks = -1;
 
         public bool Equals(OLAuthor? author)
         {

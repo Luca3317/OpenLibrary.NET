@@ -12,13 +12,16 @@ namespace OpenLibrary.NET
         [JsonIgnore]
         public string ID => _id;
         [JsonIgnore]
-        public OLEditionData? Data
-        {
-            get => _data;
-            init => _data = value;
-        }
+        public OLEditionData? Data => _data;
 
+        [JsonConstructor]
         public OLEdition(string id) => _id = id;
+
+        public OLEdition(OLEditionData data)
+        {
+            _id = data.ID;
+            _data = data;
+        }
 
         public async Task<(bool, OLEditionData?)> TryGetDataAsync()
         {

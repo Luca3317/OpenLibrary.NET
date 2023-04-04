@@ -79,7 +79,7 @@ namespace OpenLibrary.NET
             try { return (true, await GetEditionsCountAsync(id)); }
             catch { return (false, null); }
         }
-        public async static Task<int?> GetEditionsCountAsync(string id)
+        public async static Task<int> GetEditionsCountAsync(string id)
         {
             return await OpenLibraryUtility.LoadAsync<int>
             (
@@ -172,7 +172,7 @@ namespace OpenLibrary.NET
             try { return (true, await GetWorksCountAsync(id)); }
             catch { return (false, null); }
         }
-        public async static Task<int?> GetWorksCountAsync(string id)
+        public async static Task<int> GetWorksCountAsync(string id)
         {
             return await OpenLibraryUtility.LoadAsync<int>
             (

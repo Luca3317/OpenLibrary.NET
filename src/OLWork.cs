@@ -14,34 +14,25 @@ namespace OpenLibrary.NET
         [JsonIgnore]
         public int EditionsRequested => _editions == null ? 0 : _editions.Count;
         [JsonIgnore]
-        public int? TotalEditions => _totalEditionsCount;
+        public int TotalEditions => _totalEditionsCount;
 
         [JsonIgnore]
-        public OLWorkData? Data
-        {
-            get => _data;
-            init => _data = value;
-        }
+        public OLWorkData? Data => _data;
         [JsonIgnore]
-        public OLRatingsData? Ratings
-        {
-            get => _ratings;
-            init => _ratings = value;
-        }
+        public OLRatingsData? Ratings => _ratings;
         [JsonIgnore]
-        public OLBookshelvesData? Bookshelves
-        {
-            get => _bookshelves;
-            init => _bookshelves = value;
-        }
+        public OLBookshelvesData? Bookshelves => _bookshelves;
         [JsonIgnore]
-        public IReadOnlyList<OLEditionData>? Editions
-        {
-            get => _editions == null ? null : new ReadOnlyCollection<OLEditionData>(_editions);
-            init => _editions = value?.ToList();
-        }
+        public IReadOnlyList<OLEditionData>? Editions => _editions == null ? null : new ReadOnlyCollection<OLEditionData>(_editions);
 
+        [JsonConstructor]
         public OLWork(string id) => _id = id;
+
+        public OLWork(OLWorkData data)
+        {
+            _id = data.ID;
+            _data = data;
+        }
 
         public async Task<(bool, OLWorkData?)> TryGetDataAsync()
         {
@@ -84,8 +75,8 @@ namespace OpenLibrary.NET
         }
         public async Task<IReadOnlyList<OLEditionData>?> RequestEditionsAsync(int amount)
         {
-            if (_totalEditionsCount != null && _totalEditionsCount > amount)
-                amount = _totalEditionsCount.Value;
+            if (_totalEditionsCount != -1 && _totalEditionsCount > amount)
+                amount = _totalEditionsCount;
 
             if (_editions == null)
             {
@@ -121,9 +112,9 @@ namespace OpenLibrary.NET
             try { return (true, await GetTotalEditionCountAsync()); }
             catch { return (false, null); }
         }
-        public async Task<int?> GetTotalEditionCountAsync()
+        public async Task<int> GetTotalEditionCountAsync()
         {
-            if (_totalEditionsCount == null) _totalEditionsCount = await OLWorkLoader.GetEditionsCountAsync(_id);
+            if (_totalEditionsCount == -1) _totalEditionsCount = await OLWorkLoader.GetEditionsCountAsync(_id);
             return _totalEditionsCount;
         }
 
@@ -138,7 +129,7 @@ namespace OpenLibrary.NET
         [JsonProperty("editions")]
         private List<OLEditionData>? _editions = null;
         [JsonProperty("total_editions")]
-        private int? _totalEditionsCount = null;
+        private int _totalEditionsCount = -1;
 
         public bool Equals(OLWork? work)
         {
