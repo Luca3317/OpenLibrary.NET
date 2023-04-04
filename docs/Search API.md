@@ -3,7 +3,7 @@
 
 The Search API allows to search OpenLibrary for books, authors, subjects and lists.
 
-For more usage examples of this API, see [MiscellaneousExamples](https://github.com/Luca3317/OpenLibrary.NET/blob/main/examples/MiscellaneousExamples.cs)
+For more usage examples of this API, see [MiscellaneousExamples](https://github.com/Luca3317/OpenLibrary.NET/blob/main/examples/MiscellaneousExamples.cs).
 ***
 
 To get a search query's result, use the static OLSearchLoader class:

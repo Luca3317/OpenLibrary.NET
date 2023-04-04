@@ -3,7 +3,7 @@
 
 The Authors API serves to get information pertaining to an author and their body of work.
 
-For more usage examples of this API, see [AuthorAPIExamples](https://github.com/Luca3317/OpenLibrary.NET/blob/main/examples/AuthorAPIExamples.cs)
+For more usage examples of this API, see [AuthorAPIExamples](https://github.com/Luca3317/OpenLibrary.NET/blob/main/examples/AuthorAPIExamples.cs).
 ***
 
 OLAuthor serves to combine storage of the various requests supported by the authors API.
