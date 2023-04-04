@@ -97,12 +97,12 @@ namespace OpenLibrary.NET
 
     public static class OLEditionLoader
     {
-        public async static Task<(bool, OLEditionData?)> TryGetDataAsync(string id)
+        public async static Task<(bool, OLEditionData?)> TryGetDatabyOLIDAsync(string id)
         {
-            try { return (true, await GetDataAsync(id)); }
+            try { return (true, await GetDataByOLIDAsync(id)); }
             catch { return (false, null); }
         }
-        public async static Task<OLEditionData?> GetDataAsync(string id)
+        public async static Task<OLEditionData?> GetDataByOLIDAsync(string id)
         {
             return await OpenLibraryUtility.LoadAsync<OLEditionData>
             (
@@ -114,9 +114,9 @@ namespace OpenLibrary.NET
             );
         }
 
-        public async static Task<(bool, OLEditionData?)> TryGetDataByISBNAsync(string id)
+        public async static Task<(bool, OLEditionData?)> TryGetDataByISBNAsync(string isbn)
         {
-            try { return (true, await GetDataByISBNAsync(id)); }
+            try { return (true, await GetDataByISBNAsync(isbn)); }
             catch { return (false, null); }
         }
         public async static Task<OLEditionData?> GetDataByISBNAsync(string id)
@@ -217,7 +217,7 @@ namespace OpenLibrary.NET
             (
                 await OpenLibraryUtility.RequestAsync(OpenLibraryUtility.BuildURL
                 (
-                    OLRequestAPI.Covers, 
+                    OLRequestAPI.Covers,
                     id,
                     parameters: new KeyValuePair<string, string>("default", "false")
                 ))
@@ -238,7 +238,7 @@ namespace OpenLibrary.NET
             (
                 await OpenLibraryUtility.RequestAsync(OpenLibraryUtility.BuildURL
                 (
-                    OLRequestAPI.AuthorPhotos, 
+                    OLRequestAPI.AuthorPhotos,
                     id,
                     parameters: new KeyValuePair<string, string>("default", "false")
                 ))
