@@ -30,7 +30,7 @@ OLWorkData workData {
 All OLData record classes implement JsonExtensionData. Therefore, fields that may not be supported by the class structure can still be accessed.
 
 ***
-### OLWork and OLAuthor
+### OLWork, OLAuthor, OLEdition
 Some OpenLibrary APIs allow for various types of requests related to a common object.
 
 For example, the works API can also be used to make requests for the ratings, "bookshelves", and editions of a work.
@@ -66,4 +66,4 @@ Console.WriteLine(work.Data == null); // false
 ```
 The authors API has its equivalent with the [OLAuthor](https://github.com/Luca3317/OpenLibrary.NET/blob/main/src/OLAuthor.cs) record class.
 
-As with the OLData classes, both OLWork and OLAuthor implement JsonExtensionData.
+The editions API has its equivalent with the [OLEditon](https://github.com/Luca3317/OpenLibrary.NET/blob/main/src/OLEdition.cs) record class. OLEdition also has additional methods to get its cover.
