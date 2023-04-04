@@ -213,7 +213,15 @@ namespace OpenLibrary.NET
         }
         public async static Task<byte[]> GetCoverAsync(string id)
         {
-            return Encoding.ASCII.GetBytes(await OpenLibraryUtility.RequestAsync(OpenLibraryUtility.BuildURL(OLRequestAPI.Covers, id)));
+            return Encoding.ASCII.GetBytes
+            (
+                await OpenLibraryUtility.RequestAsync(OpenLibraryUtility.BuildURL
+                (
+                    OLRequestAPI.Covers, 
+                    id,
+                    parameters: new KeyValuePair<string, string>("default", "false")
+                ))
+            );
         }
 
         public async static Task<(bool, byte[]?)> TryGetCoverAsync(string idType, string id, string size) => await TryGetCoverAsync(idType + "/" + id + "-" + size);
@@ -226,7 +234,15 @@ namespace OpenLibrary.NET
         }
         public async static Task<byte[]> GetAuthorPhotoAsync(string id)
         {
-            return Encoding.ASCII.GetBytes(await OpenLibraryUtility.RequestAsync(OpenLibraryUtility.BuildURL(OLRequestAPI.AuthorPhotos, id)));
+            return Encoding.ASCII.GetBytes
+            (
+                await OpenLibraryUtility.RequestAsync(OpenLibraryUtility.BuildURL
+                (
+                    OLRequestAPI.AuthorPhotos, 
+                    id,
+                    parameters: new KeyValuePair<string, string>("default", "false")
+                ))
+            );
         }
 
         public async static Task<(bool, byte[]?)> TryGetAuthorPhotoAsync(string idType, string id, string size) => await TryGetAuthorPhotoAsync(idType + "/" + id + "-" + size);
