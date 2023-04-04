@@ -2,6 +2,8 @@
 ### [Documentation on the OpenLibrary covers API (Note the warnings about rate limiting and bulk downloads)](https://openlibrary.org/dev/docs/api/covers)
 
 The Covers API serves to get book covers and author photos.
+
+For more usage examples of this API, see [MiscellaneousExamples](https://github.com/Luca3317/OpenLibrary.NET/blob/main/examples/MiscellaneousExamples.cs)
 ***
 
 ### Book Covers

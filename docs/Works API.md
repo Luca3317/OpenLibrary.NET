@@ -2,6 +2,8 @@
 ### [Documentation on the OpenLibrary works API](https://openlibrary.org/dev/docs/api/books)
 
 The Works API serves to get information pertaining to a work and its editions.
+
+For more usage examples of this API, see [WorkAPIExamples](https://github.com/Luca3317/OpenLibrary.NET/blob/main/examples/WorkAPIExamples.cs)
 ***
 
 OLWork serves to combine storage of the various requests supported by the works API.
