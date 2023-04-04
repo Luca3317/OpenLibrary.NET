@@ -48,7 +48,7 @@ namespace OpenLibrary.NET
                 this.BirthDate == data.BirthDate &&
                 this.DeathDate == data.DeathDate &&
                 this.Bio == data.Bio &&
-                SequenceEqual(this.photosIDs, data.photosIDs);
+                GeneralUtility.SequenceEqual(this.photosIDs, data.photosIDs);
         }
 
         public override int GetHashCode() => base.GetHashCode();

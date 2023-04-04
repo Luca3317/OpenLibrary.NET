@@ -113,8 +113,8 @@ namespace OpenLibrary.NET
                 return
                     data != null &&
                     CompareExtensionData(data.extensionData) &&
-                    SequenceEqual(this.goodreads, data.goodreads) &&
-                    SequenceEqual(this.libraryThing, data.libraryThing);
+                    GeneralUtility.SequenceEqual(this.goodreads, data.goodreads) &&
+                    GeneralUtility.SequenceEqual(this.libraryThing, data.libraryThing);
             }
 
             public override int GetHashCode() => base.GetHashCode();
@@ -130,13 +130,13 @@ namespace OpenLibrary.NET
                 this.Description == data.Description &&
                 this.PageCount == data.PageCount &&
                 this.Identifiers == data.Identifiers &&
-                SequenceEqual(this.isbn10, data.isbn10) &&
-                SequenceEqual(this.isbn13, data.isbn13) &&
-                SequenceEqual(this.authors, data.authors) &&
-                SequenceEqual(this.coverKeys, data.coverKeys) &&
-                SequenceEqual(this.workKeys, data.workKeys) &&
-                SequenceEqual(this.subjects, data.subjects) &&
-                SequenceEqual(this.publishers, data.publishers);
+                GeneralUtility.SequenceEqual(this.isbn10, data.isbn10) &&
+                GeneralUtility.SequenceEqual(this.isbn13, data.isbn13) &&
+                GeneralUtility.SequenceEqual(this.authors, data.authors) &&
+                GeneralUtility.SequenceEqual(this.coverKeys, data.coverKeys) &&
+                GeneralUtility.SequenceEqual(this.workKeys, data.workKeys) &&
+                GeneralUtility.SequenceEqual(this.subjects, data.subjects) &&
+                GeneralUtility.SequenceEqual(this.publishers, data.publishers);
         }
 
         public override int GetHashCode() => base.GetHashCode();

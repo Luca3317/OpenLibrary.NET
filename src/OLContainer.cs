@@ -29,12 +29,5 @@ namespace OpenLibrary.NET
             if (extensionData == null || data == null) return false;
             return Enumerable.SequenceEqual(extensionData.Keys, data.Keys);
         }
-
-        protected bool SequenceEqual<T>(IEnumerable<T>? first, IEnumerable<T>? second)
-        {
-            if (first == null && second == null) return true;
-            if (first == null || second == null) return false;
-            return Enumerable.SequenceEqual(first, second);
-        }
     }
 }

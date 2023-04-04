@@ -6,7 +6,7 @@ namespace OpenLibrary.NET
     /// <summary>
     /// Represents an (OpenLibrary) work.
     /// </summary>
-    public sealed record OLWork : OLContainer
+    public sealed record OLWork
     {
         [JsonIgnore]
         public string ID => _id;
@@ -134,12 +134,11 @@ namespace OpenLibrary.NET
         public bool Equals(OLWork? work)
         {
             return work != null &&
-                CompareExtensionData(work.extensionData) &&
                 work._id == _id &&
                 work._data == _data &&
                 work._ratings == _ratings &&
                 work._bookshelves == _bookshelves &&
-                SequenceEqual(work._editions, _editions);
+                GeneralUtility.SequenceEqual(work._editions, _editions);
         }
         public override int GetHashCode() => base.GetHashCode();
     }

@@ -7,7 +7,7 @@ namespace OpenLibrary.NET
     /// <summary>
     /// Represents an (OpenLibrary) edition.
     /// </summary>
-    public sealed record OLEdition : OLContainer
+    public sealed record OLEdition
     {
         [JsonIgnore]
         public string ID => _id;
@@ -42,7 +42,6 @@ namespace OpenLibrary.NET
         public bool Equals(OLEdition? edition)
         {
             return edition != null &&
-                CompareExtensionData(edition.extensionData) &&
                 edition.ID == ID &&
                 edition.Data == Data;
         }

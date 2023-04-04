@@ -6,7 +6,7 @@ namespace OpenLibrary.NET
     /// <summary>
     /// Represents an (OpenLibrary) author.
     /// </summary>
-    public sealed record OLAuthor : OLContainer
+    public sealed record OLAuthor
     {
         [JsonIgnore]
         public string ID => _id;
@@ -103,10 +103,9 @@ namespace OpenLibrary.NET
         public bool Equals(OLAuthor? author)
         {
             return author != null &&
-                CompareExtensionData(author.extensionData) &&
                 author._id == _id &&
                 author._data == _data &&
-                SequenceEqual(author._works, _works);
+                GeneralUtility.SequenceEqual(author._works, _works);
         }
         public override int GetHashCode() => base.GetHashCode();
     }

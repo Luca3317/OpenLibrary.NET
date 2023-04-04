@@ -33,8 +33,8 @@ namespace OpenLibrary.NET
             return
                 data != null &&
                 CompareExtensionData(data.extensionData) &&
-                SequenceEqual(this.extensionData, data.extensionData) &&
-                SequenceEqual(this.Works, data.Works) &&
+                GeneralUtility.SequenceEqual(this.extensionData, data.extensionData) &&
+                GeneralUtility.SequenceEqual(this.Works, data.Works) &&
                 this.Name == data.Name &&
                 this.WorkCount == data.WorkCount;
         }

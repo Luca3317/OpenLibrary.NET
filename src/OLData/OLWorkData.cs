@@ -65,9 +65,9 @@ namespace OpenLibrary.NET
                 this.Key == data.Key &&
                 this.Title == data.Title &&
                 this.Description == data.Description &&
-                SequenceEqual(this.subjects, data.subjects) &&
-                SequenceEqual(this.coverKeys, data.coverKeys) &&
-                SequenceEqual(this.authors, data.authors);
+                GeneralUtility.SequenceEqual(this.subjects, data.subjects) &&
+                GeneralUtility.SequenceEqual(this.coverKeys, data.coverKeys) &&
+                GeneralUtility.SequenceEqual(this.authors, data.authors);
         }
 
         public override int GetHashCode() => base.GetHashCode();
