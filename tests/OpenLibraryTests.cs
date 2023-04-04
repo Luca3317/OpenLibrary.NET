@@ -5,6 +5,8 @@ using System.Collections.ObjectModel;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using OpenLibrary.NET;
+using System.Text.RegularExpressions;
+using System.Text;
 
 #pragma warning disable 8604, 8602
 namespace Tests
@@ -76,7 +78,7 @@ namespace Tests
 
         public static string[] CoverIDs = new string[]
         {
-            "240727-S"
+            "240727"
         };
 
         public static string[] AuthorPhotoIDs = new string[]
@@ -134,167 +136,338 @@ namespace Tests
             "boats"
         };
 
-        [Fact]
-        public async Task OLWorkTests()
+        public static string[] ISBNs = new string[]
         {
-            foreach (var workID in WorksIDs)
+            "1784878006",
+            "1784877980",
+            "1846276845"
+        };
+
+        [Fact]
+        public async Task OLWorkLoaderTests()
+        {
+            foreach (string id in WorksIDs)
             {
-                OLWork work = new OLWork(workID)
-                {
-                    Data = await OLWorkLoader.GetDataAsync(workID),
-                    Ratings = await OLWorkLoader.GetRatingsAsync(workID),
-                    Bookshelves = await OLWorkLoader.GetBookshelvesAsync(workID),
-                    Editions = new ReadOnlyCollection<OLEditionData>
-                    (
-                        await OLWorkLoader.GetEditionsAsync(workID)!
-                    )
-                };
+                OLWorkData? data = await OLWorkLoader.GetDataAsync(id);
+                OLRatingsData? ratings = await OLWorkLoader.GetRatingsAsync(id);
+                OLBookshelvesData? bookshelves = await OLWorkLoader.GetBookshelvesAsync(id);
+                OLEditionData[]? editions = await OLWorkLoader.GetEditionsAsync(id, new KeyValuePair<string, string>("limit", "10"));
 
-                Assert.NotNull(work);
-                Assert.NotNull(work.Data);
-                Assert.NotNull(work.Data.Subjects);
-                Assert.NotNull(work.Ratings);
-                Assert.NotNull(work.Bookshelves);
-                Assert.NotNull(work.Editions);
-
-                // Assert Data has been set
-                Assert.NotEqual("", work.Data.Key);
-                Assert.True(work.Data.CoverKeys.Count > 0);
-                Assert.True(work.Data.Subjects.Count > 0);
-
-                _testOutputHelper.WriteLine(work.Data.CoverKeys[0].ToString());
-
-                // Assert Ratings has been set
-                Assert.NotEqual(-1, work.Ratings.Count);
-                Assert.NotNull(work.Ratings.Average);
-
-                // Assert Bookshelves has been set
-                Assert.NotEqual(-1, work.Bookshelves.WantToRead);
-                Assert.NotEqual(-1, work.Bookshelves.CurrentlyReading);
-                Assert.NotEqual(-1, work.Bookshelves.AlreadyRead);
-
-                // Assert equality operator
-                OLWork copy = new OLWork(workID)
-                {
-                    Data = await OLWorkLoader.GetDataAsync(workID),
-                    Ratings = await OLWorkLoader.GetRatingsAsync(workID),
-                    Bookshelves = await OLWorkLoader.GetBookshelvesAsync(workID),
-                    Editions = new ReadOnlyCollection<OLEditionData>
-                    (
-                        await OLWorkLoader.GetEditionsAsync(workID)
-                    )
-                };
-                Assert.True(copy.Data.Subjects.Count > 0);
-                Assert.Equal(work, copy);
+                CheckOLWorkData(data);
+                CheckOLRatingsData(ratings);
+                CheckOLBookshelvesData(bookshelves);
+                foreach (OLEditionData edition in editions) CheckOLEditionData(edition);
             }
         }
 
         [Fact]
-        public async Task OLEditionTests()
+        public async Task OLEditionLoaderTests()
         {
-            foreach (var editionID in EditionsIDs)
+            foreach (string id in EditionsIDs)
             {
-                OLEdition edition = new OLEdition(editionID)
-                {
-                    Data = await OLEditionLoader.GetDataAsync(editionID)
-                };
+                OLEditionData? data = await OLEditionLoader.GetDataByOLIDAsync(id);
+                CheckOLEditionData(data);
+            }
 
-                Assert.NotNull(edition.Data);
-                Assert.NotEqual("", edition.Data.Key);
+            foreach (string isbn in ISBNs)
+            {
+                OLEditionData? data = await OLEditionLoader.GetDataByISBNAsync(isbn);
+                CheckOLEditionData(data);
+            }
+        }
 
-                OLEdition copy = new OLEdition(editionID)
-                {
-                    Data = await OLEditionLoader.GetDataAsync(editionID)
-                };
-                Assert.Equal(edition, copy);
+        [Fact]
+        public async Task OLAuthorLoaderTests()
+        {
+            foreach (string id in AuthorIDs)
+            {
+                OLAuthorData? data = await OLAuthorLoader.GetDataAsync(id);
+                int worksCount = await OLAuthorLoader.GetWorksCountAsync(id);
+                OLWorkData[]? works = await OLAuthorLoader.GetWorksAsync(id, new KeyValuePair<string, string>("limit", "10"));
+
+                Assert.True(worksCount > 0);
+                CheckOLAuthorData(data);
+                foreach (OLWorkData work in works) CheckOLWorkData(work);
+            }
+        }
+
+        [Fact]
+        public async Task OLSubjectLoaderTests()
+        {
+            foreach (string id in Subjects)
+            {
+                OLSubjectData? data = await OLSubjectLoader.GetDataAsync(id);
+                CheckOLSubjectData(data);
+            }
+        }
+
+        [Fact]
+        public async Task OLImageLoaderTests()
+        {
+            foreach (string id in CoverIDs)
+                Assert.NotEmpty(await OLImageLoader.GetCoverAsync("id", id, "S"));
+
+            foreach (string id in AuthorPhotoIDs)
+                Assert.NotEmpty(await OLImageLoader.GetAuthorPhotoAsync("id", id, "S"));
+        }
+
+        [Fact]
+        public async Task OLSearchLoaderrTests()
+        {
+            foreach (string query in SearchQueries)
+            {
+                OLWorkData[]? data = await OLSearchLoader.GetSearchResultsAsync(query);
+                foreach (OLWorkData work in data)
+                    CheckOLWorkData(work);
+            }
+
+            foreach (string query in AuthorSearchQueries)
+            {
+                OLAuthorData[]? data = await OLSearchLoader.GetAuthorSearchResultsAsync(query);
+                foreach (OLAuthorData author in data)
+                    CheckOLAuthorData(author);
+            }
+
+            foreach (string query in SubjectSearchQueries)
+            {
+                OLSubjectData[]? data = await OLSearchLoader.GetSubjectSearchResultsAsync(query);
+                foreach (OLSubjectData subject in data)
+                    CheckOLSubjectData(subject);
+            }
+
+            foreach (string query in ListSearchQueries)
+            {
+                OLListData[]? data = await OLSearchLoader.GetListSearchResultsAsync(query);
+                foreach (OLListData list in data)
+                    CheckOLListData(list);
+            }
+        }
+
+        [Fact]
+        public async Task OLWorkTests()
+        {
+            foreach (string id in WorksIDs)
+            {
+                OLWork work = new OLWork(id);
+                CheckOLWorkData(await work.GetDataAsync());
+                CheckOLRatingsData(await work.GetRatingsAsync());
+                CheckOLBookshelvesData(await work.GetBookshelvesAsync());
+                CheckOLRatingsData(await work.GetRatingsAsync());
+                foreach (OLEditionData edition in await work.RequestEditionsAsync(10))
+                    CheckOLEditionData(edition);
             }
         }
 
         [Fact]
         public async Task OLAuthorTests()
         {
-            foreach (var authorID in AuthorIDs)
+            foreach (string id in AuthorIDs)
             {
-                OLAuthor author = new OLAuthor(authorID)
-                {
-                    Data = await OLAuthorLoader.GetDataAsync(authorID),
-                    Works = new ReadOnlyCollection<OLWorkData>
-                    (
-                        await OLAuthorLoader.GetWorksAsync(authorID)
-                    )
-                };
-
-                Assert.NotNull(author.Data);
-                Assert.NotNull(author.Works);
-                Assert.NotNull(author.Works[0].Subjects);
-
-                Assert.NotEqual("", author.Data.Key);
-
-                OLAuthor copy = new OLAuthor(authorID)
-                {
-                    Data = await OLAuthorLoader.GetDataAsync(authorID),
-                    Works = new ReadOnlyCollection<OLWorkData>
-                    (
-                        await OLAuthorLoader.GetWorksAsync(authorID)
-                    )
-                };
-                Assert.NotNull(copy.Works[0].Subjects);
-                Assert.Equal(author, copy);
+                OLAuthor author = new OLAuthor(id);
+                CheckOLAuthorData(await author.GetDataAsync());
+                foreach (OLWorkData work in await author.RequestWorksAsync(10))
+                    CheckOLWorkData(work);
             }
         }
 
         [Fact]
-        public async Task OLSubjectTests()
+        public async Task OLEditionTests()
         {
-            foreach (var subjectID in Subjects)
+            foreach (string id in EditionsIDs)
             {
-                OLSubjectData? subject = await OLSubjectLoader.GetDataAsync(subjectID);
-
-                Assert.NotNull(subject);
-                Assert.NotNull(subject.Works);
-
-                Assert.NotEqual("", subject.Name);
-                Assert.NotEqual(-1, subject.WorkCount);
-                Assert.True(subject.Works.Count > 0);
-
-                OLSubjectData? copy = await OLSubjectLoader.GetDataAsync(subjectID);
-                Assert.Equal(subject, copy);
+                OLEdition edition = new OLEdition(id);
+                CheckOLEditionData(await edition.GetDataAsync());
+                Assert.NotNull(edition.GetCoverAsync("s"));
             }
         }
 
         [Fact]
-        public async void OLSearchTests()
+        public async Task OLWorkDataSerializationTest()
         {
-            foreach (var query in SearchQueries)
+            foreach (string id in WorksIDs)
             {
-                var obj = await OLSearchLoader.GetSearchResultsAsync(query);
-
-                Assert.NotNull(obj);
-                Assert.True(obj.Length > 0);
+                OLWorkData? data = await OLWorkLoader.GetDataAsync(id);
+                string serialized = JsonConvert.SerializeObject(data);
+                var deserialized = JsonConvert.DeserializeObject<OLWorkData>(serialized);
+                string reserialized = JsonConvert.SerializeObject(deserialized);
+                Assert.Equal(data, deserialized);
+                Assert.Equal(serialized, reserialized);
             }
+        }
 
-            foreach (var query in AuthorSearchQueries)
+        [Fact]
+        public async Task OLEditionDataSerializationTest()
+        {
+            foreach (string id in EditionsIDs)
             {
-                var obj = await OLSearchLoader.GetAuthorSearchResultsAsync(query);
-
-                Assert.NotNull(obj);
-                Assert.True(obj.Length > 0);
+                OLEditionData? data = await OLEditionLoader.GetDataByOLIDAsync(id);
+                string serialized = JsonConvert.SerializeObject(data);
+                var deserialized = JsonConvert.DeserializeObject<OLEditionData>(serialized);
+                string reserialized = JsonConvert.SerializeObject(deserialized);
+                Assert.Equal(data, deserialized);
+                Assert.Equal(serialized, reserialized);
             }
+        }
 
-            foreach (var query in SubjectSearchQueries)
+        [Fact]
+        public async Task OLAuthorDataSerializationTest()
+        {
+            foreach (string id in AuthorIDs)
             {
-                var obj = await OLSearchLoader.GetSubjectSearchResultsAsync(query);
-
-                Assert.NotNull(obj);
-                Assert.True(obj.Length > 0);
+                OLAuthorData? data = await OLAuthorLoader.GetDataAsync(id);
+                string serialized = JsonConvert.SerializeObject(data);
+                var deserialized = JsonConvert.DeserializeObject<OLAuthorData>(serialized);
+                string reserialized = JsonConvert.SerializeObject(deserialized);
+                Assert.Equal(data, deserialized);
+                Assert.Equal(serialized, reserialized);
             }
+        }
 
-            foreach (var query in ListSearchQueries)
+        [Fact]
+        public async Task OLRatingsDataSerializationTest()
+        {
+            foreach (string id in WorksIDs)
             {
-                var obj = await OLSearchLoader.GetListSearchResultsAsync(query);
-                Assert.NotNull(obj);
-                Assert.True(obj.Length > 0);
+                OLRatingsData? data = await OLWorkLoader.GetRatingsAsync(id);
+                string serialized = JsonConvert.SerializeObject(data);
+                var deserialized = JsonConvert.DeserializeObject<OLRatingsData>(serialized);
+                string reserialized = JsonConvert.SerializeObject(deserialized);
+                Assert.Equal(data, deserialized);
+                Assert.Equal(serialized, reserialized);
             }
+        }
+
+        [Fact]
+        public async Task OLBookshelvesDataSerializationTest()
+        {
+            foreach (string id in WorksIDs)
+            {
+                OLBookshelvesData? data = await OLWorkLoader.GetBookshelvesAsync(id);
+                string serialized = JsonConvert.SerializeObject(data);
+                var deserialized = JsonConvert.DeserializeObject<OLBookshelvesData>(serialized);
+                string reserialized = JsonConvert.SerializeObject(deserialized);
+                Assert.Equal(data, deserialized);
+                Assert.Equal(serialized, reserialized);
+            }
+        }
+
+        [Fact]
+        public async Task OLSubjectDataSerializationTest()
+        {
+            foreach (string id in Subjects)
+            {
+                OLSubjectData? data = await OLSubjectLoader.GetDataAsync(id);
+                string serialized = JsonConvert.SerializeObject(data);
+                var deserialized = JsonConvert.DeserializeObject<OLSubjectData>(serialized);
+                string reserialized = JsonConvert.SerializeObject(deserialized);
+                Assert.Equal(data, deserialized);
+                Assert.Equal(serialized, reserialized);
+            }
+        }
+
+        [Fact]
+        public async Task OLWorkSerializationTest()
+        {
+            foreach (string id in WorksIDs)
+            {
+                OLWork work = new OLWork(id);
+                await work.GetDataAsync();
+                await work.GetRatingsAsync();
+                await work.GetBookshelvesAsync();
+                await work.GetTotalEditionCountAsync();
+                await work.RequestEditionsAsync(10);
+                string serialized = JsonConvert.SerializeObject(work);
+                var deserialized = JsonConvert.DeserializeObject<OLWork>(serialized);
+                string reserialized = JsonConvert.SerializeObject(deserialized);
+                Assert.Equal(work, deserialized);
+                Assert.Equal(serialized, reserialized);
+            }
+        }
+
+        [Fact]
+        public async Task OLAuthorSerializationTest()
+        {
+            foreach (string id in AuthorIDs)
+            {
+                OLAuthor author = new OLAuthor(id);
+                await author.GetDataAsync();
+                await author.GetTotalWorksCountAsync();
+                await author.RequestWorksAsync(10);
+                string serialized = JsonConvert.SerializeObject(author);
+                var deserialized = JsonConvert.DeserializeObject<OLAuthor>(serialized);
+                string reserialized = JsonConvert.SerializeObject(deserialized);
+                Assert.Equal(author, deserialized);
+                Assert.Equal(serialized, reserialized);
+            }
+        }
+
+        [Fact]
+        public async Task OLEditionSerializationTest()
+        {
+            foreach (string id in EditionsIDs)
+            {
+                OLEdition edition = new OLEdition(id);
+                await edition.GetDataAsync();
+                await edition.GetCoverAsync("s");
+                string serialized = JsonConvert.SerializeObject(edition);
+                var deserialized = JsonConvert.DeserializeObject<OLEdition>(serialized);
+                string reserialized = JsonConvert.SerializeObject(deserialized);
+                Assert.Equal(edition, deserialized);
+                Assert.Equal(serialized, reserialized);
+            }
+        }
+
+        void CheckOLWorkData(OLWorkData? data)
+        {
+            Assert.NotNull(data);
+            Assert.NotEqual("", data.Key);
+            Assert.NotEqual("", data.Title);
+        }
+
+        void CheckOLRatingsData(OLRatingsData? data)
+        {
+            Assert.NotNull(data);
+            Assert.NotEqual(-1, data.Count);
+            if (data.Count != 0) Assert.NotNull(data.Average);
+            else Assert.Null(data.Average);
+        }
+
+        void CheckOLBookshelvesData(OLBookshelvesData? data)
+        {
+            Assert.NotNull(data);
+            Assert.NotEqual(-1, data.WantToRead);
+            Assert.NotEqual(-1, data.CurrentlyReading);
+            Assert.NotEqual(-1, data.AlreadyRead);
+        }
+
+        void CheckOLEditionData(OLEditionData? data)
+        {
+            Assert.NotNull(data);
+            Assert.NotEqual("", data.Key);
+            Assert.NotEqual("", data.Title);
+            Assert.NotEmpty(data.WorkKeys);
+        }
+
+        void CheckOLAuthorData(OLAuthorData? data)
+        {
+            Assert.NotNull(data);
+            Assert.NotEqual("", data.Name);
+            Assert.NotEqual("", data.Key);
+        }
+
+        void CheckOLSubjectData(OLSubjectData? data)
+        {
+            Assert.NotNull(data);
+            Assert.NotEqual("", data.Name);
+            Assert.NotEqual(-1, data.WorkCount);
+        }
+
+        void CheckOLListData(OLListData? data)
+        {
+            Assert.NotNull(data);
+            Assert.NotEqual("", data.Name);
+            Assert.NotEqual("", data.URL);
+            Assert.NotEqual("", data.LastUpdate);
         }
     }
 }
