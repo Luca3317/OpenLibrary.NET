@@ -136,7 +136,7 @@ namespace OpenLibrary.NET
                     else if (reader.TokenType == JsonToken.StartObject)
                     {
                         JToken? value = JToken.ReadFrom(reader)["value"];
-                        if (value != null && value.Type == JTokenType.String) return value.ToString();
+                        if (value != null && value.Type == JTokenType.String) return value.ToObject<string>();
                     }
 
                     throw new JsonException();
@@ -157,7 +157,7 @@ namespace OpenLibrary.NET
                     {
                         JToken? value = JToken.ReadFrom(reader)["value"];
 
-                        if (value != null && value.Type == JTokenType.String) return value.ToString();
+                        if (value != null && value.Type == JTokenType.String) return value.ToObject<string>();
                     }
 
                     throw new JsonException();
@@ -189,7 +189,7 @@ namespace OpenLibrary.NET
                             {
                                 JToken? authorToken = value["key"];
                                 if (authorToken == null) throw new JsonException();
-                                strings.Add(authorToken.ToString());
+                                strings.Add(authorToken.ToObject<string>()!);
                             }
 
                             return strings.ToArray();
@@ -272,8 +272,12 @@ namespace OpenLibrary.NET
                             foreach (JToken value in array)
                             {
                                 JToken? authorToken = value["key"];
-                                if (authorToken == null) if (authorToken == null) throw new JsonException();
-                                strings.Add(authorToken.ToString());
+                                if (authorToken == null)
+                                {
+                                    authorToken = value["url"];
+                                    if (authorToken == null) throw new JsonException();
+                                }
+                                strings.Add(authorToken.ToObject<string>()!);
                             }
 
                             return strings.ToArray();
