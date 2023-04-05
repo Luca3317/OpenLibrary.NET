@@ -144,6 +144,30 @@ namespace Tests
         };
 
         [Fact]
+        public async Task ExamplesTest()
+        {
+            // Work examples
+            await new OpenLibrary.NET.examples.WorkAPIExamples().GetWork();
+            await new OpenLibrary.NET.examples.WorkAPIExamples().GetWorkFromSearch();
+            await new OpenLibrary.NET.examples.WorkAPIExamples().GetRatings();
+
+            // Editon examples
+            await new OpenLibrary.NET.examples.EditionAPIExamples().GetEditionFromSearch();
+            await new OpenLibrary.NET.examples.EditionAPIExamples().GetEdition();
+            await new OpenLibrary.NET.examples.EditionAPIExamples().GetCover();
+
+            // Author examples
+            await new OpenLibrary.NET.examples.AuthorAPIExamples().GetAuthorFromSearch();
+            await new OpenLibrary.NET.examples.AuthorAPIExamples().GetAuthor();
+            await new OpenLibrary.NET.examples.AuthorAPIExamples().GeAuthorData();
+
+            // Miscellaneous examples
+            await new OpenLibrary.NET.examples.MiscellaneousExamples().CoverExamples();
+            await new OpenLibrary.NET.examples.MiscellaneousExamples().SubjectExamples();
+            await new OpenLibrary.NET.examples.MiscellaneousExamples().SearchExamples();
+        }
+
+        [Fact]
         public async Task OLWorkLoaderTests()
         {
             foreach (string id in WorksIDs)
@@ -156,6 +180,7 @@ namespace Tests
                 CheckOLWorkData(data);
                 CheckOLRatingsData(ratings);
                 CheckOLBookshelvesData(bookshelves);
+                Assert.NotEmpty(editions);
                 foreach (OLEditionData edition in editions) CheckOLEditionData(edition);
             }
         }
@@ -187,6 +212,7 @@ namespace Tests
 
                 Assert.True(worksCount > 0);
                 CheckOLAuthorData(data);
+                Assert.NotEmpty(works);
                 foreach (OLWorkData work in works) CheckOLWorkData(work);
             }
         }
@@ -217,6 +243,8 @@ namespace Tests
             foreach (string query in SearchQueries)
             {
                 OLWorkData[]? data = await OLSearchLoader.GetSearchResultsAsync(query);
+                _testOutputHelper.WriteLine(query);
+                Assert.NotEmpty(data);
                 foreach (OLWorkData work in data)
                     CheckOLWorkData(work);
             }
@@ -224,6 +252,7 @@ namespace Tests
             foreach (string query in AuthorSearchQueries)
             {
                 OLAuthorData[]? data = await OLSearchLoader.GetAuthorSearchResultsAsync(query);
+                Assert.NotEmpty(data);
                 foreach (OLAuthorData author in data)
                     CheckOLAuthorData(author);
             }
@@ -231,6 +260,7 @@ namespace Tests
             foreach (string query in SubjectSearchQueries)
             {
                 OLSubjectData[]? data = await OLSearchLoader.GetSubjectSearchResultsAsync(query);
+                Assert.NotEmpty(data);
                 foreach (OLSubjectData subject in data)
                     CheckOLSubjectData(subject);
             }
@@ -238,6 +268,7 @@ namespace Tests
             foreach (string query in ListSearchQueries)
             {
                 OLListData[]? data = await OLSearchLoader.GetListSearchResultsAsync(query);
+                Assert.NotEmpty(data);
                 foreach (OLListData list in data)
                     CheckOLListData(list);
             }
@@ -253,7 +284,9 @@ namespace Tests
                 CheckOLRatingsData(await work.GetRatingsAsync());
                 CheckOLBookshelvesData(await work.GetBookshelvesAsync());
                 CheckOLRatingsData(await work.GetRatingsAsync());
-                foreach (OLEditionData edition in await work.RequestEditionsAsync(10))
+                var editions = await work.RequestEditionsAsync(10);
+                Assert.NotEmpty(editions);
+                foreach (OLEditionData edition in editions)
                     CheckOLEditionData(edition);
             }
         }
@@ -265,7 +298,8 @@ namespace Tests
             {
                 OLAuthor author = new OLAuthor(id);
                 CheckOLAuthorData(await author.GetDataAsync());
-                foreach (OLWorkData work in await author.RequestWorksAsync(10))
+                var works = author.RequestWorksAsync(10);
+                foreach (OLWorkData work in await works)
                     CheckOLWorkData(work);
             }
         }

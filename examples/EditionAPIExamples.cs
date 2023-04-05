@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace OpenLibrary.NET.examples
 {
-    internal class EditionAPIExamples
+    public class EditionAPIExamples
     {
         /*
         * Given an edition's OLID, get all its information
         */
-        public async void GetEdition()
+        public async Task GetEdition()
         {
             // The edition's OLID
             string id = "OL7826547M";
@@ -29,7 +29,7 @@ namespace OpenLibrary.NET.examples
          * Get an edition without having a prior edition OLID,
          * using the search function
          */
-        public async void GetEditionFromSearch()
+        public async Task GetEditionFromSearch()
         {
             // The search query
             string query = "Finnegans Wake";
@@ -62,7 +62,7 @@ namespace OpenLibrary.NET.examples
         /*
          * Given an editions's OLID, get only its cover
          */
-        public async void GetCover()
+        public async Task GetCover()
         {
             // The editions OLID
             string id = "OL31827A";

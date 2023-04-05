@@ -56,13 +56,10 @@ namespace OpenLibrary.NET
                     stringBuilder.Append(".json");
                     if (parameters != null && parameters.Length > 0)
                     {
-                        stringBuilder.Append("?q=");
+                        stringBuilder.Append("?");
                         foreach (var param in parameters)
                         {
-                            if (param.Key == "q")
-                                stringBuilder.Append(param.Value + " ");
-                            else
-                                stringBuilder.Append(param.Key + ":" + param.Value + " ");
+                            stringBuilder.Append(param.Key + "=" + param.Value + "&");
                         }
                     }
                     break;
@@ -409,7 +406,7 @@ namespace OpenLibrary.NET
         (
             new Dictionary<string, List<string>>
             {
-                {string.Empty, new List<string>() { "q", "title", "author", "subject", "place", "person", "language", "publisher", "sort", "first_publish_year", "title_suggest", "ddc", "lcc" } },
+                {string.Empty, new List<string>() { "q", "title", "author", "subject", "place", "person", "language", "publisher", "sort" } },
                 {"authors", new List<string>() { "q", "sort", "limit", "offset" } },
                 {"subjects", new List<string>() { "q", "limit", "offset" } },
                 {"lists", new List<string>() { "q", "limit", "offset" } },

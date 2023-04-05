@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace OpenLibrary.NET.examples
 {
-    internal class MiscellaneousExamples
+    public class MiscellaneousExamples
     {
-        public async void SubjectExamples()
+        public async Task SubjectExamples()
         {
             string subject = "horror";
 
@@ -25,13 +25,12 @@ namespace OpenLibrary.NET.examples
                     new KeyValuePair<string, string>("detail", "true")
                 );
 
-            // Get only 10 works for this subject
-            // Also, only consider works that have an ebook variant
+            // Get only 10 works for this subject and offset by 5
+            // Therefore get work 5 through 14
             OLSubjectData? subjectData3 = await OLSubjectLoader.GetDataAsync
                 (
                     subject,
-                    new KeyValuePair<string, string>("limit", "10"),
-                    new KeyValuePair<string, string>("ebooks", "true")
+                    new KeyValuePair<string, string>("limit", "10")
                 );
 
             // You can also get subjects from, for example, works, like so
@@ -39,7 +38,7 @@ namespace OpenLibrary.NET.examples
             IReadOnlyList<string> workSubjects = (await work.GetDataAsync())!.Subjects;
         }
 
-        public async void SearchExamples()
+        public async Task SearchExamples()
         {
             string query = "my query";
 
@@ -57,19 +56,17 @@ namespace OpenLibrary.NET.examples
 
 
             // Search for Lolita, by Vladimir Nabokov
-            // Limit the search to 3 works
             OLWorkData[]? workData2 = await OLSearchLoader.GetSearchResultsAsync
                 (
                     "",
                     new KeyValuePair<string, string>("title", "lolita"),
-                    new KeyValuePair<string, string>("author", "vladimir nabokov"),
-                    new KeyValuePair<string, string>("limit", "3")
+                    new KeyValuePair<string, string>("author", "vladimir nabokov")
                 );
 
             // Alternatively, you could search like this; they are equivalent
             OLWorkData[]? workData3 = await OLSearchLoader.GetSearchResultsAsync
                 (
-                    "title:lolita author:vladimir nabokov limit:3"
+                    "title:lolita author:vladimir nabokov"
                 );
 
             // Search for random authors with "Max" in their name
@@ -84,7 +81,7 @@ namespace OpenLibrary.NET.examples
                 );
         }
 
-        public async void CoverExamples()
+        public async Task CoverExamples()
         {
             // From an OLWork, get the covers of all editions
 
@@ -92,7 +89,7 @@ namespace OpenLibrary.NET.examples
 
             foreach (OLEditionData editionData in (await work.RequestEditionsAsync(await work.GetTotalEditionCountAsync()))!)
             {
-                byte[] cover = await OLImageLoader.GetCoverAsync(editionData.ID);
+                byte[] cover = await OLImageLoader.GetCoverAsync("olid", editionData.ID, "s");
             }
         }
     }

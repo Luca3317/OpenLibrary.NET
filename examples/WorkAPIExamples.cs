@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace OpenLibrary.NET.examples
 {
-    internal class WorkAPIExamples
+    public class WorkAPIExamples
     {
         /*
          * Given a work's OLID, get all its information
          */
-        public async void GetWork()
+        public async Task GetWork()
         {
             // The work's OLID
             string id = "OL29583061W";
@@ -30,7 +30,7 @@ namespace OpenLibrary.NET.examples
          * Get a work without having a prior work OLID,
          * using the search function
          */
-        public async void GetWorkFromSearch()
+        public async Task GetWorkFromSearch()
         {
             // The search query
             string query = "Tom sawyer";
@@ -51,7 +51,7 @@ namespace OpenLibrary.NET.examples
         /*
          * Given a work's OLID, get only its ratings
          */
-        public async void GetRatings()
+        public async Task GetRatings()
         {
             // The work's OLID
             string id = "OL29583061W";

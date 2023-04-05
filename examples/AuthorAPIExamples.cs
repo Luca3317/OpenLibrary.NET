@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace OpenLibrary.NET.examples
 {
-    internal class AuthorAPIExamples
+    public class AuthorAPIExamples
     {
         /*
         * Given an author's OLID, get all their information
         */
-        public async void GetAuthor()
+        public async Task GetAuthor()
         {
             // The author's OLID
             string id = "OL31827A";
@@ -28,7 +28,7 @@ namespace OpenLibrary.NET.examples
          * Get an author without having a prior author OLID,
          * using the search function
          */
-        public async void GetAuthorFromSearch()
+        public async Task GetAuthorFromSearch()
         {
             // The search query
             string query = "James Joyce";
@@ -49,7 +49,7 @@ namespace OpenLibrary.NET.examples
         /*
          * Given an author's OLID, get only their OLAuthorData
          */
-        public async void GeAuthorData()
+        public async Task GeAuthorData()
         {
             // The author's OLID
             string id = "OL31827A";
