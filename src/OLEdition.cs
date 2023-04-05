@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.Security.Cryptography;
-using System.Xml.Linq;
 
 namespace OpenLibrary.NET
 {

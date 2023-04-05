@@ -1,12 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
-using OpenLibrary.NET;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OpenLibrary
+﻿
+namespace OpenLibrary.NET
 {
     internal static class GeneralUtility
     {

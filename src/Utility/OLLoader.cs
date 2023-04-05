@@ -1,9 +1,4 @@
-﻿using OpenLibrary.NET;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 /*
  * Helper functions for requesting specific data from OpenLibrary, and populating OLData and OLObject records
