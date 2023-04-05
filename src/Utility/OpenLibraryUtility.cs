@@ -226,12 +226,18 @@ namespace OpenLibrary.NET
                             foreach (JToken value in array)
                             {
                                 JToken? authorToken = value["author"];
+
                                 if (authorToken == null)
                                 {
                                     authorToken = value["key"];
                                     if (authorToken == null) throw new JsonException();
                                 }
-                                strings.Add(authorToken.ToString());
+                                else if (authorToken.Type == JTokenType.Object)
+                                {
+                                    authorToken = authorToken["key"];
+                                    if (authorToken == null) throw new JsonException();
+                                }
+                                strings.Add(authorToken.ToObject<string>()!);
                             }
 
                             return strings.ToArray();
