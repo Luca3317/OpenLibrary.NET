@@ -1,5 +1,5 @@
 # OpenLibrary.NET
-[![NuGet](https://img.shields.io/nuget/v/WinSW?style=flat-square)](https://www.nuget.org/packages/OpenLibrary.NET/)
+[![NuGet](https://img.shields.io/nuget/v/OpenLibrary.Net)](https://www.nuget.org/packages/OpenLibrary.NET/)
 
 A C# library for OpenLibrary by the InternetArchive
 
