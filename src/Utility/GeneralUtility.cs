@@ -1,5 +1,5 @@
 ﻿
-namespace OpenLibrary.NET
+namespace OpenLibraryNET
 {
     internal static class GeneralUtility
     {

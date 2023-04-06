@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace OpenLibrary.NET
+namespace OpenLibraryNET
 {
     public record OLRequest
     {

@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 
-namespace OpenLibrary.NET
+namespace OpenLibraryNET
 {
     public static class OpenLibraryUtility
     {

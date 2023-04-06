@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
-using OpenLibrary;
+using OpenLibraryNET;
 using Xunit.Abstractions;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json.Linq;
 using System.IO;
-using OpenLibrary.NET;
 using System.Text.RegularExpressions;
 using System.Text;
 
@@ -144,27 +143,59 @@ namespace Tests
         };
 
         [Fact]
+        public async Task Tesst()
+        {
+            OLWork work = new OLWork("OL45804W");
+            await work.GetBookshelvesAsync();
+            await work.GetRatingsAsync();
+            await work.GetDataAsync();
+            await work.GetTotalEditionCountAsync();
+            await work.RequestEditionsAsync(1);
+
+            _testOutputHelper.WriteLine(work.Data.AuthorKeys[0]);
+            string aid = OpenLibraryUtility.ExtractIdFromKey(work.Data.AuthorKeys[0]);
+            _testOutputHelper.WriteLine(aid);
+
+            _testOutputHelper.WriteLine
+            (
+                "Title: " + work.Data.Title +
+                "\nDescription: " + work.Data.Description +
+                "\nAuthor: " + (await OLAuthorLoader.GetDataAsync(aid))!.Name +
+                "\nRatings: " + work.Ratings.Count +
+                "\nAverage: " + work.Ratings.Average +
+                "\nRead by: " + work.Bookshelves.AlreadyRead + " people"
+            );
+
+            OLAuthor author = new OLAuthor(aid);
+            await author.GetDataAsync();
+            await author.GetTotalWorksCountAsync();
+
+            await OLImageLoader.GetCoverAsync("id", work.Editions[0].CoverKeys[0].ToString(), "s");
+            await OLImageLoader.GetAuthorPhotoAsync("id", author.Data.PhotosIDs[0].ToString(), "s");
+        }
+
+        [Fact]
         public async Task ExamplesTest()
         {
             // Work examples
-            await new OpenLibrary.NET.examples.WorkAPIExamples().GetWork();
-            await new OpenLibrary.NET.examples.WorkAPIExamples().GetWorkFromSearch();
-            await new OpenLibrary.NET.examples.WorkAPIExamples().GetRatings();
+            await new OpenLibraryNET.examples.WorkAPIExamples().GetWork();
+            await new OpenLibraryNET.examples.WorkAPIExamples().GetWorkFromSearch();
+            await new OpenLibraryNET.examples.WorkAPIExamples().GetRatings();
 
             // Editon examples
-            await new OpenLibrary.NET.examples.EditionAPIExamples().GetEditionFromSearch();
-            await new OpenLibrary.NET.examples.EditionAPIExamples().GetEdition();
-            await new OpenLibrary.NET.examples.EditionAPIExamples().GetCover();
+            await new OpenLibraryNET.examples.EditionAPIExamples().GetEditionFromSearch();
+            await new OpenLibraryNET.examples.EditionAPIExamples().GetEdition();
+            await new OpenLibraryNET.examples.EditionAPIExamples().GetCover();
 
             // Author examples
-            await new OpenLibrary.NET.examples.AuthorAPIExamples().GetAuthorFromSearch();
-            await new OpenLibrary.NET.examples.AuthorAPIExamples().GetAuthor();
-            await new OpenLibrary.NET.examples.AuthorAPIExamples().GeAuthorData();
+            await new OpenLibraryNET.examples.AuthorAPIExamples().GetAuthorFromSearch();
+            await new OpenLibraryNET.examples.AuthorAPIExamples().GetAuthor();
+            await new OpenLibraryNET.examples.AuthorAPIExamples().GeAuthorData();
 
             // Miscellaneous examples
-            await new OpenLibrary.NET.examples.MiscellaneousExamples().CoverExamples();
-            await new OpenLibrary.NET.examples.MiscellaneousExamples().SubjectExamples();
-            await new OpenLibrary.NET.examples.MiscellaneousExamples().SearchExamples();
+            await new OpenLibraryNET.examples.MiscellaneousExamples().CoverExamples();
+            await new OpenLibraryNET.examples.MiscellaneousExamples().SubjectExamples();
+            await new OpenLibraryNET.examples.MiscellaneousExamples().SearchExamples();
         }
 
         [Fact]
@@ -456,6 +487,8 @@ namespace Tests
             Assert.NotNull(data);
             Assert.NotEqual("", data.Key);
             Assert.NotEqual("", data.Title);
+            foreach (string author in data.AuthorKeys)
+                Assert.Matches("/authors/OL[0-9]*A", author);
         }
 
         void CheckOLRatingsData(OLRatingsData? data)

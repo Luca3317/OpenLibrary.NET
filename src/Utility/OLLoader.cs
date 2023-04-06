@@ -4,7 +4,7 @@
  * Helper functions for requesting specific data from OpenLibrary, and populating OLData and OLObject records
  */
 
-namespace OpenLibrary.NET
+namespace OpenLibraryNET
 {
     public static class OLWorkLoader
     {

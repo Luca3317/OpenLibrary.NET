@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenLibrary.NET.examples
+namespace OpenLibraryNET.examples
 {
     public class EditionAPIExamples
     {

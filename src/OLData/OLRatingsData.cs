@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace OpenLibrary.NET
+namespace OpenLibraryNET
 {
     /// <summary>
     /// Represents an OpenLibrary Ratings request.

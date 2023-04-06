@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 
-namespace OpenLibrary.NET
+namespace OpenLibraryNET
 {
     /// <summary>
     /// Represents an OpenLibrary Edition request.

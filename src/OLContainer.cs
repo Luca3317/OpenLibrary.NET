@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 
-namespace OpenLibrary.NET
+namespace OpenLibraryNET
 {
     /// <summary>
     /// Base record for OLData and OLObject records.
