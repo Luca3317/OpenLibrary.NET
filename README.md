@@ -8,8 +8,8 @@ See the [OpenLibray Developer Center](https://openlibrary.org/developers/api) fo
 See the [docs folder](https://github.com/Luca3317/OpenLibrary.NET/tree/main/docs) for documentation on this library.
 
 ## Installation
-```
-> dotnet add package OpenLibrary.NET --version 0.0.3
+```console
+dotnet add package OpenLibrary.NET --version 0.0.3
 ```
 ***
 Currently, OpenLibrary.Net supports the following of OpenLibrary's APIs:
