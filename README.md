@@ -1,9 +1,16 @@
 # OpenLibrary.NET
+[![NuGet](https://img.shields.io/nuget/v/WinSW?style=flat-square)](https://www.nuget.org/packages/OpenLibrary.NET/)
+
 A C# library for OpenLibrary by the InternetArchive
 
 See the [OpenLibray Developer Center](https://openlibrary.org/developers/api) for documentation on the various APIs offered by OpenLibrary.
 
 See the [docs folder](https://github.com/Luca3317/OpenLibrary.NET/tree/main/docs) for documentation on this library.
+
+## Installation
+```
+> dotnet add package OpenLibrary.NET --version 0.0.3
+```
 ***
 Currently, OpenLibrary.Net supports the following of OpenLibrary's APIs:
 * Books API
