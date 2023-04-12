@@ -17,18 +17,17 @@ Currently, OpenLibrary.Net supports the following of OpenLibrary's APIs:
   * [Works API](docs/Works%20API.md)
   * [Editions API](docs/Editions%20API.md)
   * [ISBN API](docs/Editions%20API.md)
-  * [(Generic) Books API](docs/Editions%20API.md) - Partially supported using Extension Data
+  * [(Generic) Books API](docs/Editions%20API.md)
 * [Authors API](docs/Authors%20API.md)
 * [Subjects API](docs/Subjects%20API.md)
 * [Search API](docs/Search%20API.md)
+* [Lists API](docs/Lists%20API.md)
 * Covers API
   * [Covers API](docs/Covers%20API.md)
   * [AuthorPhotos API](docs/Covers%20API.md)
 
-For now, the SearchInside, Partner, RecentChanges and Lists APIs are unsupported.
+For now, the SearchInside, Partner and RecentChanges are unsupported.
 ***
 Coming TODO:
 
-* Add full support for the Books API
-* Add support for the Lists API
 * Add support for the SearchInside API
