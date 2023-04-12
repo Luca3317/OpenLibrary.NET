@@ -466,4 +466,44 @@ namespace OpenLibraryNET
             );
         }
     }
+
+    public static class OLListLoader
+    {
+        public async static Task<OLListData[]?> GetUserListsAsync(string username)
+        {
+            return await OpenLibraryUtility.LoadAsync<OLListData[]>
+            (
+                OpenLibraryUtility.BuildListsURL(username), "entries"
+            );
+        }
+
+        public async static Task<OLListData?> GetList(string username, string id)
+        {
+            return await OpenLibraryUtility.LoadAsync<OLListData>
+            (
+                OpenLibraryUtility.BuildListsURL(username, id)
+            );
+        }
+
+        public async static Task<OLEditionData[]?> GetListEditions(string username, string id, params KeyValuePair<string, string>[] parameters)
+        {
+            return await OpenLibraryUtility.LoadAsync<OLEditionData[]>
+            (
+                OpenLibraryUtility.BuildListsURL(username, id, "editions", parameters), "entries"
+            );
+        }
+
+        /*
+         * TODO
+         * Response format seems inconsistent with other similar requests
+         * 
+        public async static Task<OLSubjectData[]?> GetListSubjects(string username, string id, params KeyValuePair<string, string>[] parameters)
+        {
+            return await OpenLibraryUtility.LoadAsync<OLSubjectData[]>
+            (
+                OpenLibraryUtility.BuildListsURL(username, id, "subjects", parameters), "entries"
+            );
+        }
+        */
+    }
 }
