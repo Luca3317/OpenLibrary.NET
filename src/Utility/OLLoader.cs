@@ -88,6 +88,26 @@ namespace OpenLibraryNET
                 "size"
             );
         }
+
+        public async static Task<(bool, OLListData[]?)> TryGetListsAsync(string id, params KeyValuePair<string, string>[] parameters)
+        {
+            try { return (true, await GetListsAsync(id)); }
+            catch { return (false, null); }
+        }
+        public async static Task<OLListData[]?> GetListsAsync(string id, params KeyValuePair<string, string>[] parameters)
+        {
+            return await OpenLibraryUtility.LoadAsync<OLListData[]>
+            (
+                OpenLibraryUtility.BuildURL
+                (
+                    OLRequestAPI.Books_Works,
+                    id,
+                    "lists",
+                    parameters
+                ),
+                "entries"
+            );
+        }
     }
 
     public static class OLEditionLoader
@@ -123,6 +143,26 @@ namespace OpenLibraryNET
                     OLRequestAPI.Books_ISBN,
                     id
                 )
+            );
+        }
+
+        public async static Task<(bool, OLListData[]?)> TryGetListsAsync(string id, params KeyValuePair<string, string>[] parameters)
+        {
+            try { return (true, await GetListsAsync(id)); }
+            catch { return (false, null); }
+        }
+        public async static Task<OLListData[]?> GetListsAsync(string id, params KeyValuePair<string, string>[] parameters)
+        {
+            return await OpenLibraryUtility.LoadAsync<OLListData[]>
+            (
+                OpenLibraryUtility.BuildURL
+                (
+                    OLRequestAPI.Books_Editions,
+                    id,
+                    "lists",
+                    parameters
+                ),
+                "entries"
             );
         }
     }
@@ -181,6 +221,26 @@ namespace OpenLibraryNET
                 "size"
             );
         }
+
+        public async static Task<(bool, OLListData[]?)> TryGetListsAsync(string id, params KeyValuePair<string, string>[] parameters)
+        {
+            try { return (true, await GetListsAsync(id)); }
+            catch { return (false, null); }
+        }
+        public async static Task<OLListData[]?> GetListsAsync(string id, params KeyValuePair<string, string>[] parameters)
+        {
+            return await OpenLibraryUtility.LoadAsync<OLListData[]>
+            (
+                OpenLibraryUtility.BuildURL
+                (
+                    OLRequestAPI.Authors,
+                    id,
+                    "lists",
+                    parameters
+                ),
+                "entries"
+            );
+        }
     }
 
     public static class OLSubjectLoader
@@ -195,6 +255,26 @@ namespace OpenLibraryNET
             return await OpenLibraryUtility.LoadAsync<OLSubjectData>
             (
                 OpenLibraryUtility.BuildURL(OLRequestAPI.Subjects, subject, "", parameters)
+            );
+        }
+
+        public async static Task<(bool, OLListData[]?)> TryGetListsAsync(string id, params KeyValuePair<string, string>[] parameters)
+        {
+            try { return (true, await GetListsAsync(id)); }
+            catch { return (false, null); }
+        }
+        public async static Task<OLListData[]?> GetListsAsync(string id, params KeyValuePair<string, string>[] parameters)
+        {
+            return await OpenLibraryUtility.LoadAsync<OLListData[]>
+            (
+                OpenLibraryUtility.BuildURL
+                (
+                    OLRequestAPI.Subjects,
+                    id,
+                    "lists",
+                    parameters
+                ),
+                "entries"
             );
         }
     }
