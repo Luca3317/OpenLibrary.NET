@@ -292,6 +292,76 @@ namespace OpenLibraryNET
                     serializer.Serialize(writer, value);
                 }
             }
+
+            public class EditionPublishersConverter : JsonConverter<string[]>
+            {
+                public override string[]? ReadJson(JsonReader reader, Type objectType, string[]? existingValue, bool hasExistingValue, JsonSerializer serializer)
+                {
+                    if (reader.TokenType == JsonToken.StartArray)
+                    {
+                        JArray array = JArray.Load(reader);
+                        if (array.Count == 0) return new string[0];
+
+                        if (array[0].Type == JTokenType.String)
+                        {
+                            return array.ToObject<string[]>();
+                        }
+                        else if (array[0].Type == JTokenType.Object)
+                        {
+                            List<string> strings = new List<string>();
+                            foreach (JToken value in array)
+                            {
+                                JToken? authorToken = value["name"];
+                                strings.Add(authorToken!.ToObject<string>()!);
+                            }
+
+                            return strings.ToArray();
+                        }
+                    }
+
+                    throw new JsonException();
+                }
+
+                public override void WriteJson(JsonWriter writer, string[]? value, JsonSerializer serializer)
+                {
+                    serializer.Serialize(writer, value);
+                }
+            }
+
+            public class EditionSubjectsConverter : JsonConverter<string[]>
+            {
+                public override string[]? ReadJson(JsonReader reader, Type objectType, string[]? existingValue, bool hasExistingValue, JsonSerializer serializer)
+                {
+                    if (reader.TokenType == JsonToken.StartArray)
+                    {
+                        JArray array = JArray.Load(reader);
+                        if (array.Count == 0) return new string[0];
+
+                        if (array[0].Type == JTokenType.String)
+                        {
+                            return array.ToObject<string[]>();
+                        }
+                        else if (array[0].Type == JTokenType.Object)
+                        {
+                            List<string> strings = new List<string>();
+                            foreach (JToken value in array)
+                            {
+                                JToken? authorToken = value["name"];
+                                strings.Add(authorToken!.ToObject<string>()!);
+                            }
+
+                            return strings.ToArray();
+                        }
+                    }
+
+                    throw new JsonException();
+                }
+
+                public override void WriteJson(JsonWriter writer, string[]? value, JsonSerializer serializer)
+                {
+                    serializer.Serialize(writer, value);
+                }
+            }
         }
         #endregion
 
@@ -439,7 +509,17 @@ namespace OpenLibraryNET
         );
         #endregion
 
-        // subjects, books, works, editions, isbn, partner, search, searchinside, and more
+        #region Lists Maps
+        public static readonly ReadOnlyDictionary<string, List<string>> ListsSubfileFiltersMap = new ReadOnlyDictionary<string, List<string>>
+        (
+            new Dictionary<string, List<string>>
+            {
+                {string.Empty, new List<string>() { } },
+                {"editions", new List<string>() { "limit", "offset" } },
+                {"subjects", new List<string>() { "limit", "offset" } }
+            }
+        );
+        #endregion
         #endregion
 
     }

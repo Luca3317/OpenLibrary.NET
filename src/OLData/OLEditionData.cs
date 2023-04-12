@@ -84,8 +84,10 @@ namespace OpenLibraryNET
         [JsonConverter(typeof(OpenLibraryUtility.Serialization.WorksKeysConverter))]
         private string[] workKeys { get; init; } = new string[0];
         [JsonProperty("subjects")]
+        [JsonConverter(typeof(OpenLibraryUtility.Serialization.EditionSubjectsConverter))]
         private string[] subjects { get; init; } = new string[0];
         [JsonProperty("publishers")]
+        [JsonConverter(typeof(OpenLibraryUtility.Serialization.EditionPublishersConverter))]
         private string[] publishers { get; init; } = new string[0];
 
         /// <summary>

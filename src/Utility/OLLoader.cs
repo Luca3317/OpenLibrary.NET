@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 
 /*
  * Helper functions for requesting specific data from OpenLibrary, and populating OLData and OLObject records
@@ -132,7 +133,25 @@ namespace OpenLibraryNET
 
     public static class OLEditionLoader
     {
-        public async static Task<(bool, OLEditionData?)> TryGetDatabyOLIDAsync(string id)
+        public async static Task<(bool, OLEditionData?)> TryGetDataAsync(string id, EditionIdType? editionIdType = null)
+        {
+            try { return (true, await GetDataAsync(id, editionIdType)); }
+            catch { return (false, null); }
+        }
+        public async static Task<OLEditionData?> GetDataAsync(string id, EditionIdType? editionIdType = null)
+        {
+            if (editionIdType == null) editionIdType = InferEditionIdType(id);
+            switch (editionIdType)
+            {
+                case EditionIdType.OLID: return await GetDataByOLIDAsync(id);
+                case EditionIdType.ISBN: return await GetDataByISBNAsync(id);
+                case EditionIdType.LCCN: return await GetDataByBibkeyAsync("LCCN:" + GetPureID(id));
+                case EditionIdType.OCLC: return await GetDataByBibkeyAsync("OCLC:" + GetPureID(id));
+                default: return await GetDataByBibkeyAsync(id);
+            }
+        }
+
+        public async static Task<(bool, OLEditionData?)> TryGetDataByOLIDAsync(string id)
         {
             try { return (true, await GetDataByOLIDAsync(id)); }
             catch { return (false, null); }
@@ -166,6 +185,64 @@ namespace OpenLibraryNET
             );
         }
 
+        public async static Task<(bool, OLEditionData?)> TryGetDataByBibkeyAsync(string id, EditionIdType? editionIdType = null)
+        {
+            try { return (true, await GetDataByBibkeyAsync(id, editionIdType)); }
+            catch { return (false, null); }
+        }
+        public async static Task<OLEditionData?> GetDataByBibkeyAsync(string id, EditionIdType? editionIdType = null)
+        {
+            if (editionIdType == null) editionIdType = InferEditionIdType(id);
+            switch (editionIdType)
+            {
+                case EditionIdType.OLID: id = "OLID:" + GetPureID(id); break;
+                case EditionIdType.ISBN: id = "ISBN:" + GetPureID(id); break;
+                case EditionIdType.LCCN: id = "LCCN:" + GetPureID(id); break;
+                case EditionIdType.OCLC: id = "OCLC:" + GetPureID(id); break;
+            }
+
+            return await OpenLibraryUtility.LoadAsync<OLEditionData>
+            (
+                OpenLibraryUtility.BuildBooksURL
+                (
+                    new KeyValuePair<string, string>("bibkeys", id),
+                    new KeyValuePair<string, string>("jscmd", "data"),
+                    new KeyValuePair<string, string>("format", "json")
+                ),
+                id
+            );
+        }
+
+        public async static Task<(bool, OLBookViewAPI?)> TryGetViewAPIAsync(string id, EditionIdType? editionIdType = null)
+        {
+            try { return (true, await GetViewAPIAsync(id, editionIdType)); }
+            catch { return (false, null); }
+        }
+        public async static Task<OLBookViewAPI?> GetViewAPIAsync(string id, EditionIdType? editionIdType = null)
+        {
+            if (editionIdType == null) editionIdType = InferEditionIdType(id);
+            switch (editionIdType)
+            {
+                case EditionIdType.OLID: id = "OLID:" + GetPureID(id); break;
+                case EditionIdType.ISBN: id = "ISBN:" + GetPureID(id); break;
+                case EditionIdType.LCCN: id = "LCCN:" + GetPureID(id); break;
+                case EditionIdType.OCLC: id = "OCLC:" + GetPureID(id); break;
+            }
+
+            return await OpenLibraryUtility.LoadAsync<OLBookViewAPI>
+            (
+                OpenLibraryUtility.BuildBooksURL
+                (
+                    new KeyValuePair<string, string>("bibkeys", id),
+                    new KeyValuePair<string, string>("jscmd", "viewapi"),
+                    new KeyValuePair<string, string>("format", "json")
+                ),
+                id
+            );
+        }
+
+        // TODO Maybe; add support for getting lists by isbn/bibkey
+        // But: does not seem like that is possible in the OL API
         public async static Task<(bool, OLListData[]?)> TryGetListsAsync(string id, params KeyValuePair<string, string>[] parameters)
         {
             try { return (true, await GetListsAsync(id)); }
@@ -204,6 +281,30 @@ namespace OpenLibraryNET
                 ),
                 "size"
             );
+        }
+
+        private static string GetPureID(string id) => Regex.Match(id, "(?<=:)[^:]*$|^[^:]*$").ToString();
+        private static string GetIDPrefix(string id) => Regex.Match(id, "^[^:]*").ToString();
+
+        private static EditionIdType? InferEditionIdType(string id)
+        {
+            string pureID = GetPureID(id);
+            string idPrefix = GetIDPrefix(id);
+
+            if (idPrefix != null && idPrefix != "")
+            {
+                switch (idPrefix)
+                {
+                    case "ISBN": return EditionIdType.ISBN;
+                    case "LCCN": return EditionIdType.LCCN;
+                    case "OCLC": return EditionIdType.OCLC;
+                    case "OLID": return EditionIdType.OLID;
+                }
+            }
+            if (Regex.Match(pureID, "^OL[0-9]*[A-Z]").Success)
+                return EditionIdType.OLID;
+
+            return null;
         }
     }
 
