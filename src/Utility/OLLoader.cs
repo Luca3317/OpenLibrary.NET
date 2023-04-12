@@ -108,6 +108,26 @@ namespace OpenLibraryNET
                 "entries"
             );
         }
+
+        public async static Task<(bool, int?)> TryGetListsCountAsync(string id)
+        {
+            try { return (true, await GetListsCountAsync(id)); }
+            catch { return (false, null); }
+        }
+        public async static Task<int> GetListsCountAsync(string id)
+        {
+            return await OpenLibraryUtility.LoadAsync<int>
+            (
+                OpenLibraryUtility.BuildURL
+                (
+                    OLRequestAPI.Books_Works,
+                    id,
+                    "lists",
+                    new KeyValuePair<string, string>("limit", "0")
+                ),
+                "size"
+            );
+        }
     }
 
     public static class OLEditionLoader
@@ -163,6 +183,26 @@ namespace OpenLibraryNET
                     parameters
                 ),
                 "entries"
+            );
+        }
+
+        public async static Task<(bool, int?)> TryGetListsCountAsync(string id)
+        {
+            try { return (true, await GetListsCountAsync(id)); }
+            catch { return (false, null); }
+        }
+        public async static Task<int> GetListsCountAsync(string id)
+        {
+            return await OpenLibraryUtility.LoadAsync<int>
+            (
+                OpenLibraryUtility.BuildURL
+                (
+                    OLRequestAPI.Books_Editions,
+                    id,
+                    "lists",
+                    new KeyValuePair<string, string>("limit", "0")
+                ),
+                "size"
             );
         }
     }
@@ -241,6 +281,26 @@ namespace OpenLibraryNET
                 "entries"
             );
         }
+
+        public async static Task<(bool, int?)> TryGetListsCountAsync(string id)
+        {
+            try { return (true, await GetListsCountAsync(id)); }
+            catch { return (false, null); }
+        }
+        public async static Task<int> GetListsCountAsync(string id)
+        {
+            return await OpenLibraryUtility.LoadAsync<int>
+            (
+                OpenLibraryUtility.BuildURL
+                (
+                    OLRequestAPI.Authors,
+                    id,
+                    "lists",
+                    new KeyValuePair<string, string>("limit", "0")
+                ),
+                "size"
+            );
+        }
     }
 
     public static class OLSubjectLoader
@@ -275,6 +335,26 @@ namespace OpenLibraryNET
                     parameters
                 ),
                 "entries"
+            );
+        }
+
+        public async static Task<(bool, int?)> TryGetListsCountAsync(string id)
+        {
+            try { return (true, await GetListsCountAsync(id)); }
+            catch { return (false, null); }
+        }
+        public async static Task<int> GetListsCountAsync(string id)
+        {
+            return await OpenLibraryUtility.LoadAsync<int>
+            (
+                OpenLibraryUtility.BuildURL
+                (
+                    OLRequestAPI.Subjects,
+                    id,
+                    "lists",
+                    new KeyValuePair<string, string>("limit", "0")
+                ),
+                "size"
             );
         }
     }
