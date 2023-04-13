@@ -22,11 +22,12 @@ Currently, OpenLibrary.Net supports the following of OpenLibrary's APIs:
 * [Subjects API](docs/Subjects%20API.md)
 * [Search API](docs/Search%20API.md)
 * [Lists API](docs/Lists%20API.md)
+* [RecentChanges API](docs/RecentChanges%20API.md)
 * Covers API
   * [Covers API](docs/Covers%20API.md)
   * [AuthorPhotos API](docs/Covers%20API.md)
 
-For now, the SearchInside, Partner and RecentChanges are unsupported.
+For now, the SearchInside and Partner API are unsupported.
 ***
 Coming TODO:
 
