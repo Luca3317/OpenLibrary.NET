@@ -607,4 +607,27 @@ namespace OpenLibraryNET
         }
         */
     }
+
+    public static class OLRecentChangesLoader
+    {
+        public async static Task<OLRecentChangesData[]?> GetRecentChangesAsync(string kind = "", params KeyValuePair<string, string>[] parameters)
+        {
+            return await OpenLibraryUtility.LoadAsync<OLRecentChangesData[]>(OpenLibraryUtility.BuildRecentChangesURL(kind, parameters));
+        }
+
+        public async static Task<OLRecentChangesData[]?> GetRecentChangesAsync(string year, string kind = "", params KeyValuePair<string, string>[] parameters)
+        {
+            return await OpenLibraryUtility.LoadAsync<OLRecentChangesData[]>(OpenLibraryUtility.BuildRecentChangesURL(year, kind, parameters));
+        }
+
+        public async static Task<OLRecentChangesData[]?> GetRecentChangesAsync(string year, string month, string kind = "", params KeyValuePair<string, string>[] parameters)
+        {
+            return await OpenLibraryUtility.LoadAsync<OLRecentChangesData[]>(OpenLibraryUtility.BuildRecentChangesURL(year, month, kind, parameters));
+        }
+
+        public async static Task<OLRecentChangesData[]?> GetRecentChangesAsync(string year, string month, string day, string kind = "", params KeyValuePair<string, string>[] parameters)
+        {
+            return await OpenLibraryUtility.LoadAsync<OLRecentChangesData[]>(OpenLibraryUtility.BuildRecentChangesURL(year, month, day, kind, parameters));
+        }
+    }
 }

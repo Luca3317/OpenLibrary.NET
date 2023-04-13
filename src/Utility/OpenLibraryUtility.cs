@@ -4,6 +4,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
+using System;
 
 namespace OpenLibraryNET
 {
@@ -362,6 +363,27 @@ namespace OpenLibraryNET
                     serializer.Serialize(writer, value);
                 }
             }
+
+            public class RecentChangesAuthorConverter : JsonConverter<string>
+            {
+                public override string? ReadJson(JsonReader reader, Type objectType, string? existingValue, bool hasExistingValue, JsonSerializer serializer)
+                {
+                    if (reader.TokenType == JsonToken.String) return reader.Value!.ToString();
+                    else if (reader.TokenType == JsonToken.StartObject)
+                    {
+                        JToken? value = JToken.ReadFrom(reader)["key"];
+
+                        if (value != null && value.Type == JTokenType.String) return value.ToObject<string>();
+                    }
+
+                    throw new JsonException();
+                }
+
+                public override void WriteJson(JsonWriter writer, string? value, JsonSerializer serializer)
+                {
+                    serializer.Serialize(writer, value);
+                }
+            }
         }
         #endregion
 
@@ -384,7 +406,8 @@ namespace OpenLibraryNET
             {OLRequestAPI.Partner, ""},
             {OLRequestAPI.Covers, "b"},
             {OLRequestAPI.AuthorPhotos, "a"},
-            {OLRequestAPI.RecentChanges, ""},
+            {OLRequestAPI.RecentChanges, "recentchanges"},
+            {OLRequestAPI.Lists, "lists"}
             }
         );
 
@@ -517,6 +540,16 @@ namespace OpenLibraryNET
                 {string.Empty, new List<string>() { } },
                 {"editions", new List<string>() { "limit", "offset" } },
                 {"subjects", new List<string>() { "limit", "offset" } }
+            }
+        );
+        #endregion
+
+        #region RecentChanges Maps
+        public static readonly ReadOnlyDictionary<string, List<string>> RecentChangesSubfileFiltersMap = new ReadOnlyDictionary<string, List<string>>
+        (
+            new Dictionary<string, List<string>>
+            {
+                {string.Empty, new List<string>() { "limit", "offset", "bot" } }
             }
         );
         #endregion
