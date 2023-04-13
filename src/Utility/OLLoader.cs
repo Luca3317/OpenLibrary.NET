@@ -214,11 +214,16 @@ namespace OpenLibraryNET
         }
 
         public async static Task<(bool, OLBookViewAPI?)> TryGetViewAPIAsync(string id, EditionIdType? editionIdType = null)
+            => await TryGetViewAPIAsync(id, false, editionIdType);
+        public async static Task<OLBookViewAPI?> GetViewAPIAsync(string id, EditionIdType? editionIdType = null)
+            => await GetViewAPIAsync(id, false, editionIdType);
+
+        public async static Task<(bool, OLBookViewAPI?)> TryGetViewAPIAsync(string id, bool details = false, EditionIdType? editionIdType = null)
         {
-            try { return (true, await GetViewAPIAsync(id, editionIdType)); }
+            try { return (true, await GetViewAPIAsync(id, details, editionIdType)); }
             catch { return (false, null); }
         }
-        public async static Task<OLBookViewAPI?> GetViewAPIAsync(string id, EditionIdType? editionIdType = null)
+        public async static Task<OLBookViewAPI?> GetViewAPIAsync(string id, bool details = false, EditionIdType? editionIdType = null)
         {
             if (editionIdType == null) editionIdType = InferEditionIdType(id);
             switch (editionIdType)
@@ -234,15 +239,13 @@ namespace OpenLibraryNET
                 OpenLibraryUtility.BuildBooksURL
                 (
                     new KeyValuePair<string, string>("bibkeys", id),
-                    new KeyValuePair<string, string>("jscmd", "viewapi"),
+                    new KeyValuePair<string, string>("jscmd", details ? "details" : "viewapi"),
                     new KeyValuePair<string, string>("format", "json")
                 ),
                 id
             );
         }
 
-        // TODO Maybe; add support for getting lists by isbn/bibkey
-        // But: does not seem like that is possible in the OL API
         public async static Task<(bool, OLListData[]?)> TryGetListsAsync(string id, params KeyValuePair<string, string>[] parameters)
         {
             try { return (true, await GetListsAsync(id)); }
