@@ -1,11 +1,7 @@
-﻿using OpenLibraryNET;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using OpenLibraryNET.Utility;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace OpenLibraryNET
+namespace OpenLibraryNET.Loader
 {
     public class OLImageLoader
     {

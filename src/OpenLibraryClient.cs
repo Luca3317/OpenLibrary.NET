@@ -1,10 +1,8 @@
-﻿
-using Newtonsoft.Json.Linq;
-using OpenLibraryNET;
-using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
 using System.Text.RegularExpressions;
+using OpenLibraryNET.Loader;
+using OpenLibraryNET.Utility;
 
 namespace OpenLibraryNET
 {

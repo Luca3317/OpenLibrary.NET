@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
+using OpenLibraryNET.Utility;
 using System.Text.RegularExpressions;
 
-namespace OpenLibraryNET
+namespace OpenLibraryNET.Data
 {
     /// <summary>
     /// Represents an OpenLibrary List request.

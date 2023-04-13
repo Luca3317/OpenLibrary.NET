@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.ObjectModel;
+using OpenLibraryNET.Data;
+using OpenLibraryNET.Utility;
 
 namespace OpenLibraryNET
 {

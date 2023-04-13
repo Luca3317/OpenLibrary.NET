@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace OpenLibraryNET
+namespace OpenLibraryNET.Utility
 {
     public class OLRequestBuilder
     {

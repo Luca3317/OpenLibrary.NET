@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.ObjectModel;
+using OpenLibraryNET.Utility;
 
-namespace OpenLibraryNET
+namespace OpenLibraryNET.Data
 {
     /// <summary>
     /// Represents an OpenLibrary Work request.

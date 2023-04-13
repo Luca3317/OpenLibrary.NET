@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenLibraryNET.Utility;
 
-namespace OpenLibraryNET
+namespace OpenLibraryNET.Data
 {
     public class OLRecentChangesData
     {

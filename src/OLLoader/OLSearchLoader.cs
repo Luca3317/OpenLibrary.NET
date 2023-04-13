@@ -1,11 +1,7 @@
-﻿using OpenLibraryNET;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenLibraryNET.Data;
+using OpenLibraryNET.Utility;
 
-namespace OpenLibraryNET
+namespace OpenLibraryNET.Loader
 {
     public class OLSearchLoader
     {
