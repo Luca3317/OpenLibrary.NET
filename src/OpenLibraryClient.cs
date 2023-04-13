@@ -37,14 +37,14 @@ namespace OpenLibraryNET
             _recentChanges = new OLRecentChangesLoader(_httpClient);
         }
 
-        public async Task<bool> TryLogin(string email, string password)
+        public async Task<bool> TryLoginAsync(string email, string password)
         {
-            try { await Login(email, password); return true; }
+            try { await LoginAsync(email, password); return true; }
             catch { return false; }
         }
-        public async Task Login(string email, string password)
+        public async Task LoginAsync(string email, string password)
         {
-            await Logout();
+            await LogoutAsync();
 
             var loginData = new KeyValuePair<string, string>[]
             {
@@ -69,12 +69,12 @@ namespace OpenLibraryNET
             catch { throw new System.Exception("Failed to authenticate; did you correctly input your email and password?"); }
         }
 
-        public async Task<bool> TryLogout()
+        public async Task<bool> TryLogoutAsync()
         {
-            try { await Logout(); return true; }
+            try { await LogoutAsync(); return true; }
             catch { return false; }
         }
-        public async Task Logout()
+        public async Task LogoutAsync()
         {
             if (!LoggedIn) return;
 
