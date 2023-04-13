@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
 namespace OpenLibraryNET
 {
@@ -7,6 +8,8 @@ namespace OpenLibraryNET
     /// </summary>
     public sealed record OLListData : OLContainer
     {
+        public string ID => Regex.Match(URL, "(?<=/)[^/]+$").ToString();
+
         [JsonProperty("name")]
         public string Name { get; init; } = "";
         [JsonProperty("url")]
