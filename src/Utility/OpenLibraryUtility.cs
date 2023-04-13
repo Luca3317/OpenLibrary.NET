@@ -92,15 +92,26 @@ namespace OpenLibraryNET
         /* Helper functions for requesting (and deserializing) data.
          */
         #region Requests
-        public async static Task<string> RequestAsync(string url)
+        public async static Task<string> RequestAsync(string url, HttpClient? client = null)
         {
             if (client == null) client = GetClient();
             return await client.GetStringAsync(url);
         }
 
-        public async static Task<T?> LoadAsync<T>(string url, string path = "")
+        public static T? Parse<T>(string serialized, string path = "")
         {
-            string response = await RequestAsync(url);
+            if (string.IsNullOrWhiteSpace(path))
+                return JsonConvert.DeserializeObject<T>(serialized);
+            else
+            {
+                JToken token = JToken.Parse(serialized);
+                return token[path]!.ToObject<T>();
+            }
+        }
+
+        public async static Task<T?> LoadAsync<T>(string url, string path = "", HttpClient? client = null)
+        {
+            string response = await RequestAsync(url, client);
             if (string.IsNullOrWhiteSpace(path))
                 return JsonConvert.DeserializeObject<T>(response);
             else
@@ -112,13 +123,13 @@ namespace OpenLibraryNET
 
         private static HttpClient? client = null;
 
-        private static HttpClient GetClient()
+        public static HttpClient GetClient()
         {
             HttpClientHandler handler = new HttpClientHandler()
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
             };
-            client = new HttpClient(handler);
+            HttpClient client = new HttpClient(handler);
             return client;
         }
         #endregion
