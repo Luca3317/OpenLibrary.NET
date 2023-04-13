@@ -8,103 +8,25 @@ namespace OpenLibraryNET
     /// </summary>
     public sealed record OLAuthor
     {
-        [JsonIgnore]
-        public string ID => _id;
-
-        [JsonIgnore]
-        public int WorksRequested => _works == null ? 0 : _works.Count;
-        [JsonIgnore]
-        public int TotalWorks => _totalWorks;
-
-        [JsonIgnore]
-        public OLAuthorData? Data => _data;
-        [JsonIgnore]
-        public IReadOnlyList<OLWorkData>? Works => _works == null ? null : new ReadOnlyCollection<OLWorkData>(_works);
-
-        [JsonConstructor]
-        public OLAuthor(string id) => _id = id;
-
-        public OLAuthor(OLAuthorData data)
-        {
-            _id = data.ID;
-            _data = data;
-        }
-
-        public async Task<(bool, OLAuthorData?)> TryGetDataAsync()
-        {
-            try { return (true, await GetDataAsync()); }
-            catch { return (false, null); }
-        }
-        public async Task<OLAuthorData?> GetDataAsync()
-        {
-            if (_data == null) _data = await OLAuthorLoader.GetDataAsync(_id);
-            return _data;
-        }
-
-        public async Task<(bool, IReadOnlyList<OLWorkData>?)> TryRequestWorksAsync(int amount)
-        {
-            try { return (true, await RequestWorksAsync(amount)); }
-            catch { return (false, null); }
-        }
-        public async Task<IReadOnlyList<OLWorkData>?> RequestWorksAsync(int amount)
-        {
-            if (_totalWorks != -1 && _totalWorks > amount)
-                amount = _totalWorks;
-
-            if (_works == null)
-            {
-                _works = new List<OLWorkData>
-                (
-                    (await OLAuthorLoader.GetWorksAsync
-                    (
-                        _id,
-                        new KeyValuePair<string, string>("limit", amount.ToString())
-                    ))!
-                );
-
-                return new ReadOnlyCollection<OLWorkData>(_works);
-            }
-            else if (amount > _works.Count)
-            {
-                _works.AddRange
-                (
-                    (await OLAuthorLoader.GetWorksAsync
-                    (
-                        _id,
-                        new KeyValuePair<string, string>("limit", (amount - _works.Count).ToString()),
-                        new KeyValuePair<string, string>("offset", _works.Count.ToString())
-                    ))!
-                );
-            }
-
-            return new ReadOnlyCollection<OLWorkData>(_works);
-        }
-
-        public async Task<(bool, int?)> TryGetTotalWorksCountAsync()
-        {
-            try { return (true, await GetTotalWorksCountAsync()); }
-            catch { return (false, null); }
-        }
-        public async Task<int> GetTotalWorksCountAsync()
-        {
-            if (_totalWorks == -1) _totalWorks = await OLAuthorLoader.GetWorksCountAsync(_id);
-            return _totalWorks;
-        }
-
         [JsonProperty("id")]
-        private string _id;
+        public string ID { get; init; } = "";
         [JsonProperty("data")]
-        private OLAuthorData? _data = null;
+        public OLAuthorData? Data { get; init; } = null;
+        [JsonIgnore]
+        public IReadOnlyList<OLWorkData>? Works
+        {
+            get => _works == null ? null : new ReadOnlyCollection<OLWorkData>(_works);
+            init { if (value == null) _works = null; else _works = value.ToArray(); }
+        }
+
         [JsonProperty("works")]
-        private List<OLWorkData>? _works = null;
-        [JsonProperty("total_works")]
-        private int _totalWorks = -1;
+        private OLWorkData[]? _works { get; init; } = null;
 
         public bool Equals(OLAuthor? author)
         {
             return author != null &&
-                author._id == _id &&
-                author._data == _data &&
+                author.ID == ID &&
+                author.Data == Data &&
                 GeneralUtility.SequenceEqual(author._works, _works);
         }
         public override int GetHashCode() => base.GetHashCode();

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.ObjectModel;
 
 namespace OpenLibraryNET
 {
@@ -7,61 +8,36 @@ namespace OpenLibraryNET
     /// </summary>
     public sealed record OLEdition
     {
-        [JsonIgnore]
-        public string ID => _id;
-        [JsonIgnore]
-        public OLEditionData? Data => _data;
-
-        [JsonConstructor]
-        public OLEdition(string id) => _id = id;
-
-        public OLEdition(OLEditionData data)
-        {
-            _id = data.ID;
-            _data = data;
-        }
-
-        public async Task<(bool, OLEditionData?)> TryGetDataAsync()
-        {
-            try { return (true, await GetDataAsync()); }
-            catch { return (false, null); }
-        }
-        public async Task<OLEditionData?> GetDataAsync()
-        {
-            if (_data == null) _data = await OLEditionLoader.GetDataByOLIDAsync(_id);
-            return _data;
-        }
-
-        public async Task<byte[]?> GetCoverAsync(string size)
-        {
-            switch (size.Trim().ToLower())
-            {
-                case "s":
-                    if (_coverS == null) _coverS = await OLImageLoader.GetCoverAsync("olid", _id, "S");
-                    return _coverS;
-
-                case "m":
-                    if (_coverM == null) _coverM = await OLImageLoader.GetCoverAsync("olid", _id, "M");
-                    return _coverS;
-
-                case "l":
-                    if (_coverL == null) _coverL = await OLImageLoader.GetCoverAsync("olid", _id, "L");
-                    return _coverL;
-            }
-
-            return null;
-        }
-
         [JsonProperty("id")]
-        private string _id;
+        public string ID { get; init; } = "";
         [JsonProperty("data")]
-        private OLEditionData? _data = null;
+        public OLEditionData? Data { get; init; } = null;
+
+        [JsonIgnore]
+        public IReadOnlyList<byte>? CoverS
+        {
+            get => cover_S == null ? null : new ReadOnlyCollection<byte>(cover_S);
+            init { if (value == null) cover_S = null; else cover_S = value.ToArray(); }
+        }
+        [JsonIgnore]
+        public IReadOnlyList<byte>? CoverM
+        {
+            get => cover_M == null ? null : new ReadOnlyCollection<byte>(cover_M);
+            init { if (value == null) cover_M = null; else cover_M = value.ToArray(); }
+        }
+        [JsonIgnore]
+        public IReadOnlyList<byte>? CoverL
+        {
+            get => cover_L == null ? null : new ReadOnlyCollection<byte>(cover_L);
+            init { if (value == null) cover_L = null; else cover_L = value.ToArray(); }
+        }
+
         [JsonProperty("cover_s")]
-        private byte[]? _coverS = null;
+        private byte[]? cover_S { get; init; } = null;
         [JsonProperty("cover_m")]
-        private byte[]? _coverM = null;
+        private byte[]? cover_M { get; init; } = null;
         [JsonProperty("cover_l")]
-        private byte[]? _coverL = null;
+        private byte[]? cover_L { get; init; } = null;
 
         public bool Equals(OLEdition? edition)
         {
