@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http.Json;
 using System.Text.RegularExpressions;
 using OpenLibraryNET.Loader;
@@ -43,8 +44,7 @@ namespace OpenLibraryNET
         }
         public async Task Login(string email, string password)
         {
-            // Clear cookies TODO: maybe only remove session cookie
-            _httpHandler.CookieContainer = new CookieContainer();
+            await Logout();
 
             var loginData = new KeyValuePair<string, string>[]
             {
@@ -69,9 +69,68 @@ namespace OpenLibraryNET
             catch { throw new System.Exception("Failed to authenticate; did you correctly input your email and password?"); }
         }
 
+        public async Task<bool> TryLogout()
+        {
+            try { await Logout(); return true; }
+            catch { return false; }
+        }
+        public async Task Logout()
+        {
+            if (!LoggedIn) return;
+
+            Uri uri = new Uri("https://openlibrary.org/account/logout");
+            var response = await _httpClient.PostAsync(uri, null);
+
+            _loggedIn = false;
+            _email = null;
+            _password = null;
+            _username = null;
+        }
+
+        public async Task<OLWork> GetWorkAsync(string id, int editionsCount = 0)
+        {
+            return new OLWork()
+            {
+                ID = id,
+                Data = await _work.GetDataAsync(id),
+                Ratings = await _work.GetRatingsAsync(id),
+                Bookshelves = await _work.GetBookshelvesAsync(id),
+                Editions = editionsCount > 0 ? 
+                    await _work.GetEditionsAsync(id, new KeyValuePair<string, string>("limit", editionsCount.ToString())) : null
+            };
+        }
+
+        public async Task<OLAuthor> GetAuthorAsync(string id, int worksCount = 0)
+        {
+            return new OLAuthor()
+            {
+                ID = id,
+                Data = await _author.GetDataAsync(id),
+                Works = worksCount > 0 ?
+                    await _author.GetWorksAsync(id, new KeyValuePair<string, string>("limit", worksCount.ToString())) : null
+            };
+        }
+
+        public async Task<OLEdition> GetEditionAsync(string id, EditionIdType? idType = null, string coverSize = "")
+        {
+            OLEdition edition = new OLEdition()
+            {
+                ID = id,
+                Data = await _edition.GetDataAsync(id, idType),
+            };
+
+            switch (coverSize.Trim().ToLower())
+            {
+                case "s": return edition with { CoverS = await _image.GetCoverAsync("ID", edition.Data!.CoverKeys[0].ToString(), "s") }; 
+                case "m": return edition with { CoverM = await _image.GetCoverAsync("ID", edition.Data!.CoverKeys[0].ToString(), "m") }; 
+                case "l": return edition with { CoverL = await _image.GetCoverAsync("ID", edition.Data!.CoverKeys[0].ToString(), "l") };
+                default: return edition;
+            }
+        }
+
         public async Task<bool> TryCreateListAsync(string listName, string listDescription, IEnumerable<string>? listSeeds = null, IEnumerable<string>? listTags = null)
         {
-            try { await CreateListAsync(listName, listDescription, listSeeds, listTags);  return true; }
+            try { await CreateListAsync(listName, listDescription, listSeeds, listTags); return true; }
             catch { return false; }
         }
         public async Task CreateListAsync(string listName, string listDescription = "", IEnumerable<string>? listSeeds = null, IEnumerable<string>? listTags = null)
@@ -91,7 +150,7 @@ namespace OpenLibraryNET
 
         public async Task<bool> TryDeleteListAsync(string listID)
         {
-            try { await DeleteListAsync(listID); return true; } 
+            try { await DeleteListAsync(listID); return true; }
             catch { return false; };
         }
         public async Task DeleteListAsync(string listID)
