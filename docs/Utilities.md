@@ -2,7 +2,7 @@
 
 There are various important utility classes.
 
-### OLLoader
+### [OLLoader](https://github.com/Luca3317/OpenLibrary.NET/tree/main/src/OLLoader)
 
 For each of OpenLibrary's APIs there is a static Loader class. These supply a simple interface for requesting and parsing specific data from OpenLibrary.
 
@@ -13,7 +13,7 @@ OLRatingsData workRatings = await OLWorkLoader.GetRatingsAsync("OL21019691W");
 ```
 For examples for each Loader class, see the respective API's documentations.
 
-### OpenLibraryUtility
+### [OpenLibraryUtility](https://github.com/Luca3317/OpenLibrary.NET/blob/main/src/Utility/OpenLibraryUtility.cs)
 The main utility class. Provides various helpful methods and variables.
 
 #### Constants
