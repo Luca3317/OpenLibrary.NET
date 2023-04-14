@@ -1,4 +1,4 @@
-﻿﻿# Docs
+# Docs
 
 These docs relate to OpenLibrary.NET.
 
