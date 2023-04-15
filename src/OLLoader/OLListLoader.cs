@@ -34,7 +34,7 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<OLListData[]>
             (
-                OpenLibraryUtility.BuildListsURL(username),
+                OpenLibraryUtility.BuildListsUri(username),
                 "entries",
                 client: client
             );
@@ -49,7 +49,7 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<OLListData>
             (
-                OpenLibraryUtility.BuildListsURL(username, id),
+                OpenLibraryUtility.BuildListsUri(username, id),
                 client: client
             );
         }
@@ -63,7 +63,7 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<OLEditionData[]>
             (
-                OpenLibraryUtility.BuildListsURL(username, id, "editions", parameters),
+                OpenLibraryUtility.BuildListsUri(username, id, "editions", parameters),
                 "entries",
                 client: client
             );

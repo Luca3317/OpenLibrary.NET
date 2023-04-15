@@ -36,7 +36,7 @@ namespace OpenLibraryNET.Loader
         }
         public async static Task<OLRecentChangesData[]?> GetRecentChangesAsync(HttpClient client, string kind = "", params KeyValuePair<string, string>[] parameters)
         {
-            return await OpenLibraryUtility.LoadAsync<OLRecentChangesData[]>(OpenLibraryUtility.BuildRecentChangesURL(kind, parameters), client: client);
+            return await OpenLibraryUtility.LoadAsync<OLRecentChangesData[]>(OpenLibraryUtility.BuildRecentChangesUri(kind, parameters), client: client);
         }
 
         public async static Task<(bool, OLRecentChangesData[]?)> TryGetRecentChangesAsync(HttpClient client, string year, string kind = "", params KeyValuePair<string, string>[] parameters)
@@ -46,7 +46,7 @@ namespace OpenLibraryNET.Loader
         }
         public async static Task<OLRecentChangesData[]?> GetRecentChangesAsync(HttpClient client, string year, string kind = "", params KeyValuePair<string, string>[] parameters)
         {
-            return await OpenLibraryUtility.LoadAsync<OLRecentChangesData[]>(OpenLibraryUtility.BuildRecentChangesURL(year, kind, parameters), client: client);
+            return await OpenLibraryUtility.LoadAsync<OLRecentChangesData[]>(OpenLibraryUtility.BuildRecentChangesUri(year, kind, parameters), client: client);
         }
 
         public async static Task<(bool, OLRecentChangesData[]?)> TryGetRecentChangesAsync(HttpClient client, string year, string month, string kind = "", params KeyValuePair<string, string>[] parameters)
@@ -56,7 +56,7 @@ namespace OpenLibraryNET.Loader
         }
         public async static Task<OLRecentChangesData[]?> GetRecentChangesAsync(HttpClient client, string year, string month, string kind = "", params KeyValuePair<string, string>[] parameters)
         {
-            return await OpenLibraryUtility.LoadAsync<OLRecentChangesData[]>(OpenLibraryUtility.BuildRecentChangesURL(year, month, kind, parameters), client: client);
+            return await OpenLibraryUtility.LoadAsync<OLRecentChangesData[]>(OpenLibraryUtility.BuildRecentChangesUri(year, month, kind, parameters), client: client);
         }
 
         public async static Task<(bool, OLRecentChangesData[]?)> TryGetRecentChangesAsync(HttpClient client, string year, string month, string day, string kind = "", params KeyValuePair<string, string>[] parameters)
@@ -66,7 +66,7 @@ namespace OpenLibraryNET.Loader
         }
         public async static Task<OLRecentChangesData[]?> GetRecentChangesAsync(HttpClient client, string year, string month, string day, string kind = "", params KeyValuePair<string, string>[] parameters)
         {
-            return await OpenLibraryUtility.LoadAsync<OLRecentChangesData[]>(OpenLibraryUtility.BuildRecentChangesURL(year, month, day, kind, parameters), client: client);
+            return await OpenLibraryUtility.LoadAsync<OLRecentChangesData[]>(OpenLibraryUtility.BuildRecentChangesUri(year, month, day, kind, parameters), client: client);
         }
     }
 

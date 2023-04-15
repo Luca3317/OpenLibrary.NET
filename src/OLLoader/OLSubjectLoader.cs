@@ -14,43 +14,42 @@ namespace OpenLibraryNET.Loader
         public async Task<OLSubjectData?> GetDataAsync(string subject, params KeyValuePair<string, string>[] parameters)
             => await GetDataAsync(_client, subject, parameters);
 
-        public async Task<(bool, OLListData[]?)> TryGetListsAsync(string id, params KeyValuePair<string, string>[] parameters)
-            => await TryGetListsAsync(_client, id, parameters);
-        public async Task<OLListData[]?> GetListsAsync(string id, params KeyValuePair<string, string>[] parameters)
-            => await GetListsAsync(_client, id, parameters);
+        public async Task<(bool, OLListData[]?)> TryGetListsAsync(string subject, params KeyValuePair<string, string>[] parameters)
+            => await TryGetListsAsync(_client, subject, parameters);
+        public async Task<OLListData[]?> GetListsAsync(string subject, params KeyValuePair<string, string>[] parameters)
+            => await GetListsAsync(_client, subject, parameters);
 
-        public async Task<(bool, int?)> TryGetListsCountAsync(string id)
-            => await TryGetListsCountAsync(_client, id);
-        public async Task<int> GetListsCountAsync(string id)
-            => await GetListsCountAsync(_client, id);
+        public async Task<(bool, int?)> TryGetListsCountAsync(string subject)
+            => await TryGetListsCountAsync(_client, subject);
+        public async Task<int> GetListsCountAsync(string subject)
+            => await GetListsCountAsync(_client, subject);
 
-        public async static Task<(bool, OLSubjectData?)> TryGetDataAsync(HttpClient client, string id, params KeyValuePair<string, string>[] parameters)
+        public async static Task<(bool, OLSubjectData?)> TryGetDataAsync(HttpClient client, string subject, params KeyValuePair<string, string>[] parameters)
         {
-            try { return (true, await GetDataAsync(client, id, parameters)); }
+            try { return (true, await GetDataAsync(client, subject, parameters)); }
             catch { return (false, null); }
         }
         public async static Task<OLSubjectData?> GetDataAsync(HttpClient client, string subject, params KeyValuePair<string, string>[] parameters)
         {
             return await OpenLibraryUtility.LoadAsync<OLSubjectData>
             (
-                OpenLibraryUtility.BuildURL(OLRequestAPI.Subjects, subject, "", parameters),
+                OpenLibraryUtility.BuildSubjectsUri(subject, parameters: parameters),
                 client: client
             );
         }
 
-        public async static Task<(bool, OLListData[]?)> TryGetListsAsync(HttpClient client, string id, params KeyValuePair<string, string>[] parameters)
+        public async static Task<(bool, OLListData[]?)> TryGetListsAsync(HttpClient client, string subject, params KeyValuePair<string, string>[] parameters)
         {
-            try { return (true, await GetListsAsync(client, id)); }
+            try { return (true, await GetListsAsync(client, subject, parameters)); }
             catch { return (false, null); }
         }
-        public async static Task<OLListData[]?> GetListsAsync(HttpClient client, string id, params KeyValuePair<string, string>[] parameters)
+        public async static Task<OLListData[]?> GetListsAsync(HttpClient client, string subject, params KeyValuePair<string, string>[] parameters)
         {
             return await OpenLibraryUtility.LoadAsync<OLListData[]>
             (
-                OpenLibraryUtility.BuildURL
+                OpenLibraryUtility.BuildSubjectsUri
                 (
-                    OLRequestAPI.Subjects,
-                    id,
+                    subject,
                     "lists",
                     parameters
                 ),
@@ -59,19 +58,18 @@ namespace OpenLibraryNET.Loader
             );
         }
 
-        public async static Task<(bool, int?)> TryGetListsCountAsync(HttpClient client, string id)
+        public async static Task<(bool, int?)> TryGetListsCountAsync(HttpClient client, string subject)
         {
-            try { return (true, await GetListsCountAsync(client, id)); }
+            try { return (true, await GetListsCountAsync(client, subject)); }
             catch { return (false, null); }
         }
-        public async static Task<int> GetListsCountAsync(HttpClient client, string id)
+        public async static Task<int> GetListsCountAsync(HttpClient client, string subject)
         {
             return await OpenLibraryUtility.LoadAsync<int>
             (
-                OpenLibraryUtility.BuildURL
+                OpenLibraryUtility.BuildSubjectsUri
                 (
-                    OLRequestAPI.Subjects,
-                    id,
+                    subject,
                     "lists",
                     new KeyValuePair<string, string>("limit", "0")
                 ),

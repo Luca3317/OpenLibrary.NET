@@ -10,7 +10,5 @@ namespace OpenLibraryNET
         public string? Path { get; init; }
         public ReadOnlyDictionary<string, string> Params { get; init; }
             = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>());
-
-        public string ToURL() => OpenLibraryUtility.BuildURL(this);
     }
 }

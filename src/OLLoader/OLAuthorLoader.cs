@@ -43,7 +43,7 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<OLAuthorData>
             (
-                OpenLibraryUtility.BuildURL(OLRequestAPI.Authors, id),
+                OpenLibraryUtility.BuildUri(OLRequestAPI.Authors, id),
                 client: client
             );
         }
@@ -57,9 +57,8 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<OLWorkData[]>
             (
-                OpenLibraryUtility.BuildURL
+                OpenLibraryUtility.BuildAuthorsUri
                 (
-                    OLRequestAPI.Authors,
                     id,
                     "works",
                     parameters
@@ -78,9 +77,8 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<int>
             (
-                OpenLibraryUtility.BuildURL
+                OpenLibraryUtility.BuildAuthorsUri
                 (
-                    OLRequestAPI.Authors,
                     id,
                     "works",
                     new KeyValuePair<string, string>("limit", "0")
@@ -99,9 +97,8 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<OLListData[]>
             (
-                OpenLibraryUtility.BuildURL
+                OpenLibraryUtility.BuildAuthorsUri
                 (
-                    OLRequestAPI.Authors,
                     id,
                     "lists",
                     parameters
@@ -120,9 +117,8 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<int>
             (
-                OpenLibraryUtility.BuildURL
+                OpenLibraryUtility.BuildAuthorsUri
                 (
-                    OLRequestAPI.Authors,
                     id,
                     "lists",
                     new KeyValuePair<string, string>("limit", "0")

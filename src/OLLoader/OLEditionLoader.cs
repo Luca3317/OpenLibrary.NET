@@ -78,9 +78,8 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<OLEditionData>
             (
-                OpenLibraryUtility.BuildURL
+                OpenLibraryUtility.BuildEditionsUri
                 (
-                    OLRequestAPI.Books_Editions,
                     id
                 ),
                 client: client
@@ -92,14 +91,13 @@ namespace OpenLibraryNET.Loader
             try { return (true, await GetDataByISBNAsync(client, isbn)); }
             catch { return (false, null); }
         }
-        public async static Task<OLEditionData?> GetDataByISBNAsync(HttpClient client, string id)
+        public async static Task<OLEditionData?> GetDataByISBNAsync(HttpClient client, string isbn)
         {
             return await OpenLibraryUtility.LoadAsync<OLEditionData>
             (
-                OpenLibraryUtility.BuildURL
+                OpenLibraryUtility.BuildISBNUri
                 (
-                    OLRequestAPI.Books_ISBN,
-                    id
+                    isbn
                 ),
                 client: client
             );
@@ -123,8 +121,9 @@ namespace OpenLibraryNET.Loader
 
             return await OpenLibraryUtility.LoadAsync<OLEditionData>
             (
-                OpenLibraryUtility.BuildBooksURL
+                OpenLibraryUtility.BuildBooksUri
                 (
+                    "", "",
                     new KeyValuePair<string, string>("bibkeys", id),
                     new KeyValuePair<string, string>("jscmd", "data"),
                     new KeyValuePair<string, string>("format", "json")
@@ -157,8 +156,9 @@ namespace OpenLibraryNET.Loader
 
             return await OpenLibraryUtility.LoadAsync<OLBookViewAPI>
             (
-                OpenLibraryUtility.BuildBooksURL
+                OpenLibraryUtility.BuildBooksUri
                 (
+                    "", "",
                     new KeyValuePair<string, string>("bibkeys", id),
                     new KeyValuePair<string, string>("jscmd", details ? "details" : "viewapi"),
                     new KeyValuePair<string, string>("format", "json")
@@ -177,9 +177,8 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<OLListData[]>
             (
-                OpenLibraryUtility.BuildURL
+                OpenLibraryUtility.BuildEditionsUri
                 (
-                    OLRequestAPI.Books_Editions,
                     id,
                     "lists",
                     parameters
@@ -198,9 +197,8 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<int>
             (
-                OpenLibraryUtility.BuildURL
+                OpenLibraryUtility.BuildEditionsUri
                 (
-                    OLRequestAPI.Books_Editions,
                     id,
                     "lists",
                     new KeyValuePair<string, string>("limit", "0")

@@ -5,14 +5,20 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using System;
+using System.Security.Cryptography;
+using System.IO;
+using System.Reflection.Metadata;
 
 namespace OpenLibraryNET.Utility
 {
     public static class OpenLibraryUtility
     {
         #region Constants
-        public const string BaseURL = "https://openlibrary.org/";
-        public const string BaseURL_Covers = "https://covers.openlibrary.org/";
+        public const string BaseURL = "openlibrary.org";
+        public const string BaseURL_Covers = "covers.openlibrary.org";
+
+        public static readonly Uri BaseUri = new Uri("https://" + BaseURL);
+        public static readonly Uri BaseUri_Covers = new Uri("https://" + BaseURL_Covers);
         #endregion
 
         // TODO Make more robust; rn will just remove /xyz/
@@ -24,81 +30,252 @@ namespace OpenLibraryNET.Utility
         /* Helper functions for correctly formatting OpenLibrary request URLs. 
          */
         #region URL Builders Functions
-
-        public static string BuildURL(OLRequest request)
+        public static Uri BuildWorksUri(string olid, string path = "", params KeyValuePair<string, string>[] parameters)
         {
-            // TODO: perhaps instead dont make request.API nullable?
-            if (request.API == null) throw new InvalidOperationException();
-            return BuildURL((OLRequestAPI)request.API, request.ID, request.Path, request.Params.ToArray());
+            return BuildUri
+            (
+                BaseURL,
+                "works/" + olid + (string.IsNullOrWhiteSpace(path) ? "" : "/" + path) + ".json",
+                parameters
+            );
         }
 
-        public static string BuildURL(OLRequestAPI api, string? id = null, string? path = null, params KeyValuePair<string, string>[] parameters)
+        public static Uri BuildEditionsUri(string olid, string path = "", params KeyValuePair<string, string>[] parameters)
         {
-            StringBuilder stringBuilder = new StringBuilder().Clear();
+            return BuildUri
+            (
+                BaseURL,
+                "books/" + olid + (string.IsNullOrWhiteSpace(path) ? "" : "/" + path) + ".json",
+                parameters
+            );
+        }
+
+        public static Uri BuildISBNUri(string isbn)
+        {
+            return BuildUri
+            (
+                BaseURL,
+                "isbn/" + isbn + ".json"
+            );
+        }
+
+        public static Uri BuildBooksUri(string bibkeys = "", string path = "", params KeyValuePair<string, string>[] parameters)
+            => BuildUri
+                (
+                    BaseURL,
+                    "api/books" + (string.IsNullOrWhiteSpace(path) ? "" : "/" + path) + ".json",
+                    string.IsNullOrWhiteSpace(bibkeys) ?
+                    parameters :
+                    new List<KeyValuePair<string, string>>(parameters) { new KeyValuePair<string, string>("bibkeys", bibkeys) }.ToArray()
+
+                );
+
+        public static Uri BuildAuthorsUri(string olid, string path = "", params KeyValuePair<string, string>[] parameters)
+        {
+            return BuildUri
+            (
+                BaseURL,
+                "authors/" + olid + (string.IsNullOrWhiteSpace(path) ? "" : "/" + path) + ".json",
+                parameters
+            );
+        }
+
+        public static Uri BuildSubjectsUri(string subject, string path = "", params KeyValuePair<string, string>[] parameters)
+        {
+            return BuildUri
+            (
+                BaseURL,
+                "subjects/" + subject + (string.IsNullOrWhiteSpace(path) ? "" : "/" + path) + ".json",
+                parameters
+            );
+        }
+
+        public static Uri BuildSearchUri(string query = "", string path = "", params KeyValuePair<string, string>[] parameters)
+        {
+            return BuildUri
+            (
+                BaseURL,
+                "search" + (string.IsNullOrWhiteSpace(path) ? "" : "/" + path) + ".json",
+                string.IsNullOrWhiteSpace(query) ?
+                    parameters :
+                    new List<KeyValuePair<string, string>>(parameters) { new KeyValuePair<string, string>("q", query) }.ToArray()
+            );
+        }
+
+        public static Uri BuildRecentChangesUri(string year, string month, string day, string kind = "", params KeyValuePair<string, string>[] parameters)
+            => BuildRecentChangesUri(year + "/" + month + "/" + day + (string.IsNullOrWhiteSpace(kind) ? "" : "/" + kind), parameters);
+        public static Uri BuildRecentChangesUri(string year, string month, string kind = "", params KeyValuePair<string, string>[] parameters)
+            => BuildRecentChangesUri(year + "/" + month + (string.IsNullOrWhiteSpace(kind) ? "" : "/" + kind), parameters);
+        public static Uri BuildRecentChangesUri(string year, string kind = "", params KeyValuePair<string, string>[] parameters)
+            => BuildRecentChangesUri(year + (string.IsNullOrWhiteSpace(kind) ? "" : "/" + kind), parameters);
+        public static Uri BuildRecentChangesUri(string kind = "", params KeyValuePair<string, string>[] parameters)
+        {
+            return BuildUri
+            (
+                BaseURL,
+                "recentchanges" +
+                (string.IsNullOrWhiteSpace(kind) ? "" : "/" + kind) + ".json",
+                parameters
+            );
+        }
+
+        public static Uri BuildListsUri(string username, string? id = null, string? path = null, params KeyValuePair<string, string>[] parameters)
+        {
+            return BuildUri
+            (
+                BaseURL,
+                "people/" + username + "/lists" +
+                (string.IsNullOrWhiteSpace(id) ? "" : "/" + id) +
+                (string.IsNullOrWhiteSpace(path) ? "" : "/" + path) +
+                ".json",
+                parameters
+            );
+        }
+
+        public static Uri BuildCoversUri(string key, params KeyValuePair<string, string>[] parameters)
+        {
+            return BuildUri
+            (
+                BaseURL_Covers,
+                "b/" + key + ".jpg",
+                parameters
+            );
+        }
+        public static Uri BuildCoversUri(string idType, string id, string size, params KeyValuePair<string, string>[] parameters)
+        {
+            return BuildUri
+            (
+                BaseURL_Covers,
+                "b/" + idType + "/" + id + "-" + size + ".jpg",
+                parameters
+            );
+        }
+
+        public static Uri BuildAuthorsPhotosUri(string key, params KeyValuePair<string, string>[] parameters)
+        {
+            return BuildUri
+            (
+                BaseURL_Covers,
+                "a/" + key + ".jpg",
+                parameters
+            );
+        }
+        public static Uri BuildAuthorsPhotosUri(string idType, string id, string size, params KeyValuePair<string, string>[] parameters)
+        {
+            return BuildUri
+            (
+                BaseURL_Covers,
+                "a/" + idType + "/" + id + "-" + size + ".jpg",
+                parameters
+            );
+        }
+
+        // TODO maybe add only path + parameters version for each builder; could call this here then instead of using requesttypeprefixmap
+        public static Uri BuildUri(OLRequestAPI api, string path, params KeyValuePair<string, string>[] parameters)
+        {
+            // Remove leading prefix if it is there, to prevent duplication
+            path = SetPrefix(api, path);
+            path = SetFileExtension(api, path);
 
             switch (api)
             {
                 case OLRequestAPI.Covers:
-                case OLRequestAPI.AuthorPhotos:
-                    stringBuilder.Append(BaseURL_Covers + RequestTypePrefixMap[api] + "/" + id + ".jpg");
-                    break;
+                case OLRequestAPI.AuthorPhotos: return BuildUri(BaseURL_Covers, path, KeyValuePairToString(parameters));
 
-                case OLRequestAPI.Search:
-                    stringBuilder.Append(BaseURL + RequestTypePrefixMap[api]);
+                default: return BuildUri(BaseURL, path, KeyValuePairToString(parameters));
+            }
+        }
 
-                    if (!string.IsNullOrWhiteSpace(path))
-                        stringBuilder.Append("/" + path);
+        /// <summary>
+        /// Builds an Uri from the given arguments.
+        /// None of the arguments are modified in any way, therefore
+        /// Host: The base address; since this function is private, this is ensured to always be BaseURL or BaseURL_Covers.
+        /// Path: The absolute path; must already include prefix and file extension.
+        /// Parameters: Form the component of the Uri; either pass in array or use KeyValuePairToString.
+        /// </summary>
+        /// <param name="host">The base address; since this function is private, this is ensured to always be BaseURL or BaseURL_Covers.</param>
+        /// <param name="path">The absolute path; must already include prefix and file extension.</param>
+        /// <param name="fileExt"></param>
+        /// <param name="parameters">Form the component of the Uri; either pass in array or use KeyValuePairToString.</param>
+        /// <returns></returns>
+        private static Uri BuildUri(string host, string path = "", params KeyValuePair<string, string>[] parameters)
+            => BuildUri(host, path, KeyValuePairToString(parameters));
+        private static Uri BuildUri(string host, string path = "", string query = "")
+        {
+            UriBuilder builder = new UriBuilder() { Scheme = Uri.UriSchemeHttps };
+            builder.Host = host;
+            builder.Path = path;
+            builder.Query = query;
+            return builder.Uri;
+        }
 
-                    stringBuilder.Append(".json");
-                    if (parameters != null && parameters.Length > 0)
-                    {
-                        stringBuilder.Append("?");
-                        foreach (var param in parameters)
-                        {
-                            stringBuilder.Append(param.Key + "=" + param.Value + "&");
-                        }
-                    }
-                    break;
+        /// <summary>
+        /// Ensures path will have the correct prefix prepended.
+        /// Passing in paths that already have a prefix is fine.
+        /// </summary>
+        /// <param name="api"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string SetPrefix(OLRequestAPI api, string path)
+        {
+            string prefix = RequestTypePrefixMap[api];
 
-                // Should work for /authors, /works, /editions, /isbn, /subjects ...?
-                default:
-                    stringBuilder.Append(BaseURL + RequestTypePrefixMap[api]);
+            if (api == OLRequestAPI.Books)
+            {
+                path = Regex.Replace(path, "^/?" + RequestTypePrefixMap[api] + "/?", "");
+                return prefix + path;
+            }
 
-                    if (!string.IsNullOrWhiteSpace(id))
-                        stringBuilder.Append("/" + id);
+            path = Regex.Replace(path, "^/?" + RequestTypePrefixMap[api] + "/", "");
+            return prefix + "/" + path;
+        }
 
-                    if (!string.IsNullOrWhiteSpace(path))
-                        stringBuilder.Append("/" + path);
+        /// <summary>
+        /// Ensures path will have the correct file extension.
+        /// Passing in paths that already have a file extension is fine.
+        /// </summary>
+        /// <param name="api"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string SetFileExtension(OLRequestAPI api, string path)
+        {
+            path = Regex.Replace(path, "\\.([^.]*\\.?)$", "");
+            if (api == OLRequestAPI.Covers || api == OLRequestAPI.AuthorPhotos)
+                return path + ".jpg";
+            else
+                return path + ".json";
+        }
 
-                    stringBuilder.Append(".json");
-                    if (parameters != null && parameters.Length > 0)
-                    {
-                        stringBuilder.Append("?");
-                        foreach (var parameter in parameters)
-                        {
-                            stringBuilder.Append(parameter.Key + "=" + parameter.Value + "&");
-                        }
+        private static string KeyValuePairToString(params KeyValuePair<string, string>[] parameters)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
 
-                        // Remove the trailing &
-                        stringBuilder.Remove(stringBuilder.Length - 1, 1);
-                    }
-                    break;
+            if (parameters != null && parameters.Length > 0)
+            {
+                foreach (var parameter in parameters)
+                {
+                    stringBuilder.Append(parameter.Key + "=" + parameter.Value + "&");
+                }
+
+                // Remove the trailing &
+                stringBuilder.Remove(stringBuilder.Length - 1, 1);
             }
 
             return stringBuilder.ToString();
         }
         #endregion
 
+
         /* Helper functions for requesting (and deserializing) data.
          */
         #region Requests
-        public async static Task<string> RequestAsync(string url, HttpClient? client = null)
+        internal async static Task<string> RequestAsync(Uri uri, HttpClient? client = null)
         {
             if (client == null) client = GetClient();
-            return await client.GetStringAsync(url);
+            return await client.GetStringAsync(uri);
         }
 
-        public static T? Parse<T>(string serialized, string path = "")
+        internal static T? Parse<T>(string serialized, string path = "")
         {
             if (string.IsNullOrWhiteSpace(path))
                 return JsonConvert.DeserializeObject<T>(serialized);
@@ -109,9 +286,9 @@ namespace OpenLibraryNET.Utility
             }
         }
 
-        public async static Task<T?> LoadAsync<T>(string url, string path = "", HttpClient? client = null)
+        internal async static Task<T?> LoadAsync<T>(Uri uri, string path = "", HttpClient? client = null)
         {
-            string response = await RequestAsync(url, client);
+            string response = await RequestAsync(uri, client);
             if (string.IsNullOrWhiteSpace(path))
                 return JsonConvert.DeserializeObject<T>(response);
             else
@@ -120,8 +297,6 @@ namespace OpenLibraryNET.Utility
                 return token[path]!.ToObject<T>();
             }
         }
-
-        private static HttpClient? client = null;
 
         public static HttpClient GetClient()
         {
@@ -406,7 +581,7 @@ namespace OpenLibraryNET.Utility
         (
             new Dictionary<OLRequestAPI, string>()
             {
-            {OLRequestAPI.Books, "api"},
+            {OLRequestAPI.Books, "api/books"},
             {OLRequestAPI.Books_Works, "works"},
             {OLRequestAPI.Books_Editions, "books"},
             {OLRequestAPI.Books_ISBN, "isbn"},
@@ -418,7 +593,7 @@ namespace OpenLibraryNET.Utility
             {OLRequestAPI.Covers, "b"},
             {OLRequestAPI.AuthorPhotos, "a"},
             {OLRequestAPI.RecentChanges, "recentchanges"},
-            {OLRequestAPI.Lists, "lists"}
+            {OLRequestAPI.Lists, "people"}
             }
         );
 

@@ -56,7 +56,7 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<OLWorkData>
             (
-                OpenLibraryUtility.BuildURL(OLRequestAPI.Books_Works, id),
+                OpenLibraryUtility.BuildWorksUri(id),
                 client: client
             );
         }
@@ -70,7 +70,7 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<OLRatingsData>
             (
-                OpenLibraryUtility.BuildURL(OLRequestAPI.Books_Works, id, "ratings"),
+                OpenLibraryUtility.BuildWorksUri(id, "ratings"),
                 "summary",
                 client: client
             );
@@ -85,7 +85,7 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<OLBookshelvesData>
             (
-                OpenLibraryUtility.BuildURL(OLRequestAPI.Books_Works, id, "bookshelves"),
+                OpenLibraryUtility.BuildWorksUri(id, "bookshelves"),
                 "counts",
                 client: client
             );
@@ -100,9 +100,8 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<OLEditionData[]>
             (
-                OpenLibraryUtility.BuildURL
+                OpenLibraryUtility.BuildWorksUri
                 (
-                    OLRequestAPI.Books_Works,
                     id,
                     "editions",
                     parameters
@@ -121,9 +120,8 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<int>
             (
-                OpenLibraryUtility.BuildURL
+                OpenLibraryUtility.BuildWorksUri
                 (
-                    OLRequestAPI.Books_Works,
                     id,
                     "editions",
                     new KeyValuePair<string, string>("limit", "0")
@@ -142,9 +140,8 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<OLListData[]>
             (
-                OpenLibraryUtility.BuildURL
+                OpenLibraryUtility.BuildWorksUri
                 (
-                    OLRequestAPI.Books_Works,
                     id,
                     "lists",
                     parameters
@@ -163,9 +160,8 @@ namespace OpenLibraryNET.Loader
         {
             return await OpenLibraryUtility.LoadAsync<int>
             (
-                OpenLibraryUtility.BuildURL
+                OpenLibraryUtility.BuildWorksUri
                 (
-                    OLRequestAPI.Books_Works,
                     id,
                     "lists",
                     new KeyValuePair<string, string>("limit", "0")

@@ -38,11 +38,10 @@ namespace OpenLibraryNET.Loader
         {
             return Encoding.ASCII.GetBytes
             (
-                await OpenLibraryUtility.RequestAsync(OpenLibraryUtility.BuildURL
+                await OpenLibraryUtility.RequestAsync(OpenLibraryUtility.BuildCoversUri
                 (
-                    OLRequestAPI.Covers,
                     id,
-                    parameters: new KeyValuePair<string, string>("default", "false")
+                    new KeyValuePair<string, string>("default", "false")
                 ), client: client
                 )
             );
@@ -62,9 +61,8 @@ namespace OpenLibraryNET.Loader
         {
             return Encoding.ASCII.GetBytes
             (
-                await OpenLibraryUtility.RequestAsync(OpenLibraryUtility.BuildURL
+                await OpenLibraryUtility.RequestAsync(OpenLibraryUtility.BuildAuthorsPhotosUri
                 (
-                    OLRequestAPI.AuthorPhotos,
                     id,
                     parameters: new KeyValuePair<string, string>("default", "false")
                 ), client: client

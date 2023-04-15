@@ -9,7 +9,7 @@ namespace OpenLibraryNET
 {
     public class OpenLibraryClient
     {
-        public bool LoggedIn => _httpHandler.CookieContainer.GetCookies(new Uri(OpenLibraryUtility.BaseURL)).SingleOrDefault(cookie => cookie.Name == "session") != null;
+        public bool LoggedIn => _httpHandler.CookieContainer.GetCookies(OpenLibraryUtility.BaseUri).SingleOrDefault(cookie => cookie.Name == "session") != null;
         public string? Username => _username;
         public string? Email => _email;
 
@@ -24,7 +24,7 @@ namespace OpenLibraryNET
 
         public OpenLibraryClient()
         {
-            _httpHandler = new HttpClientHandler();
+            _httpHandler = new HttpClientHandler() { AllowAutoRedirect = true, UseCookies = true };
             _httpClient = new HttpClient(_httpHandler);
 
             _work = new OLWorkLoader(_httpClient);
@@ -52,7 +52,7 @@ namespace OpenLibraryNET
                 new ("password", password)
             };
 
-            Uri uri = new Uri("https://openlibrary.org/account/login");
+            Uri uri = new Uri(OpenLibraryUtility.BaseUri, "account/login");
             FormUrlEncodedContent content = new FormUrlEncodedContent(loginData);
 
             var response = await _httpClient.PostAsync(uri, content);
@@ -60,10 +60,9 @@ namespace OpenLibraryNET
             // Check that there is now a session cookie present
             try
             {
-                Cookie sessionCookie = _httpHandler.CookieContainer.GetCookies(new Uri(OpenLibraryUtility.BaseURL)).Single(cookie => cookie.Name == "session");
+                Cookie sessionCookie = _httpHandler.CookieContainer.GetCookies(OpenLibraryUtility.BaseUri).Single(cookie => cookie.Name == "session");
                 _loggedIn = true;
                 _email = email;
-                _password = password;
                 _username = ExtractUsernameFromSessionCookie(sessionCookie);
             }
             catch { throw new System.Exception("Failed to authenticate; did you correctly input your email and password?"); }
@@ -78,12 +77,11 @@ namespace OpenLibraryNET
         {
             if (!LoggedIn) return;
 
-            Uri uri = new Uri("https://openlibrary.org/account/logout");
+            Uri uri = new Uri(OpenLibraryUtility.BaseUri, "account/logout");
             var response = await _httpClient.PostAsync(uri, null);
 
             _loggedIn = false;
             _email = null;
-            _password = null;
             _username = null;
         }
 
@@ -121,9 +119,9 @@ namespace OpenLibraryNET
 
             switch (coverSize.Trim().ToLower())
             {
-                case "s": return edition with { CoverS = await _image.GetCoverAsync("ID", edition.Data!.CoverKeys[0].ToString(), "s") }; 
-                case "m": return edition with { CoverM = await _image.GetCoverAsync("ID", edition.Data!.CoverKeys[0].ToString(), "m") }; 
-                case "l": return edition with { CoverL = await _image.GetCoverAsync("ID", edition.Data!.CoverKeys[0].ToString(), "l") };
+                case "s": return edition with { CoverS = await _image.GetCoverAsync("ID", edition.Data!.CoverKeys[0].ToString(), "S") };
+                case "m": return edition with { CoverM = await _image.GetCoverAsync("ID", edition.Data!.CoverKeys[0].ToString(), "M") };
+                case "l": return edition with { CoverL = await _image.GetCoverAsync("ID", edition.Data!.CoverKeys[0].ToString(), "L") };
                 default: return edition;
             }
         }
@@ -165,7 +163,6 @@ namespace OpenLibraryNET
 
         private bool _loggedIn = false;
         private string? _username = null;
-        private string? _password = null;
         private string? _email = null;
 
         private OLWorkLoader _work;

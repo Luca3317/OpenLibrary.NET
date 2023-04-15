@@ -36,10 +36,9 @@ namespace OpenLibraryNET.Loader
         }
         public async static Task<OLWorkData[]?> GetSearchResultsAsync(HttpClient client, string query, params KeyValuePair<string, string>[] parameters)
         {
-            parameters = parameters.Append(new KeyValuePair<string, string>("q", query)).ToArray();
             return await OpenLibraryUtility.LoadAsync<OLWorkData[]>
             (
-                OpenLibraryUtility.BuildURL(OLRequestAPI.Search, parameters: parameters),
+                OpenLibraryUtility.BuildSearchUri(query, parameters: parameters),
                 "docs",
                 client: client
             );
@@ -52,10 +51,9 @@ namespace OpenLibraryNET.Loader
         }
         public async static Task<OLAuthorData[]?> GetAuthorSearchResultsAsync(HttpClient client, string query, params KeyValuePair<string, string>[] parameters)
         {
-            parameters = parameters.Append(new KeyValuePair<string, string>("q", query)).ToArray();
             return await OpenLibraryUtility.LoadAsync<OLAuthorData[]>
             (
-                OpenLibraryUtility.BuildURL(OLRequestAPI.Search, path: "authors", parameters: parameters),
+                OpenLibraryUtility.BuildSearchUri(query, "authors", parameters),
                 "docs",
                 client: client
             );
@@ -68,10 +66,9 @@ namespace OpenLibraryNET.Loader
         }
         public async static Task<OLSubjectData[]?> GetSubjectSearchResultsAsync(HttpClient client, string query, params KeyValuePair<string, string>[] parameters)
         {
-            parameters = parameters.Append(new KeyValuePair<string, string>("q", query)).ToArray();
             return await OpenLibraryUtility.LoadAsync<OLSubjectData[]>
             (
-                OpenLibraryUtility.BuildURL(OLRequestAPI.Search, path: "subjects", parameters: parameters),
+                OpenLibraryUtility.BuildSearchUri(query,"subjects", parameters),
                 "docs",
                 client: client
             );
@@ -84,10 +81,9 @@ namespace OpenLibraryNET.Loader
         }
         public async static Task<OLListData[]?> GetListSearchResultsAsync(HttpClient client, string query, params KeyValuePair<string, string>[] parameters)
         {
-            parameters = parameters.Append(new KeyValuePair<string, string>("q", query)).ToArray();
             return await OpenLibraryUtility.LoadAsync<OLListData[]>
             (
-                OpenLibraryUtility.BuildURL(OLRequestAPI.Search, path: "lists", parameters: parameters),
+                OpenLibraryUtility.BuildSearchUri(query, "lists", parameters),
                 "docs",
                 client: client
             );
