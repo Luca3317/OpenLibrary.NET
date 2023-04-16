@@ -1,5 +1,4 @@
-﻿
-namespace OpenLibraryNET
+﻿namespace OpenLibraryNET
 {
     public enum OLRequestAPI
     {

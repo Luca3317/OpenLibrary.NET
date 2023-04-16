@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using OpenLibraryNET.Utility;
 
 namespace OpenLibraryNET.Data
 {

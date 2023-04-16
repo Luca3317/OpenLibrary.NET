@@ -4,10 +4,6 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
-using System;
-using System.Security.Cryptography;
-using System.IO;
-using System.Reflection.Metadata;
 
 namespace OpenLibraryNET.Utility
 {

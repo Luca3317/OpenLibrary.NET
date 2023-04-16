@@ -2,7 +2,6 @@
 using OpenLibraryNET.Utility;
 using System.Text.RegularExpressions;
 
-
 namespace OpenLibraryNET.Loader
 {
     public class OLEditionLoader
