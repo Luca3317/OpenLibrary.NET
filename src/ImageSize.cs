@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace OpenLibraryNET
 {
-    public enum EditionIdType
+    public enum ImageSize
     {
-        ISBN,
-        OLID,
-        LCCN,
-        OCLC
+        Small,
+        Medium,
+        Large
     }
 }

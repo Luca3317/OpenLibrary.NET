@@ -93,7 +93,7 @@ namespace OpenLibraryNET
                 Data = await _work.GetDataAsync(id),
                 Ratings = await _work.GetRatingsAsync(id),
                 Bookshelves = await _work.GetBookshelvesAsync(id),
-                Editions = editionsCount > 0 ? 
+                Editions = editionsCount > 0 ?
                     await _work.GetEditionsAsync(id, new KeyValuePair<string, string>("limit", editionsCount.ToString())) : null
             };
         }
@@ -109,7 +109,9 @@ namespace OpenLibraryNET
             };
         }
 
-        public async Task<OLEdition> GetEditionAsync(string id, EditionIdType? idType = null, string coverSize = "")
+        public async Task<OLEdition> GetEditionAsync(string id, EditionIdType? idType = null, ImageSize? coverSize = null)
+            => await GetEditionAsync(id, idType, coverSize == null ? "" : coverSize.Value.GetString());
+        public async Task<OLEdition> GetEditionAsync(string id, EditionIdType? idType = null, string? coverSize = null)
         {
             OLEdition edition = new OLEdition()
             {
@@ -117,13 +119,30 @@ namespace OpenLibraryNET
                 Data = await _edition.GetDataAsync(id, idType),
             };
 
-            switch (coverSize.Trim().ToLower())
+            if (!string.IsNullOrWhiteSpace(coverSize))
             {
-                case "s": return edition with { CoverS = await _image.GetCoverAsync("ID", edition.Data!.CoverKeys[0].ToString(), "S") };
-                case "m": return edition with { CoverM = await _image.GetCoverAsync("ID", edition.Data!.CoverKeys[0].ToString(), "M") };
-                case "l": return edition with { CoverL = await _image.GetCoverAsync("ID", edition.Data!.CoverKeys[0].ToString(), "L") };
-                default: return edition;
+                string type, coverId;
+                if (idType == null)
+                {
+                    type = "ID";
+                    coverId = edition.Data!.CoverKeys[0].ToString();
+                }
+                else
+                {
+                    type = idType.Value.GetString();
+                    coverId = id;
+                }
+
+                switch (coverSize.ToUpper().Trim())
+                {
+                    case "S": return edition with { CoverS = await _image.GetCoverAsync(type, coverId, "S") };
+                    case "M": return edition with { CoverM = await _image.GetCoverAsync(type, coverId, "M") };
+                    case "L": return edition with { CoverL = await _image.GetCoverAsync(type, coverId, "L") };
+                    default: throw new System.Exception();
+                }
             }
+
+            return edition;
         }
 
         public async Task<bool> TryCreateListAsync(string listName, string listDescription, IEnumerable<string>? listSeeds = null, IEnumerable<string>? listTags = null)

@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace OpenLibraryNET
 {
-    public enum EditionIdType
+    public enum CoverIdType
     {
         ISBN,
         OLID,
         LCCN,
-        OCLC
+        OCLC,
+        ID
     }
 }

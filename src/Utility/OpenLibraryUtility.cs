@@ -132,6 +132,10 @@ namespace OpenLibraryNET.Utility
             );
         }
 
+        public static Uri BuildCoversUri(CoverIdType idType, string id, ImageSize size, params KeyValuePair<string, string>[] parameters)
+            => BuildCoversUri(idType.GetString(), id, size.GetString(), parameters);
+        public static Uri BuildCoversUri(string idType, string id, string size, params KeyValuePair<string, string>[] parameters)
+            => BuildCoversUri(idType + "/" + id + "-" + size, parameters);
         public static Uri BuildCoversUri(string key, params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
@@ -141,31 +145,17 @@ namespace OpenLibraryNET.Utility
                 parameters
             );
         }
-        public static Uri BuildCoversUri(string idType, string id, string size, params KeyValuePair<string, string>[] parameters)
-        {
-            return BuildUri
-            (
-                BaseURL_Covers,
-                "b/" + idType + "/" + id + "-" + size + ".jpg",
-                parameters
-            );
-        }
 
-        public static Uri BuildAuthorsPhotosUri(string key, params KeyValuePair<string, string>[] parameters)
+        public static Uri BuildAuthorPhotosUri(AuthorPhotoIdType idType, string id, ImageSize size, params KeyValuePair<string, string>[] parameters)
+            => BuildAuthorPhotosUri(idType.GetString(), id, size.GetString(), parameters);
+        public static Uri BuildAuthorPhotosUri(string idType, string id, string size, params KeyValuePair<string, string>[] parameters)
+            => BuildAuthorPhotosUri(idType + "/" + id + "-" + size, parameters);
+        public static Uri BuildAuthorPhotosUri(string key, params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
             (
                 BaseURL_Covers,
                 "a/" + key + ".jpg",
-                parameters
-            );
-        }
-        public static Uri BuildAuthorsPhotosUri(string idType, string id, string size, params KeyValuePair<string, string>[] parameters)
-        {
-            return BuildUri
-            (
-                BaseURL_Covers,
-                "a/" + idType + "/" + id + "-" + size + ".jpg",
                 parameters
             );
         }
@@ -264,7 +254,6 @@ namespace OpenLibraryNET.Utility
             return stringBuilder.ToString();
         }
         #endregion
-
 
         /* Helper functions for requesting (and deserializing) data.
          */
