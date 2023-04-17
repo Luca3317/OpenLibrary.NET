@@ -317,13 +317,13 @@ namespace OpenLibraryNET.Utility
         /* Helper functions for requesting (and deserializing) data.
          */
         #region Requests
-        internal async static Task<string> RequestAsync(Uri uri, HttpClient? client = null)
+        public async static Task<string> RequestAsync(Uri uri, HttpClient? client = null)
         {
             if (client == null) client = GetClient();
             return await client.GetStringAsync(uri);
         }
 
-        internal static T? Parse<T>(string serialized, string path = "")
+        public static T? Parse<T>(string serialized, string path = "")
         {
             if (string.IsNullOrWhiteSpace(path))
                 return JsonConvert.DeserializeObject<T>(serialized);
@@ -334,7 +334,7 @@ namespace OpenLibraryNET.Utility
             }
         }
 
-        internal async static Task<T?> LoadAsync<T>(Uri uri, string path = "", HttpClient? client = null)
+        public async static Task<T?> LoadAsync<T>(Uri uri, string path = "", HttpClient? client = null)
         {
             string response = await RequestAsync(uri, client);
             if (string.IsNullOrWhiteSpace(path))

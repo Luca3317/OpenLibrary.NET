@@ -8,7 +8,7 @@ namespace OpenLibraryNET.Data
     /// Base record for OLData and OLObject records.
     /// Implements ExtensionData.
     /// </summary>
-    public abstract record OLContainer
+    public record OLContainer
     {
         [JsonIgnore]
         public ReadOnlyDictionary<string, JToken>? ExtensionData =>

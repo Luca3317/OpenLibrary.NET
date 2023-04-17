@@ -29,6 +29,12 @@ namespace OpenLibraryNET.Loader
         public async Task<OLListData[]?> GetListSearchResultsAsync(string query, params KeyValuePair<string, string>[] parameters)
             => await GetListSearchResultsAsync(_client, query, parameters);
 
+        public async Task<(bool, OLContainer?)> TryGetInsideSearchResultsAsync(string query, params KeyValuePair<string, string>[] parameters)
+            => await TryGetInsideSearchResultsAsync(_client, query, parameters);
+        public async Task<OLContainer?> GetInsideSearchResultsAsync(string query, params KeyValuePair<string, string>[] parameters)
+            => await GetInsideSearchResultsAsync(_client, query, parameters);
+
+
         public async static Task<(bool, OLWorkData[]?)> TryGetSearchResultsAsync(HttpClient client, string query, params KeyValuePair<string, string>[] parameters)
         {
             try { return (true, await GetSearchResultsAsync(client, query, parameters)); }
@@ -85,6 +91,20 @@ namespace OpenLibraryNET.Loader
             (
                 OpenLibraryUtility.BuildSearchUri(query, "lists", parameters),
                 "docs",
+                client: client
+            );
+        }
+
+        public async static Task<(bool, OLContainer?)> TryGetInsideSearchResultsAsync(HttpClient client, string query, params KeyValuePair<string, string>[] parameters)
+        {
+            try { return (true, await GetInsideSearchResultsAsync(client, query, parameters)); }
+            catch { return (false, null); }
+        }
+        public async static Task<OLContainer?> GetInsideSearchResultsAsync(HttpClient client, string query, params KeyValuePair<string, string>[] parameters)
+        {
+            return await OpenLibraryUtility.LoadAsync<OLContainer>
+            (
+                OpenLibraryUtility.BuildSearchUri(query, "inside", parameters),
                 client: client
             );
         }
