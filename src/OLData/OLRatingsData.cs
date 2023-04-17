@@ -11,7 +11,6 @@ namespace OpenLibraryNET.Data
         public float? Average { get; init; } = null;// Nullable, as 0 ratings do not indicate a rating of 0
         [JsonProperty("count")]
         public int Count { get; init; } = -1;
-        // dictionary for counts per rating? public Dictionary
 
         public bool Equals(OLRatingsData? data)
         {

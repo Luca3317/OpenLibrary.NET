@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OpenLibraryNET.Utility;
+using System.Collections.ObjectModel;
 
 namespace OpenLibraryNET.Data
 {
@@ -18,8 +19,16 @@ namespace OpenLibraryNET.Data
         public string Timestamp { get; init; } = "";
         [JsonProperty("comment")]
         public string Comment { get; init; } = "";
+
+        [JsonIgnore]
+        public IReadOnlyList<OLChangeData> Changes
+        {
+            get => new ReadOnlyCollection<OLChangeData>(changes);
+            init => changes = value.ToArray();
+        }
+
         [JsonProperty("changes")]
-        public OLChangeData[]? Changes { get; init; } = null;
+        private OLChangeData[] changes { get; init; } = new OLChangeData[0];
 
         public sealed record OLChangeData
         {

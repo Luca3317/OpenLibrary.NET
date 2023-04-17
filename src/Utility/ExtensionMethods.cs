@@ -50,5 +50,18 @@
 
             throw new System.NotImplementedException();
         }
+
+        public static string GetString(this PartnerIdType idType)
+        {
+            switch (idType)
+            {
+                case PartnerIdType.OLID: return "olid";
+                case PartnerIdType.ISBN: return "isbn";
+                case PartnerIdType.OCLC: return "oclc";
+                case PartnerIdType.LCCN: return "lccn";
+            }
+
+            throw new System.NotImplementedException();
+        }
     }
 }

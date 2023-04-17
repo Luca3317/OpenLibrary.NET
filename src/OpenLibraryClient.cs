@@ -20,6 +20,7 @@ namespace OpenLibraryNET
         public OLSearchLoader Search => _search;
         public OLSubjectLoader Subject => _subject;
         public OLRecentChangesLoader RecentChanges => _recentChanges;
+        public OLPartnerLoader Partner => _partner;
 
         public OpenLibraryClient()
         {
@@ -34,6 +35,7 @@ namespace OpenLibraryNET
             _search = new OLSearchLoader(_httpClient);
             _subject = new OLSubjectLoader(_httpClient);
             _recentChanges = new OLRecentChangesLoader(_httpClient);
+            _partner = new OLPartnerLoader(_httpClient);
         }
 
         public async Task<bool> TryLoginAsync(string email, string password)
@@ -191,6 +193,7 @@ namespace OpenLibraryNET
         private OLSearchLoader _search;
         private OLSubjectLoader _subject;
         private OLRecentChangesLoader _recentChanges;
+        private OLPartnerLoader _partner;
 
         private string ExtractUsernameFromSessionCookie(Cookie sessionCookie)
             => Regex.Match(sessionCookie.Value, "(?<=/people/).*?(?=%)").Value;

@@ -219,6 +219,40 @@ namespace OpenLibraryNET.Utility
             );
         }
 
+        public static Uri BuildPartnerUri(PartnerIdType idType, string id)
+            => BuildPartnerUri(idType.GetString(), id);
+        public static Uri BuildPartnerUri(string idType, string id)
+        {
+            return BuildUri
+            (
+                BaseURL,
+                RequestTypePrefixMap[OLRequestAPI.Partner] + "/" + idType + "/" + id + ".json"
+            );
+        }
+
+        public static Uri BuildPartnerMultiUri(params string[] ids)
+        {
+            string concat;
+            if (ids.Length > 1)
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+                foreach (string id in ids)
+                    stringBuilder.Append(id + "|");
+
+                // Remove the trailing &
+                stringBuilder.Remove(stringBuilder.Length - 1, 1);
+                concat = stringBuilder.ToString();
+            }
+            else concat = ids[0];
+
+            return BuildUri
+            (
+                BaseURL,
+                RequestTypePrefixMap[OLRequestAPI.Partner] + "/json/" + concat 
+            );
+        }
+
+
         // TODO maybe add only path + parameters version for each builder; could call this here then instead of using requesttypeprefixmap
         public static Uri BuildUri(OLRequestAPI api, string path, params KeyValuePair<string, string>[] parameters)
         {
@@ -637,7 +671,7 @@ namespace OpenLibraryNET.Utility
             {OLRequestAPI.Subjects, "subjects"},
             {OLRequestAPI.Search, "search"},
             {OLRequestAPI.SearchInside, ""},
-            {OLRequestAPI.Partner, ""},
+            {OLRequestAPI.Partner, "api/volumes/brief"},
             {OLRequestAPI.Covers, "b"},
             {OLRequestAPI.AuthorPhotos, "a"},
             {OLRequestAPI.RecentChanges, "recentchanges"},
