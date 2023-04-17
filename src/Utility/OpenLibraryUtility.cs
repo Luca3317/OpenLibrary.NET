@@ -23,6 +23,51 @@ namespace OpenLibraryNET.Utility
             return Regex.Replace(key, "[/[a-zA-Z]*/]*", "");
         }
 
+        #region Bibkey Helpers
+        public static string GetRawBibkey(string id) => Regex.Match(id, "(?<=:)[^:]*$|^[^:]*$").ToString();
+        public static string GetBibkeyPrefix(string id) => Regex.Match(id, ".*(?=:)").ToString();
+
+        public static EditionIdType? InferEditionIdType(string id)
+        {
+            string pureID = GetRawBibkey(id);
+            string idPrefix = GetBibkeyPrefix(id);
+
+            if (idPrefix != null && idPrefix != "")
+            {
+                switch (idPrefix)
+                {
+                    case "ISBN": return EditionIdType.ISBN;
+                    case "LCCN": return EditionIdType.LCCN;
+                    case "OCLC": return EditionIdType.OCLC;
+                    case "OLID": return EditionIdType.OLID;
+                }
+            }
+            if (Regex.Match(pureID, "^OL[0-9]*[A-Z]").Success)
+                return EditionIdType.OLID;
+
+            return null;
+        }
+
+        /// <summary>
+        /// Tries to ensure the bibkey prefix is set correctly.<br/>
+        /// Will work on raw keys and incorrectly set prefixes.
+        /// <para>
+        /// Examples:<br/>
+        /// idType = ISBN, key = "012345" => "ISBN:012345"<br/>
+        /// idType = LCCN, key = "OCLC:12312" => "LCCN:12312"<br/>
+        /// idType = ISBN, key = "OCLC90000" => "ISBN:OCLC90000" (missing colon)<br/>
+        /// </para>
+        /// </summary>
+        /// <param name="idType"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static string SetBibkeyPrefix(EditionIdType idType, string key)
+        {
+            key = Regex.Replace(key, ".*:", "");
+            return idType.GetString() + ":"+ key;
+        }
+        #endregion
+
         /* Helper functions for correctly formatting OpenLibrary request URLs. 
          */
         #region URL Builders Functions
@@ -65,6 +110,24 @@ namespace OpenLibraryNET.Utility
                     new List<KeyValuePair<string, string>>(parameters) { new KeyValuePair<string, string>("bibkeys", bibkeys) }.ToArray()
 
                 );
+
+        public static Uri BuildBooksUri(string[] bibkeys, string path = "", params KeyValuePair<string, string>[] parameters)
+        {
+            string bibkeysConcat = "";
+            foreach (string bibkey in bibkeys)
+            {
+                bibkeysConcat += bibkey + ",";
+            }
+
+            return BuildUri
+            (
+                BaseURL,
+                "api/books" + (string.IsNullOrWhiteSpace(path) ? "" : "/" + path) + ".json",
+                bibkeys == null || bibkeys.Length == 0 ?
+                parameters :
+                new List<KeyValuePair<string, string>>(parameters) { new KeyValuePair<string, string>("bibkeys", bibkeysConcat) }.ToArray()
+            );
+        }
 
         public static Uri BuildAuthorsUri(string olid, string path = "", params KeyValuePair<string, string>[] parameters)
         {
