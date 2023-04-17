@@ -97,14 +97,22 @@ namespace OpenLibraryNET.Data
         public sealed record OLEditionIdentifiers : OLContainer
         {
             [JsonIgnore]
-            public ReadOnlyCollection<string> Goodreads => goodreads.AsReadOnly();
+            public IReadOnlyList<string> Goodreads
+            {
+                get => new ReadOnlyCollection<string>(goodreads);
+                init => goodreads = value.ToArray();
+            }
             [JsonIgnore]
-            public ReadOnlyCollection<string> LibraryThing => libraryThing.AsReadOnly();
+            public IReadOnlyList<string> LibraryThing
+            {
+                get => new ReadOnlyCollection<string>(libraryThing);
+                init => libraryThing = value.ToArray();
+            }
 
             [JsonProperty("goodreads")]
-            private List<string> goodreads { get; init; } = new List<string>();
+            private string[] goodreads { get; init; } = new string[0];
             [JsonProperty("librarything")]
-            private List<string> libraryThing { get; init; } = new List<string>();
+            private string[] libraryThing { get; init; } = new string[0];
 
             public bool Equals(OLEditionIdentifiers? data)
             {
