@@ -1,10 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+using OpenLibraryNET.Utility;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenLibraryNET.Data
 {
@@ -18,17 +14,17 @@ namespace OpenLibraryNET.Data
         [JsonIgnore]
         public IReadOnlyList<Item> Items
         {
-            get => new ReadOnlyCollection<Item>(items);
-            init => items = value.ToArray();
+            get => new ReadOnlyCollection<Item>(_items);
+            init => _items = value.ToArray();
         }
 
         [JsonProperty("items")]
-        private Item[] items = new Item[0];
+        private Item[] _items = Array.Empty<Item>();
 
         public sealed record Item : OLContainer
         {
             [JsonProperty("enumcron")]
-            public bool? Enumcorn { get; init; } = null;
+            public bool? Enumcron { get; init; } = null;
             [JsonProperty("match")]
             public string Match { get; init; } = "";
             [JsonProperty("status")]
@@ -56,5 +52,17 @@ namespace OpenLibraryNET.Data
                 public string Large { get; init; } = "";
             }
         }
+
+        public bool Equals(OLPartnerData? data)
+        {
+            return
+                data != null &&
+                CompareExtensionData(data.extensionData) &&
+                this.Data == data.Data &&
+                this.Details == data.Details &&
+                GeneralUtility.SequenceEqual(this._items, data._items);
+        }
+
+        public override int GetHashCode() => base.GetHashCode();
     }
 }

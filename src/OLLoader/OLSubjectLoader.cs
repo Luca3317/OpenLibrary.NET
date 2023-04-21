@@ -7,7 +7,7 @@ namespace OpenLibraryNET.Loader
     {
         internal OLSubjectLoader(HttpClient client) => _client = client;
 
-        private HttpClient _client;
+        private readonly HttpClient _client;
 
         public async Task<(bool, OLSubjectData?)> TryGetDataAsync(string subject, params KeyValuePair<string, string>[] parameters)
             => await TryGetDataAsync(_client, subject, parameters);

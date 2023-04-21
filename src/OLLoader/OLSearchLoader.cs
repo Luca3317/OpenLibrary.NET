@@ -7,7 +7,7 @@ namespace OpenLibraryNET.Loader
     {
         internal OLSearchLoader(HttpClient client) => _client = client;
 
-        HttpClient _client;
+        private readonly HttpClient _client;
 
         public async Task<(bool, OLWorkData[]?)> TryGetSearchResultsAsync(string query, params KeyValuePair<string, string>[] parameters)
             => await TryGetSearchResultsAsync(_client, query, parameters);

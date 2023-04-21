@@ -7,7 +7,7 @@ namespace OpenLibraryNET.Loader
     {
         internal OLAuthorLoader(HttpClient client) => _client = client;
 
-        private HttpClient _client;
+        private readonly HttpClient _client;
 
         public async Task<(bool, OLAuthorData?)> TryGetDataAsync(string id)
             => await TryGetDataAsync(_client, id);
@@ -90,7 +90,7 @@ namespace OpenLibraryNET.Loader
 
         public async static Task<(bool, OLListData[]?)> TryGetListsAsync(HttpClient client, string id, params KeyValuePair<string, string>[] parameters)
         {
-            try { return (true, await GetListsAsync(client, id)); }
+            try { return (true, await GetListsAsync(client, id, parameters)); }
             catch { return (false, null); }
         }
         public async static Task<OLListData[]?> GetListsAsync(HttpClient client, string id, params KeyValuePair<string, string>[] parameters)

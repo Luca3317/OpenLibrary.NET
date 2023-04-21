@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace OpenLibraryNET.Data
 {
-    public class OLRecentChangesData
+    public sealed record OLRecentChangesData : OLContainer
     {
         [JsonProperty("id")]
         public string ID { get; init; } = "";
@@ -23,12 +23,12 @@ namespace OpenLibraryNET.Data
         [JsonIgnore]
         public IReadOnlyList<OLChangeData> Changes
         {
-            get => new ReadOnlyCollection<OLChangeData>(changes);
-            init => changes = value.ToArray();
+            get => new ReadOnlyCollection<OLChangeData>(_changes);
+            init => _changes = value.ToArray();
         }
 
         [JsonProperty("changes")]
-        private OLChangeData[] changes { get; init; } = new OLChangeData[0];
+        private OLChangeData[] _changes { get; init; } = Array.Empty<OLChangeData>();
 
         public sealed record OLChangeData
         {
@@ -37,5 +37,21 @@ namespace OpenLibraryNET.Data
             [JsonProperty("revision")]
             public int Revision { get; init; } = -1;
         }
+
+        public bool Equals(OLRecentChangesData? data)
+        {
+            return
+                data != null &&
+                CompareExtensionData(data.extensionData) &&
+                this.ID == data.ID &&
+                this.Kind == data.Kind &&
+                this.Author == data.Author &&
+                this.IP == data.IP &&
+                this.Timestamp == data.Timestamp &&
+                this.Comment == data.Comment &&
+                GeneralUtility.SequenceEqual(this._changes, data._changes);
+        }
+
+        public override int GetHashCode() => base.GetHashCode();
     }
 }

@@ -8,7 +8,7 @@ namespace OpenLibraryNET.Loader
     {
         internal OLPartnerLoader(HttpClient client) => _client = client;
 
-        HttpClient _client;
+        private readonly HttpClient _client;
 
         public async Task<(bool, OLPartnerData?)> TryGetPartnerData(PartnerIdType idType, string id)
             => await TryGetPartnerDataAsync(_client, idType, id);
@@ -33,7 +33,8 @@ namespace OpenLibraryNET.Loader
                 (
                     idType,
                     id
-                )
+                ),
+                client
             ));
 
             var prop = root.First;
@@ -52,7 +53,8 @@ namespace OpenLibraryNET.Loader
         {
             JObject root = JObject.Parse(await OpenLibraryUtility.RequestAsync
             (
-                OpenLibraryUtility.BuildPartnerMultiUri(ids)
+                OpenLibraryUtility.BuildPartnerMultiUri(ids),
+                client
             ));
 
             List<JToken> tokens = root.Children().ToList();

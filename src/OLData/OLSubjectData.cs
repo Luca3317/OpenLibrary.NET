@@ -17,12 +17,12 @@ namespace OpenLibraryNET.Data
         [JsonIgnore]
         public IReadOnlyList<OLWorkData> Works
         {
-            get => new ReadOnlyCollection<OLWorkData>(works);
-            init => works = value.ToArray();
+            get => new ReadOnlyCollection<OLWorkData>(_works);
+            init => _works = value.ToArray();
         }
 
         [JsonProperty("works")]
-        private OLWorkData[] works { get; init; } = new OLWorkData[0];
+        private OLWorkData[] _works { get; init; } = Array.Empty<OLWorkData>();
 
         public bool Equals(OLSubjectData? data)
         {

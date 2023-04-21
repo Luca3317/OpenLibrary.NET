@@ -7,7 +7,7 @@ namespace OpenLibraryNET.Loader
     {
         internal OLRecentChangesLoader(HttpClient client) => _client = client;
 
-        HttpClient _client;
+        private readonly HttpClient _client;
 
         public async Task<(bool, OLRecentChangesData[]?)> TryGetRecentChangesAsync(string kind = "", params KeyValuePair<string, string>[] parameters)
             => await TryGetRecentChangesAsync(_client, kind, parameters);

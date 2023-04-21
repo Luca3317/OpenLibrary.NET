@@ -27,12 +27,12 @@ namespace OpenLibraryNET.Data
         [JsonIgnore]
         public IReadOnlyList<int> PhotosIDs
         {
-            get => new ReadOnlyCollection<int>(photosIDs);
-            init => photosIDs = value.ToArray();
+            get => new ReadOnlyCollection<int>(_photosIDs);
+            init => _photosIDs = value.ToArray();
         }
 
         [JsonProperty("photos")]
-        private int[] photosIDs { get; init; } = new int[0];
+        private int[] _photosIDs { get; init; } = Array.Empty<int>();
 
         public bool Equals(OLAuthorData? data)
         {
@@ -44,7 +44,7 @@ namespace OpenLibraryNET.Data
                 this.BirthDate == data.BirthDate &&
                 this.DeathDate == data.DeathDate &&
                 this.Bio == data.Bio &&
-                GeneralUtility.SequenceEqual(this.photosIDs, data.photosIDs);
+                GeneralUtility.SequenceEqual(this._photosIDs, data._photosIDs);
         }
 
         public override int GetHashCode() => base.GetHashCode();

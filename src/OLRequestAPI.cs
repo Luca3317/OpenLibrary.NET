@@ -9,8 +9,7 @@
         Authors,        // DONE
         Subjects,       // DONE
         Search,         // DONE
-        SearchInside,   // TODO; Probably wont
-        Partner,        // TODO; Probably wont
+        Partner,        // DONE
         Covers,         // DONE
         AuthorPhotos,   // DONE
         RecentChanges,  // DONE

@@ -4,6 +4,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
+using System.Collections.Immutable;
 
 namespace OpenLibraryNET.Utility
 {
@@ -17,36 +18,21 @@ namespace OpenLibraryNET.Utility
         public static readonly Uri BaseUri_Covers = new Uri("https://" + BaseURL_Covers);
         #endregion
 
-        // TODO Make more robust; rn will just remove /xyz/
+        /// <summary>
+        /// Extracts the id from a valid key.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static string ExtractIdFromKey(string key)
         {
-            return Regex.Replace(key, "[/[a-zA-Z]*/]*", "");
+            //return Regex.Replace(key, "[/[a-zA-Z]*/]*", "");
+            return Regex.Replace(key, ".*/(?=[^/]*$)", "");
         }
+
 
         #region Bibkey Helpers
         public static string GetRawBibkey(string id) => Regex.Match(id, "(?<=:)[^:]*$|^[^:]*$").ToString();
         public static string GetBibkeyPrefix(string id) => Regex.Match(id, ".*(?=:)").ToString();
-
-        public static EditionIdType? InferEditionIdType(string id)
-        {
-            string pureID = GetRawBibkey(id);
-            string idPrefix = GetBibkeyPrefix(id);
-
-            if (idPrefix != null && idPrefix != "")
-            {
-                switch (idPrefix)
-                {
-                    case "ISBN": return EditionIdType.ISBN;
-                    case "LCCN": return EditionIdType.LCCN;
-                    case "OCLC": return EditionIdType.OCLC;
-                    case "OLID": return EditionIdType.OLID;
-                }
-            }
-            if (Regex.Match(pureID, "^OL[0-9]*[A-Z]").Success)
-                return EditionIdType.OLID;
-
-            return null;
-        }
 
         /// <summary>
         /// Tries to ensure the bibkey prefix is set correctly.<br/>
@@ -64,7 +50,7 @@ namespace OpenLibraryNET.Utility
         public static string SetBibkeyPrefix(EditionIdType idType, string key)
         {
             key = Regex.Replace(key, ".*:", "");
-            return idType.GetString() + ":"+ key;
+            return idType.GetString() + ":" + key;
         }
         #endregion
 
@@ -91,12 +77,13 @@ namespace OpenLibraryNET.Utility
             );
         }
 
-        public static Uri BuildISBNUri(string isbn)
+        public static Uri BuildISBNUri(string isbn, params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
             (
                 BaseURL,
-                "isbn/" + isbn + ".json"
+                "isbn/" + isbn + ".json",
+                parameters
             );
         }
 
@@ -219,18 +206,21 @@ namespace OpenLibraryNET.Utility
             );
         }
 
-        public static Uri BuildPartnerUri(PartnerIdType idType, string id)
-            => BuildPartnerUri(idType.GetString(), id);
-        public static Uri BuildPartnerUri(string idType, string id)
+        public static Uri BuildPartnerUri(PartnerIdType idType, string id, params KeyValuePair<string, string>[] parameters)
+            => BuildPartnerUri(idType.GetString(), id, parameters);
+        public static Uri BuildPartnerUri(string idType, string id, params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
             (
                 BaseURL,
-                RequestTypePrefixMap[OLRequestAPI.Partner] + "/" + idType + "/" + id + ".json"
+                RequestTypePrefixMap[OLRequestAPI.Partner] + "/" + idType + "/" + id + ".json",
+                parameters
             );
         }
 
         public static Uri BuildPartnerMultiUri(params string[] ids)
+            => BuildPartnerMultiUri(ids, Array.Empty<KeyValuePair<string, string>>());
+        public static Uri BuildPartnerMultiUri(string[] ids, params KeyValuePair<string, string>[] parameters)
         {
             string concat;
             if (ids.Length > 1)
@@ -248,12 +238,11 @@ namespace OpenLibraryNET.Utility
             return BuildUri
             (
                 BaseURL,
-                RequestTypePrefixMap[OLRequestAPI.Partner] + "/json/" + concat 
+                RequestTypePrefixMap[OLRequestAPI.Partner] + "/json/" + concat,
+                parameters
             );
         }
 
-
-        // TODO maybe add only path + parameters version for each builder; could call this here then instead of using requesttypeprefixmap
         public static Uri BuildUri(OLRequestAPI api, string path, params KeyValuePair<string, string>[] parameters)
         {
             // Remove leading prefix if it is there, to prevent duplication
@@ -529,7 +518,7 @@ namespace OpenLibraryNET.Utility
                     if (reader.TokenType == JsonToken.StartArray)
                     {
                         JArray array = JArray.Load(reader);
-                        if (array.Count == 0) return new string[0];
+                        if (array.Count == 0) return Array.Empty<string>();
 
                         if (array[0].Type == JTokenType.String)
                         {
@@ -569,7 +558,7 @@ namespace OpenLibraryNET.Utility
                     if (reader.TokenType == JsonToken.StartArray)
                     {
                         JArray array = JArray.Load(reader);
-                        if (array.Count == 0) return new string[0];
+                        if (array.Count == 0) return Array.Empty<string>();
 
                         if (array[0].Type == JTokenType.String)
                         {
@@ -604,7 +593,7 @@ namespace OpenLibraryNET.Utility
                     if (reader.TokenType == JsonToken.StartArray)
                     {
                         JArray array = JArray.Load(reader);
-                        if (array.Count == 0) return new string[0];
+                        if (array.Count == 0) return Array.Empty<string>();
 
                         if (array[0].Type == JTokenType.String)
                         {
@@ -670,7 +659,6 @@ namespace OpenLibraryNET.Utility
             {OLRequestAPI.Authors, "authors"},
             {OLRequestAPI.Subjects, "subjects"},
             {OLRequestAPI.Search, "search"},
-            {OLRequestAPI.SearchInside, ""},
             {OLRequestAPI.Partner, "api/volumes/brief"},
             {OLRequestAPI.Covers, "b"},
             {OLRequestAPI.AuthorPhotos, "a"},
@@ -679,145 +667,119 @@ namespace OpenLibraryNET.Utility
             }
         );
 
-        public static ReadOnlyDictionary<string, List<string>> GetPathParametersMap(OLRequestAPI api)
+        public static ReadOnlyDictionary<string, ImmutableArray<string>> GetPathParametersMap(OLRequestAPI api)
         {
-            switch (api)
+            return api switch
             {
-                case OLRequestAPI.Books: return AuthorsSubfileFiltersMap;
-                case OLRequestAPI.Books_Works: return WorksPathParametersMap;
-                case OLRequestAPI.Books_Editions: return EditionsPathParametersMap;
-                case OLRequestAPI.Books_ISBN: return ISBNPathParametersMap;
-                case OLRequestAPI.Authors: return AuthorsSubfileFiltersMap;
-                case OLRequestAPI.Subjects: return SubjectsSubfileFiltersMap;
-                case OLRequestAPI.Search: return SearchSubfileFiltersMap;
-                case OLRequestAPI.SearchInside: return AuthorsSubfileFiltersMap;
-                case OLRequestAPI.Partner: return AuthorsSubfileFiltersMap;
-                case OLRequestAPI.Covers: return CoversSubfileFiltersMap;
-                case OLRequestAPI.AuthorPhotos: return AuthorPhotosSubfileFiltersMap;
-                case OLRequestAPI.RecentChanges: return AuthorsSubfileFiltersMap;
-                default: throw new System.Exception();
-            }
+                OLRequestAPI.Books => BooksPathParametersMap,
+                OLRequestAPI.Books_Works => WorksPathParametersMap,
+                OLRequestAPI.Authors => AuthorsPathParametersMap,
+                OLRequestAPI.Subjects => SubjectsPathParametersMap,
+                OLRequestAPI.Search => SearchPathParametersMap,
+                OLRequestAPI.Lists => ListsPathParametersMap,
+                OLRequestAPI.Covers => CoversPathParametersMap,
+                OLRequestAPI.AuthorPhotos => AuthorPhotosPathParametersMap,
+                OLRequestAPI.RecentChanges => RecentChangesPathParametersMap,
+                _ => new ReadOnlyDictionary<string, ImmutableArray<string>>(new Dictionary<string, ImmutableArray<string>>()),
+            };
         }
 
         #region Books Maps
-        public static readonly ReadOnlyDictionary<string, List<string>> BooksPathParametersMap = new ReadOnlyDictionary<string, List<string>>
+        public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> BooksPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
-            new Dictionary<string, List<string>>
+            new Dictionary<string, ImmutableArray<string>>
             {
-                {string.Empty, new List<string>() { "bibkeys", "format", "callback", "jscmd" } }
+                {string.Empty, ImmutableArray.Create("bibkeys", "format", "callback", "jscmd") }
             }
         );
         #endregion
 
         #region Works Maps
-        public static readonly ReadOnlyDictionary<string, List<string>> WorksPathParametersMap = new ReadOnlyDictionary<string, List<string>>
+        public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> WorksPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
-            new Dictionary<string, List<string>>
+            new Dictionary<string, ImmutableArray<string>>
             {
-                {string.Empty, new List<string>() },
-                {"editions", new List<string>(){ "limit", "offset" } },
-                {"bookshelves", new List<string>() },
-                {"ratings", new List<string>() },
-            }
-        );
-
-        #endregion
-
-        #region Editions Maps
-        public static readonly ReadOnlyDictionary<string, List<string>> EditionsPathParametersMap = new ReadOnlyDictionary<string, List<string>>
-        (
-            new Dictionary<string, List<string>>
-            {
-                {string.Empty, new List<string>() },
-            }
-        );
-
-        #endregion
-
-
-        #region ISBN Maps
-        public static readonly ReadOnlyDictionary<string, List<string>> ISBNPathParametersMap = new ReadOnlyDictionary<string, List<string>>
-        (
-            new Dictionary<string, List<string>>
-            {
-                {string.Empty, new List<string>() },
+                {string.Empty, Array.Empty<string>().ToImmutableArray() },
+                {"editions", ImmutableArray.Create( "limit", "offset") },
+                {"bookshelves", Array.Empty<string>().ToImmutableArray() },
+                {"ratings", Array.Empty<string>().ToImmutableArray() },
             }
         );
 
         #endregion
 
         #region Authors Maps
-        public static readonly ReadOnlyDictionary<string, List<string>> AuthorsSubfileFiltersMap = new ReadOnlyDictionary<string, List<string>>
+        public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> AuthorsPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
-            new Dictionary<string, List<string>>
+            new Dictionary<string, ImmutableArray<string>>
             {
-                {string.Empty, new List<string>() },
-                {"works", new List<string>() { "offset", "limit" } },
+                {string.Empty, Array.Empty<string>().ToImmutableArray() },
+                {"works", ImmutableArray.Create("offset", "limit") },
             }
         );
         #endregion
 
         #region Subjects Maps
-        public static readonly ReadOnlyDictionary<string, List<string>> SubjectsSubfileFiltersMap = new ReadOnlyDictionary<string, List<string>>
+        public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> SubjectsPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
-            new Dictionary<string, List<string>>
+            new Dictionary<string, ImmutableArray<string>>
             {
-                {string.Empty, new List<string>() { "details", "ebooks", "published_in", "limit", "offset", "sort" } }
+                {string.Empty, ImmutableArray.Create("details", "ebooks", "published_in", "limit", "offset", "sort") }
             }
         );
         #endregion
 
         #region Search Maps
-        public static readonly ReadOnlyDictionary<string, List<string>> SearchSubfileFiltersMap = new ReadOnlyDictionary<string, List<string>>
+        public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> SearchPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
-            new Dictionary<string, List<string>>
+            new Dictionary<string, ImmutableArray<string>>
             {
-                {string.Empty, new List<string>() { "q", "title", "author", "subject", "place", "person", "language", "publisher", "sort" } },
-                {"authors", new List<string>() { "q", "sort", "limit", "offset" } },
-                {"subjects", new List<string>() { "q", "limit", "offset" } },
-                {"lists", new List<string>() { "q", "limit", "offset" } },
+                {string.Empty, ImmutableArray.Create("q", "title", "author", "subject", "place", "person", "language", "publisher", "sort") },
+                {"authors", ImmutableArray.Create( "q", "sort", "limit", "offset") },
+                {"subjects", ImmutableArray.Create("q", "limit", "offset") },
+                {"lists", ImmutableArray.Create("q", "limit", "offset") },
             }
         );
         #endregion
 
         #region Covers Maps
-        public static readonly ReadOnlyDictionary<string, List<string>> CoversSubfileFiltersMap = new ReadOnlyDictionary<string, List<string>>
+        public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> CoversPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
-            new Dictionary<string, List<string>>
+            new Dictionary<string, ImmutableArray<string>>
             {
-                {string.Empty, new List<string>(){ } }
+                {string.Empty, ImmutableArray.Create("default") }
             }
         );
         #endregion
 
         #region AuthorPhotos Maps
-        public static readonly ReadOnlyDictionary<string, List<string>> AuthorPhotosSubfileFiltersMap = new ReadOnlyDictionary<string, List<string>>
+        public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> AuthorPhotosPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
-            new Dictionary<string, List<string>>
+            new Dictionary<string, ImmutableArray<string>>
             {
-                {string.Empty, new List<string>() }
+                {string.Empty, ImmutableArray.Create("default") }
             }
         );
         #endregion
 
         #region Lists Maps
-        public static readonly ReadOnlyDictionary<string, List<string>> ListsSubfileFiltersMap = new ReadOnlyDictionary<string, List<string>>
+        public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> ListsPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
-            new Dictionary<string, List<string>>
+            new Dictionary<string, ImmutableArray<string>>
             {
-                {string.Empty, new List<string>() { } },
-                {"editions", new List<string>() { "limit", "offset" } },
-                {"subjects", new List<string>() { "limit", "offset" } }
+                {string.Empty, Array.Empty<string>().ToImmutableArray() },
+                {"editions", ImmutableArray.Create("limit", "offset") },
+                {"subjects", ImmutableArray.Create("limit", "offset") }
             }
         );
         #endregion
 
         #region RecentChanges Maps
-        public static readonly ReadOnlyDictionary<string, List<string>> RecentChangesSubfileFiltersMap = new ReadOnlyDictionary<string, List<string>>
+        public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> RecentChangesPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
-            new Dictionary<string, List<string>>
+            new Dictionary<string, ImmutableArray<string>>
             {
-                {string.Empty, new List<string>() { "limit", "offset", "bot" } }
+                {string.Empty, ImmutableArray.Create("limit", "offset", "bot") } 
             }
         );
         #endregion

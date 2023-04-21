@@ -8,7 +8,7 @@ namespace OpenLibraryNET.Loader
     {
         internal OLEditionLoader(HttpClient client) => _client = client;
 
-        private HttpClient _client;
+        private readonly HttpClient _client;
 
         public async Task<(bool, OLEditionData?)> TryGetDataAsync(string id, EditionIdType? idType = null)
             => await TryGetDataAsync(_client, id, idType);
@@ -156,7 +156,7 @@ namespace OpenLibraryNET.Loader
             );
 
             JToken token = JToken.Parse(response);
-            List<OLEditionData> data = new List<OLEditionData>();
+            List<OLEditionData> data = new();
             foreach (string bibkey in bibkeys)
             {
                 data.Add(token[bibkey]!.ToObject<OLEditionData>()!);
@@ -228,7 +228,7 @@ namespace OpenLibraryNET.Loader
 
         public async static Task<(bool, OLListData[]?)> TryGetListsAsync(HttpClient client, string id, params KeyValuePair<string, string>[] parameters)
         {
-            try { return (true, await GetListsAsync(client, id)); }
+            try { return (true, await GetListsAsync(client, id, parameters)); }
             catch { return (false, null); }
         }
         public async static Task<OLListData[]?> GetListsAsync(HttpClient client, string id, params KeyValuePair<string, string>[] parameters)

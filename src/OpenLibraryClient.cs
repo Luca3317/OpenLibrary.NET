@@ -80,6 +80,7 @@ namespace OpenLibraryNET
 
             Uri uri = new Uri(OpenLibraryUtility.BaseUri, "account/logout");
             var response = await _httpClient.PostAsync(uri, null);
+            response.EnsureSuccessStatusCode();
 
             _loggedIn = false;
             _email = null;
@@ -160,8 +161,8 @@ namespace OpenLibraryNET
             {
                 name = listName,
                 description = listDescription,
-                tags = listTags != null ? listTags : new List<string>(),
-                seeds = listSeeds != null ? listSeeds : new List<string>()
+                tags = listTags ?? new List<string>(),
+                seeds = listSeeds ?? new List<string>()
             });
             response.EnsureSuccessStatusCode();
         }
@@ -178,24 +179,24 @@ namespace OpenLibraryNET
             response.EnsureSuccessStatusCode();
         }
 
-        private HttpClient _httpClient;
-        private HttpClientHandler _httpHandler;
+        private readonly HttpClient _httpClient;
+        private readonly HttpClientHandler _httpHandler;
 
         private bool _loggedIn = false;
         private string? _username = null;
         private string? _email = null;
 
-        private OLWorkLoader _work;
-        private OLAuthorLoader _author;
-        private OLEditionLoader _edition;
-        private OLImageLoader _image;
-        private OLListLoader _list;
-        private OLSearchLoader _search;
-        private OLSubjectLoader _subject;
-        private OLRecentChangesLoader _recentChanges;
-        private OLPartnerLoader _partner;
+        private readonly OLWorkLoader _work;
+        private readonly OLAuthorLoader _author;
+        private readonly OLEditionLoader _edition;
+        private readonly OLImageLoader _image;
+        private readonly OLListLoader _list;
+        private readonly OLSearchLoader _search;
+        private readonly OLSubjectLoader _subject;
+        private readonly OLRecentChangesLoader _recentChanges;
+        private readonly OLPartnerLoader _partner;
 
-        private string ExtractUsernameFromSessionCookie(Cookie sessionCookie)
+        private static string ExtractUsernameFromSessionCookie(Cookie sessionCookie)
             => Regex.Match(sessionCookie.Value, "(?<=/people/).*?(?=%)").Value;
     }
 }

@@ -7,7 +7,7 @@ namespace OpenLibraryNET.Loader
     {
         internal OLListLoader(HttpClient client) => _client = client;
 
-        HttpClient _client;
+        private readonly HttpClient _client;
 
         public async Task<(bool, OLListData[]?)> TryGetUsersListsAsync(string username)
             => await TryGetUsersListAsync(_client, username);
@@ -68,19 +68,6 @@ namespace OpenLibraryNET.Loader
                 client: client
             );
         }
-
-        /*
-         * TODO
-         * Response format seems inconsistent with other similar requests
-         * 
-        public async static Task<OLSubjectData[]?> GetListSubjects(string username, string id, params KeyValuePair<string, string>[] parameters)
-        {
-            return await OpenLibraryUtility.LoadAsync<OLSubjectData[]>
-            (
-                OpenLibraryUtility.BuildListsURL(username, id, "subjects", parameters), "entries"
-            );
-        }
-        */
     }
 
 }

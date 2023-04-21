@@ -23,33 +23,33 @@ namespace OpenLibraryNET.Data
         [JsonIgnore]
         public IReadOnlyList<string> Subjects
         {
-            get => new ReadOnlyCollection<string>(subjects);
-            init => subjects = value.ToArray();
+            get => new ReadOnlyCollection<string>(_subjects);
+            init => _subjects = value.ToArray();
         }
         [JsonIgnore]
         public IReadOnlyList<string> AuthorKeys
         {
-            get => new ReadOnlyCollection<string>(authors);
-            init => authors = value.ToArray();
+            get => new ReadOnlyCollection<string>(_authors);
+            init => _authors = value.ToArray();
         }
         [JsonIgnore]
         public IReadOnlyList<int> CoverKeys
         {
-            get => new ReadOnlyCollection<int>(coverKeys);
-            init => coverKeys = value.ToArray();
+            get => new ReadOnlyCollection<int>(_coverKeys);
+            init => _coverKeys = value.ToArray();
         }
 
         [JsonProperty("subjects")]
-        private string[] subjects { get; init; } = new string[0];
+        private string[] _subjects { get; init; } = Array.Empty<string>();
         [JsonProperty("authors")]
         [JsonConverter(typeof(OpenLibraryUtility.Serialization.AuthorsKeysConverter))]
-        private string[] authors { get; init; } = new string[0];
+        private string[] _authors { get; init; } = Array.Empty<string>();
         [JsonProperty("covers")]
-        private int[] coverKeys { get; init; } = new int[0];
+        private int[] _coverKeys { get; init; } = Array.Empty<int>();
 
         // Aliases
         [JsonProperty("subject")]
-        private string[] subjectsSubjects { init => subjects = value; }
+        private string[] _subjectsSubjects { init => _subjects = value; }
         //[JsonProperty("cover_id")]
         //private int subjectsCover { init => coverKeys.Add(value); }
 
@@ -61,9 +61,9 @@ namespace OpenLibraryNET.Data
                 this.Key == data.Key &&
                 this.Title == data.Title &&
                 this.Description == data.Description &&
-                GeneralUtility.SequenceEqual(this.subjects, data.subjects) &&
-                GeneralUtility.SequenceEqual(this.coverKeys, data.coverKeys) &&
-                GeneralUtility.SequenceEqual(this.authors, data.authors);
+                GeneralUtility.SequenceEqual(this._subjects, data._subjects) &&
+                GeneralUtility.SequenceEqual(this._coverKeys, data._coverKeys) &&
+                GeneralUtility.SequenceEqual(this._authors, data._authors);
         }
 
         public override int GetHashCode() => base.GetHashCode();

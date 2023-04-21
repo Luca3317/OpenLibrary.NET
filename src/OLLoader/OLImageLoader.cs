@@ -7,7 +7,7 @@ namespace OpenLibraryNET.Loader
     {
         internal OLImageLoader(HttpClient client) => _client = client;
 
-        private HttpClient _client;
+        private readonly HttpClient _client;
 
         public async Task<(bool, byte[]?)> TryGetCoverAsync(CoverIdType idType, string id, ImageSize size)
             => await TryGetCoverAsync(idType.ToString(), id, size.GetString());
