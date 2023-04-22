@@ -13,6 +13,8 @@ namespace OpenLibraryNET.Data
         public string Name { get; init; } = "";
         [JsonProperty("work_count")]
         public int WorkCount { get; init; } = -1;
+        [JsonProperty("subject_type")]
+        public string SubjectType { get; init; } = "subject";
 
         [JsonIgnore]
         public IReadOnlyList<OLWorkData> Works
