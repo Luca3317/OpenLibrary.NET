@@ -1,29 +1,46 @@
-﻿using System;
+﻿using OpenLibraryNET.Loader;
+using OpenLibraryNET.Utility;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenLibraryNET.examples
-{
+{ 
     public class WorkAPIExamples
     {
         /*
-         * Given a work's OLID, get all its information
-         */
-        public async Task GetWork()
+        * Given a work's id, get all its information
+        */
+        public async Task LoadWork()
         {
-            // The work's OLID
-            string id = "OL29583061W";
+            OpenLibraryClient client = new OpenLibraryClient();
+            string workOLID = "";
 
-            // Create work and load all its data
-            // These values, once loaded, are stored in work
-            OLWork work = new OLWork(id);
-            await work.GetDataAsync();
-            await work.GetRatingsAsync();
-            await work.GetBookshelvesAsync();
-            await work.GetTotalEditionCountAsync();
-            await work.RequestEditionsAsync(work.TotalEditions);
+            // Get all of the work's info and 10 of its editions
+            OLWork work = await client.GetWorkAsync(workOLID, 10);
+
+            // Equivalent
+            work = new OLWork()
+            {
+                ID = workOLID,
+                Data = await client.Work.GetDataAsync(workOLID),
+                Bookshelves = await client.Work.GetBookshelvesAsync(workOLID),
+                Ratings = await client.Work.GetRatingsAsync(workOLID),
+                Editions = await client.Work.GetEditionsAsync(workOLID, new KeyValuePair<string, string>("limit", "10"))
+            };
+
+            // Equivalent, using static methods
+            HttpClient httpClient = new HttpClient();
+            work = new OLWork()
+            {
+                ID = workOLID,
+                Data = await OLWorkLoader.GetDataAsync(httpClient, workOLID),
+                Bookshelves = await OLWorkLoader.GetBookshelvesAsync(httpClient, workOLID),
+                Ratings = await OLWorkLoader.GetRatingsAsync(httpClient, workOLID),
+                Editions = await OLWorkLoader.GetEditionsAsync(httpClient, workOLID, new KeyValuePair<string, string>("limit", "10"))
+            };
         }
 
         /*
@@ -32,12 +49,14 @@ namespace OpenLibraryNET.examples
          */
         public async Task GetWorkFromSearch()
         {
-            // The search query
-            string query = "Tom sawyer";
+            HttpClient client = new HttpClient();
 
-            // Request the first work returned by the search
-            var results = await OLSearchLoader.GetSearchResultsAsync(query, new KeyValuePair<string, string>("limit", "1"));
-            
+            // The search query
+            string query = "The picture of dorian gray";
+
+            // Request the first author returned by the search
+            var results = await OLSearchLoader.GetSearchResultsAsync(client, query, new KeyValuePair<string, string>("limit", "1"));
+
             // Ensure there were enough search results
             if (results == null || results.Length == 0)
             {
@@ -45,18 +64,11 @@ namespace OpenLibraryNET.examples
                 return;
             }
 
-            OLWork workData = new OLWork(results[0]);
-        }
-
-        /*
-         * Given a work's OLID, get only its ratings
-         */
-        public async Task GetRatings()
-        {
-            // The work's OLID
-            string id = "OL29583061W";
-
-            OLRatingsData? ratings = await OLWorkLoader.GetRatingsAsync(id);
+            OLWork work = new OLWork()
+            {
+                ID = results[0].ID,
+                Data = results[0]
+            };
         }
     }
 }

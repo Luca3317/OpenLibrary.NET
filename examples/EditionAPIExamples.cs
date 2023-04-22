@@ -1,4 +1,6 @@
-﻿using System;
+﻿using OpenLibraryNET.Loader;
+using OpenLibraryNET.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,20 +11,40 @@ namespace OpenLibraryNET.examples
     public class EditionAPIExamples
     {
         /*
-        * Given an edition's OLID, get all its information
+        * Given an edition's id, get all its information
         */
-        public async Task GetEdition()
+        public async Task LoadEdition()
         {
-            // The edition's OLID
-            string id = "OL7826547M";
+            OpenLibraryClient client = new OpenLibraryClient();
+            string editionOLID = "";
 
-            // Create editon and load all its information
-            // These values, once loaded, are stored in edition
-            OLEdition edition = new OLEdition(id);
-            await edition.GetDataAsync();
-            await edition.GetCoverAsync("s"); // get cover in small resolution
-            await edition.GetCoverAsync("m"); // get cover in medium resolution
-            await edition.GetCoverAsync("l"); // get cover in large resolution
+            // Get the edition's data, as well as its cover in small resolution
+            OLEdition edition = await client.GetEditionAsync(editionOLID, EditionIdType.OLID, ImageSize.Small);
+
+            // Equivalent
+            edition = new OLEdition()
+            {
+                ID = editionOLID,
+                Data = await client.Edition.GetDataAsync(editionOLID),
+                CoverS = await client.Image.GetCoverAsync(CoverIdType.OLID, editionOLID, ImageSize.Small)
+            };
+
+            // Equivalent, using static methods
+            HttpClient httpClient = new HttpClient();
+            edition = new OLEdition()
+            {
+                ID = editionOLID,
+                Data = await OLEditionLoader.GetDataAsync(httpClient, editionOLID),
+                CoverS = await OLImageLoader.GetCoverAsync(httpClient, CoverIdType.OLID, editionOLID, ImageSize.Small),
+            };
+
+            // Alternatives
+            // Get an edition by ISBN
+            edition = await client.GetEditionAsync("0123456789", EditionIdType.ISBN, ImageSize.Small);
+            // Get an edition by OCLC
+            edition = await client.GetEditionAsync("30647889", EditionIdType.OCLC, ImageSize.Small);
+            // Get an edition using a prepared bibkey; no cover
+            edition = await client.GetEditionAsync("ISBN:0123456789");
         }
 
         /*
@@ -31,13 +53,14 @@ namespace OpenLibraryNET.examples
          */
         public async Task GetEditionFromSearch()
         {
-            // The search query
-            string query = "Finnegans Wake";
+            HttpClient client = new HttpClient();
 
-            // Request the first work returned by the search
-            OLWorkData[]? results =
-                await OLSearchLoader.GetSearchResultsAsync(query, new KeyValuePair<string, string>("limit", "1"));
-            
+            // The search query
+            string query = "the lord of the rings two towers";
+
+            // Request the first author returned by the search
+            var results = await OLSearchLoader.GetSearchResultsAsync(client, query, new KeyValuePair<string, string>("limit", "1"));
+
             // Ensure there were enough search results
             if (results == null || results.Length == 0)
             {
@@ -45,29 +68,22 @@ namespace OpenLibraryNET.examples
                 return;
             }
 
-            // Get the first of the works editions
-            OLEditionData[]? editions = 
-                await OLWorkLoader.GetEditionsAsync(results[0].ID, new KeyValuePair<string, string>("limit", "1"));
-           
-            // Ensure the work has enough editions
-            if (editions == null || editions.Length == 0)
+            OLEditionData editionData = (await OLWorkLoader.GetEditionsAsync(client, results[0].ID))![0];
+
+            OLEdition edition = new OLEdition()
             {
-                // Error handling code
-                return;
-            }
+                ID = editionData.ID,
+                Data = editionData
+            };
 
-            OLEdition edition = new OLEdition(editions[0]);
-        }
 
-        /*
-         * Given an editions's OLID, get only its cover
-         */
-        public async Task GetCover()
-        {
-            // The editions OLID
-            string id = "OL31827A";
-
-            byte[] cover = await OLImageLoader.GetCoverAsync("olid", id, "s"); // get cover in small resolution
+            // Alternatively, you can try to get the edition ID from OLWorkData's extensiondata
+            string editionID = results[0].ExtensionData["cover_edition_key"].ToObject<string>();
+            OLEdition editionAlt = new OLEdition()
+            {
+                ID = editionID,
+                Data = await OLEditionLoader.GetDataAsync(client, editionID, EditionIdType.OLID)
+            };
         }
     }
 }

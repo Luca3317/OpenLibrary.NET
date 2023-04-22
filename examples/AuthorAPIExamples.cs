@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenLibraryNET.Loader;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,19 +10,32 @@ namespace OpenLibraryNET.examples
     public class AuthorAPIExamples
     {
         /*
-        * Given an author's OLID, get all their information
-        */
-        public async Task GetAuthor()
+         * Given an author's id, get all their information.
+         */
+        public async Task LoadExamples()
         {
-            // The author's OLID
-            string id = "OL31827A";
+            OpenLibraryClient client = new OpenLibraryClient();
+            string authorOLID = "";
 
-            // Create author and load all their information
-            // These values, once loaded, are stored in author
-            OLAuthor author = new OLAuthor(id);
-            await author.GetDataAsync();
-            await author.GetTotalWorksCountAsync();
-            await author.RequestWorksAsync(author.TotalWorks);
+            // Get all of the author's info and 10 of their works
+            OLAuthor author = await client.GetAuthorAsync(authorOLID, 10);
+
+            // Equivalent
+            author = new OLAuthor()
+            {
+                ID = authorOLID,
+                Data = await client.Author.GetDataAsync(authorOLID),
+                Works = await client.Author.GetWorksAsync(authorOLID, new KeyValuePair<string, string>("limit", "10"))
+            };
+
+            // Equivalent, using static methods
+            HttpClient httpClient = new HttpClient();
+            author = new OLAuthor()
+            {
+                ID = authorOLID,
+                Data = await OLAuthorLoader.GetDataAsync(httpClient, authorOLID),
+                Works = await OLAuthorLoader.GetWorksAsync(httpClient, authorOLID, new KeyValuePair<string, string>("limit", "10"))
+            };
         }
 
         /*
@@ -30,12 +44,14 @@ namespace OpenLibraryNET.examples
          */
         public async Task GetAuthorFromSearch()
         {
+            HttpClient client = new HttpClient();
+
             // The search query
             string query = "James Joyce";
 
             // Request the first author returned by the search
-            var results = await OLSearchLoader.GetAuthorSearchResultsAsync(query, new KeyValuePair<string, string>("limit", "1"));
-           
+            var results = await OLSearchLoader.GetAuthorSearchResultsAsync(client, query, new KeyValuePair<string, string>("limit", "1"));
+
             // Ensure there were enough search results
             if (results == null || results.Length == 0)
             {
@@ -43,18 +59,11 @@ namespace OpenLibraryNET.examples
                 return;
             }
 
-            OLAuthor author = new OLAuthor(results[0]);
-        }
-
-        /*
-         * Given an author's OLID, get only their OLAuthorData
-         */
-        public async Task GeAuthorData()
-        {
-            // The author's OLID
-            string id = "OL31827A";
-
-            OLAuthorData? data = await OLAuthorLoader.GetDataAsync(id);
+            OLAuthor author = new OLAuthor()
+            {
+                ID = results[0].ID,
+                Data = results[0]
+            };
         }
     }
 }
