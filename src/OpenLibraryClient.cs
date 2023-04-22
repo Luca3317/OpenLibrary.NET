@@ -111,14 +111,19 @@ namespace OpenLibraryNET
             };
         }
 
+        public async Task<OLEdition> GetEditionAsync(string id) => await GetEditionAsync(id, (string?)null, (string?)null);
         public async Task<OLEdition> GetEditionAsync(string id, EditionIdType? idType = null, ImageSize? coverSize = null)
-            => await GetEditionAsync(id, idType, coverSize == null ? "" : coverSize.Value.GetString());
-        public async Task<OLEdition> GetEditionAsync(string id, EditionIdType? idType = null, string? coverSize = null)
+            => await GetEditionAsync(id, idType == null ? "" : idType.Value.GetString(), coverSize == null ? "" : coverSize.Value.GetString());
+        public async Task<OLEdition> GetEditionAsync(string id, string? idType = null, string? coverSize = null)
         {
+            string bibkey;
+            if (idType != null) bibkey = OpenLibraryUtility.SetBibkeyPrefix(idType, id);
+            else bibkey = id;
+
             OLEdition edition = new OLEdition()
             {
                 ID = id,
-                Data = await _edition.GetDataAsync(id, idType),
+                Data = await _edition.GetDataByBibkeyAsync(bibkey),
             };
 
             if (!string.IsNullOrWhiteSpace(coverSize))
@@ -131,7 +136,7 @@ namespace OpenLibraryNET
                 }
                 else
                 {
-                    type = idType.Value.GetString();
+                    type = idType;
                     coverId = id;
                 }
 

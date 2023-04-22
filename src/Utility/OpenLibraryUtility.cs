@@ -48,9 +48,11 @@ namespace OpenLibraryNET.Utility
         /// <param name="key"></param>
         /// <returns></returns>
         public static string SetBibkeyPrefix(EditionIdType idType, string key)
+            => SetBibkeyPrefix(idType.GetString(), key);
+        public static string SetBibkeyPrefix(string idType, string key)
         {
             key = Regex.Replace(key, ".*:", "");
-            return idType.GetString() + ":" + key;
+            return idType + ":" + key;
         }
         #endregion
 
