@@ -18,36 +18,37 @@ namespace OpenLibraryNET.Utility
         public static readonly Uri BaseUri_Covers = new Uri("https://" + BaseURL_Covers);
         #endregion
 
+        #region ID formatting helpers
         /// <summary>
-        /// Extracts the id from a valid key.
+        /// Extracts the id from a valid key.</br>
+        /// i.e. /works/OL8037381W => OL8037381W
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
         public static string ExtractIdFromKey(string key)
         {
-            //return Regex.Replace(key, "[/[a-zA-Z]*/]*", "");
-            return Regex.Replace(key, ".*/(?=[^/]*$)", "");
+            return Regex.Match(key, "[^/]+(?=/$|$)").Value;
         }
 
-
-        #region Bibkey Helpers
         public static string GetRawBibkey(string id) => Regex.Match(id, "(?<=:)[^:]*$|^[^:]*$").ToString();
         public static string GetBibkeyPrefix(string id) => Regex.Match(id, ".*(?=:)").ToString();
 
         /// <summary>
-        /// Tries to ensure the bibkey prefix is set correctly.<br/>
+        /// Tries to ensure the bibkey prefix is set correctly.</br>
         /// Will work on raw keys and incorrectly set prefixes.
         /// <para>
         /// Examples:<br/>
-        /// idType = ISBN, key = "012345" => "ISBN:012345"<br/>
-        /// idType = LCCN, key = "OCLC:12312" => "LCCN:12312"<br/>
-        /// idType = ISBN, key = "OCLC90000" => "ISBN:OCLC90000" (missing colon)<br/>
+        /// idType = ISBN, key = "012345" => "ISBN:012345"</br>
+        /// idType = LCCN, key = "OCLC:12312" => "LCCN:12312"</br>
+        /// idType = ISBN, key = "OCLC90000" => "ISBN:OCLC90000" (missing colon)</br>
         /// </para>
         /// </summary>
         /// <param name="idType"></param>
         /// <param name="key"></param>
         /// <returns></returns>
         public static string SetBibkeyPrefix(EditionIdType idType, string key)
+            => SetBibkeyPrefix(idType.GetString(), key);
+        public static string SetBibkeyPrefix(PartnerIdType idType, string key)
             => SetBibkeyPrefix(idType.GetString(), key);
         public static string SetBibkeyPrefix(string idType, string key)
         {
@@ -211,11 +212,13 @@ namespace OpenLibraryNET.Utility
         public static Uri BuildPartnerUri(PartnerIdType idType, string id, params KeyValuePair<string, string>[] parameters)
             => BuildPartnerUri(idType.GetString(), id, parameters);
         public static Uri BuildPartnerUri(string idType, string id, params KeyValuePair<string, string>[] parameters)
+            => BuildPartnerUri(idType + "/" + id, parameters);
+        public static Uri BuildPartnerUri(string id, params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
             (
                 BaseURL,
-                RequestTypePrefixMap[OLRequestAPI.Partner] + "/" + idType + "/" + id + ".json",
+                RequestTypePrefixMap[OLRequestAPI.Partner] + "/" + id + ".json",
                 parameters
             );
         }
