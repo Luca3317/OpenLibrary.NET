@@ -4,19 +4,23 @@ using Xunit.Abstractions;
 using OpenLibraryNET.Loader;
 using OpenLibraryNET.Data;
 using OpenLibraryNET.Utility;
+using static OpenLibraryNET.Utility.OpenLibraryUtility;
+using System.Text;
+using Polly;
 
 #pragma warning disable 8604, 8602
 namespace Tests
 {
-    public class OLObjectsTests
+    public class OpenLibraryTests
     {
         private readonly ITestOutputHelper _testOutputHelper;
 
-        public OLObjectsTests(ITestOutputHelper helper)
+        public OpenLibraryTests(ITestOutputHelper helper)
         {
             _testOutputHelper = helper;
         }
 
+        #region Constants
         public static string[] WorksIDs = new string[]
         {
             "OL45804W",
@@ -80,7 +84,7 @@ namespace Tests
 
         public static string[] AuthorPhotoIDs = new string[]
         {
-            "OL229501A-S"
+            "OL229501A"
         };
 
         public static string[] SearchQueries = new string[]
@@ -175,44 +179,33 @@ namespace Tests
             "33engyjoy",
             "halliryh"
         };
+        #endregion
 
+        #region OLLoader Tests
         [Fact]
-        public async Task OpenLibraryClientLoadTests()
+        [Trait("Category", "OLLoader")]
+        public async Task OLPartnerLoaderTests()
         {
+            string id1 = "id:1;lccn:50006784";
+            string id2 = "olid:OL6179000M;lccn:55011330";
+
             OpenLibraryClient client = new OpenLibraryClient();
+            var s = await client.Partner.GetMultiDataAsync(id1, id2);
 
-            CheckOLWorkData(await client.Work.GetDataAsync(WorksIDs[0]));
-            CheckOLRatingsData(await client.Work.GetRatingsAsync(WorksIDs[0]));
-            CheckOLBookshelvesData(await client.Work.GetBookshelvesAsync(WorksIDs[0]));
-            CheckOLEditionData((await client.Work.GetEditionsAsync(WorksIDs[0]))[0]);
-
-            CheckOLEditionData(await client.Edition.GetDataAsync(EditionsIDs[0]));
-            CheckOLAuthorData(await client.Author.GetDataAsync(AuthorIDs[0]));
-            CheckOLSubjectData(await client.Subject.GetDataAsync(Subjects[0]));
-            CheckOLRecentChangesData((await client.RecentChanges.GetRecentChangesAsync())[0]);
-        }
-
-        [Fact]
-        public async Task OpenLibraryClientAccountTests()
-        {
-            OpenLibraryClient client = new OpenLibraryClient();
-            
-            await client.Login("", ""); // Email and password
-            await client.CreateListAsync("Test list", "Created this list as part of OpenLibrary.NET tests");
-            OLListData[]? lists = await client.List.GetUserListsAsync(client.Username);
-            foreach (var list in lists)
+            Assert.NotEmpty(s);
+            foreach (var item in s)
             {
-                if (list.Name == "Test list")
-                {
-                    await client.DeleteListAsync(list.ID);
-                }
+                Assert.NotNull(item.Details);
+                Assert.NotNull(item.Data);
+                Assert.NotNull(item.Items);
             }
         }
 
         [Fact]
+        [Trait("Category", "OLLoader")]
         public async Task OLRecentChangesLoaderTests()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = GetClient();
 
             OLRecentChangesData[]? changesData =
                 await OLRecentChangesLoader.GetRecentChangesAsync(client, parameters: new KeyValuePair<string, string>("limit", "10"));
@@ -230,6 +223,7 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "OLLoader")]
         public async Task OLListLoaderTests()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -257,17 +251,26 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "OLLoader")]
         public async Task OLWorkLoaderTests()
         {
+            var policy = Policy
+                .Handle<Exception>()
+                .OrResult<object?>(o => o == null)
+                .RetryAsync(3, (ex, retryCnt) =>
+                {
+                    _testOutputHelper.WriteLine($"Retry count {retryCnt}");
+                });
+
             HttpClient client = OpenLibraryUtility.GetClient();
 
             foreach (string id in WorksIDs)
             {
-                OLWorkData? data = await OLWorkLoader.GetDataAsync(client, id);
-                OLRatingsData? ratings = await OLWorkLoader.GetRatingsAsync(client, id);
-                OLBookshelvesData? bookshelves = await OLWorkLoader.GetBookshelvesAsync(client, id);
-                OLEditionData[]? editions = await OLWorkLoader.GetEditionsAsync(client, id, new KeyValuePair<string, string>("limit", "10"));
-                OLListData[]? lists = await OLWorkLoader.GetListsAsync(client, id, new KeyValuePair<string, string>("limit", "10"));
+                OLWorkData? data = (OLWorkData?)await policy.ExecuteAsync(async () => await OLWorkLoader.GetDataAsync(client, id));
+                OLRatingsData? ratings = (OLRatingsData?)await policy.ExecuteAsync(async () => await OLWorkLoader.GetRatingsAsync(client, id));
+                OLBookshelvesData? bookshelves = (OLBookshelvesData?)await policy.ExecuteAsync(async () => await OLWorkLoader.GetBookshelvesAsync(client, id));
+                OLEditionData[]? editions = (OLEditionData[]?)await policy.ExecuteAsync(async () => await OLWorkLoader.GetEditionsAsync(client, id, new KeyValuePair<string, string>("limit", "10")));
+                OLListData[]? lists = (OLListData[]?)await policy.ExecuteAsync(async () => await OLWorkLoader.GetListsAsync(client, id, new KeyValuePair<string, string>("limit", "10")));
 
                 CheckOLWorkData(data);
                 CheckOLRatingsData(ratings);
@@ -279,6 +282,7 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "OLLoader")]
         public async Task OLEditionLoaderOLIDTests()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -296,6 +300,7 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "OLLoader")]
         public async Task OLEditionLoaderISBNTests()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -314,7 +319,8 @@ namespace Tests
         }
 
         [Fact]
-        public async Task OLEditionLoaderLCCNTests()
+        [Trait("Category", "OLLoader")]
+        public async Task OLEditionLoaderBibkeyTests()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
 
@@ -326,12 +332,6 @@ namespace Tests
                 CheckOLEditionData(data);
                 CheckOLEditionViewAPI(viewapi);
             }
-        }
-
-        [Fact]
-        public async Task OLEditionLoaderOCLCTests()
-        {
-            HttpClient client = OpenLibraryUtility.GetClient();
 
             foreach (string oclc in OCLCs)
             {
@@ -341,9 +341,29 @@ namespace Tests
                 CheckOLEditionData(data);
                 CheckOLEditionViewAPI(viewapi);
             }
+
+            List<string> bibkeys = new List<string>();
+            foreach (string lccn in LCCNs) bibkeys.Add("LCCN:" + lccn);
+            OLEditionData[]? editions = await OLEditionLoader.GetDataByBibkeyAsync(client, bibkeys.ToArray());
+            OLBookViewAPI[]? viewapis = await OLEditionLoader.GetViewAPIAsync(client, bibkeys.ToArray());
+
+            bibkeys.Clear();
+            foreach (string oclc in OCLCs) bibkeys.Add("OCLC:" + oclc);
+            OLEditionData[]? editions2 = await OLEditionLoader.GetDataByBibkeyAsync(client, bibkeys.ToArray());
+            OLBookViewAPI[]? viewapis2 = await OLEditionLoader.GetViewAPIAsync(client, bibkeys.ToArray());
+
+            Assert.NotEmpty(editions);
+            Assert.NotEmpty(viewapis);
+            Assert.NotEmpty(editions2);
+            Assert.NotEmpty(viewapis2);
+            foreach (var item in editions) CheckOLEditionData(item);
+            foreach (var item in viewapis) CheckOLEditionViewAPI(item);
+            foreach (var item in editions2) CheckOLEditionData(item);
+            foreach (var item in viewapis2) CheckOLEditionViewAPI(item);
         }
 
         [Fact]
+        [Trait("Category", "OLLoader")]
         public async Task OLAuthorLoaderTests()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -364,6 +384,7 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "OLLoader")]
         public async Task OLSubjectLoaderTests()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -380,18 +401,22 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "OLLoader")]
         public async Task OLImageLoaderTests()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
 
             foreach (string id in CoverIDs)
+            {
                 Assert.NotEmpty(await OLImageLoader.GetCoverAsync(client, "id", id, "S"));
+            }
 
             foreach (string id in AuthorPhotoIDs)
-                Assert.NotEmpty(await OLImageLoader.GetAuthorPhotoAsync(client, "id", id, "S"));
+                Assert.NotEmpty(await OLImageLoader.GetAuthorPhotoAsync(client, "olid", id, "S"));
         }
 
         [Fact]
+        [Trait("Category", "OLLoader")]
         public async Task OLSearchLoaderrTests()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -428,22 +453,88 @@ namespace Tests
                 foreach (OLListData list in data)
                     CheckOLListData(list);
             }
+
+            OLContainer? container = await OLSearchLoader.GetInsideSearchResultsAsync(client, "Hello");
+            Assert.NotEmpty(container.ExtensionData);
+        }
+        #endregion
+
+        #region OpenLibraryClient Tests
+        [Fact]
+        [Trait("Category", "OpenLibaryClient")]
+        public async Task OpenLibraryClientLoadTests()
+        {
+            OpenLibraryClient client = new OpenLibraryClient();
+
+            CheckOLWorkData(await client.Work.GetDataAsync(WorksIDs[0]));
+            CheckOLRatingsData(await client.Work.GetRatingsAsync(WorksIDs[0]));
+            CheckOLBookshelvesData(await client.Work.GetBookshelvesAsync(WorksIDs[0]));
+            CheckOLEditionData((await client.Work.GetEditionsAsync(WorksIDs[0]))[0]);
+
+            CheckOLEditionData(await client.Edition.GetDataAsync(EditionsIDs[0]));
+            CheckOLAuthorData(await client.Author.GetDataAsync(AuthorIDs[0]));
+            CheckOLSubjectData(await client.Subject.GetDataAsync(Subjects[0]));
+            CheckOLRecentChangesData((await client.RecentChanges.GetRecentChangesAsync())[0]);
+
+            var workO = await client.GetWorkAsync(WorksIDs[0], 10);
+            var authorO = await client.GetAuthorAsync(AuthorIDs[0], 10);
+            //var editionO = await client.GetEditionAsync(EditionsIDs[0], EditionIdType.OLID, "S");
+            var editionO = await client.GetEditionAsync(EditionsIDs[0], "OLID", "S");
+            var editionO2 = await client.GetEditionAsync(EditionsIDs[0], EditionIdType.OLID, ImageSize.Small);
+            Assert.Equal(editionO, editionO2);
+
+            CheckOLWorkData(workO.Data);
+            CheckOLBookshelvesData(workO.Bookshelves);
+            CheckOLRatingsData(workO.Ratings);
+            foreach (var edition in workO.Editions) CheckOLEditionData(edition);
+
+            CheckOLAuthorData(authorO.Data);
+            foreach (var work in authorO.Works) CheckOLWorkData(work);
+
+            CheckOLEditionData(editionO.Data);
+            Assert.NotEmpty(editionO.CoverS);
         }
 
         [Fact]
+        [Trait("Category", "OpenLibaryClient")]
+        public async Task OpenLibraryClientAccountTests()
+        {
+            OpenLibraryClient client = new OpenLibraryClient();
+
+            await client.LoginAsync("lweist3317@gmail.com", "noriam3399"); // Email and password
+            await client.CreateListAsync("Test list", "Created this list as part of OpenLibrary.NET tests");
+            OLListData[]? lists = await client.List.GetUserListsAsync(client.Username);
+            foreach (var list in lists)
+            {
+                if (list.Name == "Test list")
+                {
+                    await client.DeleteListAsync(list.ID);
+                }
+            }
+
+            await client.LogoutAsync();
+            await Assert.ThrowsAnyAsync<System.Exception>(async () => await client.CreateListAsync("This list should not be created"));
+        }
+
+        [Fact]
+        [Trait("Category", "OpenLibaryClient")]
         public async Task OLWorkTests()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
 
             foreach (string id in WorksIDs)
             {
+                var data = await OLWorkLoader.GetDataAsync(client, id);
+                var bookshleves = await OLWorkLoader.GetBookshelvesAsync(client, id);
+                var ratings = await OLWorkLoader.GetRatingsAsync(client, id);
+                var editions = await OLWorkLoader.GetEditionsAsync(client, id, new KeyValuePair<string, string>("limit", "10"));
                 OLWork work = new OLWork()
                 {
                     ID = id,
-                    Data = await OLWorkLoader.GetDataAsync(client, id),
-                    Bookshelves = await OLWorkLoader.GetBookshelvesAsync(client, id),
-                    Ratings = await OLWorkLoader.GetRatingsAsync(client, id),
-                    Editions = await OLWorkLoader.GetEditionsAsync(client, id, new KeyValuePair<string, string>("limit", "10"))
+                    Data = data,
+                    Bookshelves = bookshleves,
+                    Ratings = ratings,
+                    Editions = editions
                 };
 
                 CheckOLWorkData(work.Data);
@@ -456,6 +547,7 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "OpenLibaryClient")]
         public async Task OLAuthorTests()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -477,6 +569,7 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "OpenLibaryClient")]
         public async Task OLEditionTests()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -487,15 +580,17 @@ namespace Tests
                 {
                     ID = id,
                     Data = await OLEditionLoader.GetDataAsync(client, id),
-                    CoverS = await OLImageLoader.GetCoverAsync(client, "OLID", id, "s")
+                    CoverS = await OLImageLoader.GetCoverAsync(client, "OLID", id, "S")
                 };
                 CheckOLEditionData(edition.Data);
                 Assert.NotEmpty(edition.CoverS);
             }
         }
+        #endregion
 
-        
+        #region Serialization Tests
         [Fact]
+        [Trait("Category", "Serialization")]
         public async Task OLWorkDataSerializationTest()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -512,6 +607,7 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "Serialization")]
         public async Task OLEditionDataSerializationTest()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -528,6 +624,7 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "Serialization")]
         public async Task OLAuthorDataSerializationTest()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -544,6 +641,7 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "Serialization")]
         public async Task OLRatingsDataSerializationTest()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -560,6 +658,7 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "Serialization")]
         public async Task OLBookshelvesDataSerializationTest()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -576,6 +675,7 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "Serialization")]
         public async Task OLSubjectDataSerializationTest()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -592,6 +692,7 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "Serialization")]
         public async Task OLWorkSerializationTest()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -616,6 +717,7 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "Serialization")]
         public async Task OLAuthorSerializationTest()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
@@ -638,17 +740,21 @@ namespace Tests
         }
 
         [Fact]
+        [Trait("Category", "Serialization")]
         public async Task OLEditionSerializationTest()
         {
             HttpClient client = OpenLibraryUtility.GetClient();
 
             foreach (string id in EditionsIDs)
             {
+                var data = await OLEditionLoader.GetDataAsync(client, id);
+                var cover = await OLImageLoader.GetCoverAsync(client, "OLID", id, "S");
+
                 OLEdition edition = new OLEdition()
                 {
                     ID = id,
-                    Data = await OLEditionLoader.GetDataAsync(client, id),
-                    CoverS = await OLImageLoader.GetCoverAsync(client, "OLID", id, "s")
+                    Data = data,
+                    CoverS = cover
                 };
 
                 string serialized = JsonConvert.SerializeObject(edition);
@@ -658,7 +764,131 @@ namespace Tests
                 Assert.Equal(serialized, reserialized);
             }
         }
-        
+
+        [Fact]
+        [Trait("Category", "Serialization")]
+        public async Task OLRecentChangesSerializationTest()
+        {
+            HttpClient client = OpenLibraryUtility.GetClient();
+            var data = await OLRecentChangesLoader.GetRecentChangesAsync(client, year: "2020");
+
+            string serialized = JsonConvert.SerializeObject(data);
+            var deserialized = JsonConvert.DeserializeObject<OLRecentChangesData[]>(serialized);
+            string reserialized = JsonConvert.SerializeObject(deserialized);
+            Assert.Equal(data, deserialized);
+            Assert.Equal(serialized, reserialized);
+        }
+
+        [Fact]
+        [Trait("Category", "Serialization")]
+        public async Task OLPartnerSerializationTest()
+        {
+            HttpClient client = OpenLibraryUtility.GetClient();
+            var data = await OLPartnerLoader.GetMultiDataAsync(client, SetBibkeyPrefix("olid", EditionsIDs[0]), SetBibkeyPrefix("olid", EditionsIDs[1]));
+
+            string serialized = JsonConvert.SerializeObject(data);
+            var deserialized = JsonConvert.DeserializeObject<OLPartnerData[]>(serialized);
+            string reserialized = JsonConvert.SerializeObject(deserialized);
+            Assert.Equal(data, deserialized);
+            Assert.Equal(serialized, reserialized);
+        }
+        #endregion
+
+        #region OpenLibraryUtility Tests
+        [Fact]
+        [Trait("Category", "OpenLibraryUtility")]
+        public void URLBuilderTests()
+        {
+            var ps = new KeyValuePair<string, string>[]
+            {
+                new ("limit", "10"),
+                new ("key", "value")
+            };
+
+            string pstring = ".json?limit=10&key=value";
+
+            string id = "OL1234W", path = "ratings";
+
+            Assert.Equal(BuildWorksUri(id, path, ps), BuildUri(OLRequestAPI.Books_Works, id + "/" + path, ps));
+            Assert.Equal("https://openlibrary.org/works/OL1234W/ratings.json?limit=10&key=value", BuildUri(OLRequestAPI.Books_Works, id + "/" + path, ps).ToString());
+
+            path = "works";
+            Assert.Equal(BuildAuthorsUri(id, path, ps), BuildUri(OLRequestAPI.Authors, id + "/" + path, ps));
+            Assert.Equal("https://openlibrary.org/authors/OL1234W/works.json?limit=10&key=value", BuildUri(OLRequestAPI.Authors, id + "/" + path, ps).ToString());
+
+            path = "lists";
+            Assert.Equal(BuildEditionsUri(id, path, ps), BuildUri(OLRequestAPI.Books_Editions, id + "/" + path, ps));
+            Assert.Equal("https://openlibrary.org/books/OL1234W/lists.json?limit=10&key=value", BuildUri(OLRequestAPI.Books_Editions, id + "/" + path, ps).ToString());
+
+            Assert.Equal(BuildISBNUri(id), BuildUri(OLRequestAPI.Books_ISBN, id));
+            Assert.Equal("https://openlibrary.org/isbn/OL1234W.json", BuildUri(OLRequestAPI.Books_ISBN, id).ToString());
+
+            string isbn = "0123456789", bibkey = "ISBN:" + isbn;
+            Assert.Equal(BuildBooksUri(bibkey), BuildUri(OLRequestAPI.Books, "", new KeyValuePair<string, string>("bibkeys", bibkey)));
+            Assert.Equal("https://openlibrary.org/api/books.json?bibkeys=ISBN:0123456789", BuildUri(OLRequestAPI.Books, "", new KeyValuePair<string, string>("bibkeys", bibkey)).ToString());
+
+            string subject = "egypt";
+            Assert.Equal(BuildSubjectsUri(subject, path, ps), BuildUri(OLRequestAPI.Subjects, subject + "/" + path, ps));
+            Assert.Equal("https://openlibrary.org/subjects/egypt/lists.json?limit=10&key=value", BuildUri(OLRequestAPI.Subjects, subject + "/" + path, ps).ToString());
+
+            string query = "nabokov"; path = "authors";
+            var ps2 = new KeyValuePair<string, string>[]
+            {
+                new ("limit", "10"),
+                new ("key", "value"),
+                new ("q", query)
+            };
+            Assert.Equal(BuildSearchUri(query, path, ps), BuildUri(OLRequestAPI.Search, path, ps2));
+            Assert.Equal("https://openlibrary.org/search/authors.json?limit=10&key=value&q=nabokov", BuildUri(OLRequestAPI.Search, path, ps2).ToString());
+
+            string username = "luca3317"; id = "OL1234L"; path = "editions";
+            Assert.Equal(BuildListsUri(username, id, path, ps), BuildUri(OLRequestAPI.Lists, username + "/lists/" + id + "/" + path, ps));
+            Assert.Equal("https://openlibrary.org/people/luca3317/lists/OL1234L/editions.json?limit=10&key=value", BuildUri(OLRequestAPI.Lists, username + "/lists/" + id + "/" + path, ps).ToString());
+
+            string year = "2012", month = "08", day = "30", kind = "merge-authors";
+            Assert.Equal(BuildRecentChangesUri(year, month, day, kind, ps), BuildUri(OLRequestAPI.RecentChanges, year + "/" + month + "/" + day + "/" + kind, ps));
+            Assert.Equal("https://openlibrary.org/recentchanges/2012/08/30/merge-authors.json?limit=10&key=value", BuildUri(OLRequestAPI.RecentChanges, year + "/" + month + "/" + day + "/" + kind, ps).ToString());
+
+            CoverIdType type = CoverIdType.ID; ImageSize size = ImageSize.Small;
+            path = type.ToString() + "/" + id + "-" + size.GetString();
+            Assert.Equal(BuildCoversUri(type, id, size, ps), BuildUri(OLRequestAPI.Covers, path, ps));
+            Assert.Equal(BuildCoversUri(type.GetString(), id, size.GetString(), ps), BuildUri(OLRequestAPI.Covers, path, ps));
+            Assert.Equal("https://covers.openlibrary.org/b/ID/OL1234L-S.jpg?limit=10&key=value", BuildUri(OLRequestAPI.Covers, path, ps).ToString());
+
+            PartnerIdType ptype = PartnerIdType.ISBN; id = "0596156715";
+            Assert.Equal("https://openlibrary.org/api/volumes/brief/isbn/0596156715.json", BuildPartnerUri(ptype, id).ToString());
+
+            string id1 = "id:1;lccn:50006784";
+            string id2 = "olid:OL6179000M;lccn:55011330";
+            string ids = id1 + "|" + id2;
+            Assert.Equal("https://openlibrary.org/api/volumes/brief/json/id:1;lccn:50006784|olid:OL6179000M;lccn:55011330", BuildPartnerMultiUri(id1, id2).ToString());
+        }
+
+        [Fact]
+        [Trait("Category", "OpenLibraryUtility")]
+        public void IdHelpersTests()
+        {
+            string k1 = "works/OL1234A", k2 = " /some/path/OL1234A", k3 = "/path/OL1234A/";
+            Assert.Equal("OL1234A", ExtractIdFromKey(k1));
+            Assert.Equal("OL1234A", ExtractIdFromKey(k2));
+            Assert.Equal("OL1234A", ExtractIdFromKey(k3));
+
+            string bk1 = "type:ID", bk2 = "this is a text?!:ID", bk3 = "ID";
+            Assert.Equal("ID", GetRawBibkey(bk1));
+            Assert.Equal("ID", GetRawBibkey(bk2));
+            Assert.Equal("ID", GetRawBibkey(bk3));
+            Assert.Equal("type", GetBibkeyPrefix(bk1));
+            Assert.Equal("this is a text?!", GetBibkeyPrefix(bk2));
+            Assert.Equal("", GetBibkeyPrefix(bk3));
+
+            Assert.Equal("TYPE:ID", SetBibkeyPrefix("TYPE", bk1));
+            Assert.Equal("TYPE:ID", SetBibkeyPrefix("TYPE", bk2));
+            Assert.Equal("TYPE:ID", SetBibkeyPrefix("TYPE", bk3));
+
+        }
+        #endregion
+
+        #region Utility
         void CheckOLWorkData(OLWorkData? data)
         {
             Assert.NotNull(data);
@@ -738,6 +968,7 @@ namespace Tests
                 Assert.NotEqual("", change.Key);
             }
         }
+        #endregion
     }
 }
 #pragma warning restore 8604, 8602
