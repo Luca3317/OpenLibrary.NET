@@ -10,22 +10,32 @@ namespace OpenLibraryNET.Loader
 
         private readonly HttpClient _client;
 
-        public async Task<(bool, OLPartnerData?)> TryGetPartnerData(PartnerIdType idType, string id)
-            => await TryGetPartnerDataAsync(_client, idType, id);
-        public async Task<OLPartnerData?> GetPartnerDataAsync(PartnerIdType idType, string id)
-            => await GetPartnerDataAsync(_client, idType, id);
+        public async Task<(bool, OLPartnerData?)> TryGetDataAsync(PartnerIdType idType, string id)
+            => await TryGetDataAsync(_client, idType, id);
+        public async Task<OLPartnerData?> GetDataAsync(PartnerIdType idType, string id)
+            => await GetDataAsync(_client, idType, id);
 
-        public async Task<(bool, OLPartnerData[]?)> TryGetPartnerMulitData(params string[] ids)
-            => await TryGetPartnerMultiDataAsync(_client, ids);
-        public async Task<OLPartnerData[]?> GetPartnerMultiDataAsync(params string[] ids)
-            => await GetPartnerMultiDataAsync(_client, ids);
+        public async Task<(bool, OLPartnerData?)> TryGetDataAsync(string idType, string id)
+            => await TryGetDataAsync(_client, idType, id);
+        public async Task<OLPartnerData?> GetDataAsync(string idType, string id)
+            => await GetDataAsync(_client, idType, id);
 
-        public async static Task<(bool, OLPartnerData?)> TryGetPartnerDataAsync(HttpClient client, PartnerIdType idType, string id)
+        public async Task<(bool, OLPartnerData[]?)> TryGetMulitDataAsync(params string[] ids)
+            => await TryGetMultiDataAsync(_client, ids);
+        public async Task<OLPartnerData[]?> GetMultiDataAsync(params string[] ids)
+            => await GetMultiDataAsync(_client, ids);
+
+        public async static Task<(bool, OLPartnerData?)> TryGetDataAsync(HttpClient client, PartnerIdType idType, string id)
+            => await TryGetDataAsync(client, idType.GetString(), id);
+        public async static Task<OLPartnerData?> GetDataAsync(HttpClient client, PartnerIdType idType, string id)
+            => await GetDataAsync(client, idType.GetString(), id);
+
+        public async static Task<(bool, OLPartnerData?)> TryGetDataAsync(HttpClient client, string idType, string id)
         {
-            try { return (true, await GetPartnerDataAsync(client, idType, id)); }
+            try { return (true, await GetDataAsync(client, idType, id)); }
             catch { return (false, null); }
         }
-        public async static Task<OLPartnerData?> GetPartnerDataAsync(HttpClient client, PartnerIdType idType, string id)
+        public async static Task<OLPartnerData?> GetDataAsync(HttpClient client, string idType, string id)
         {
             JObject root = JObject.Parse(await OpenLibraryUtility.RequestAsync
             (
@@ -44,12 +54,12 @@ namespace OpenLibraryNET.Loader
             return data! with { Items = root["items"]!.ToObject<OLPartnerData.Item[]>()! };
         }
 
-        public async static Task<(bool, OLPartnerData[]?)> TryGetPartnerMultiDataAsync(HttpClient client, params string[] ids)
+        public async static Task<(bool, OLPartnerData[]?)> TryGetMultiDataAsync(HttpClient client, params string[] ids)
         {
-            try { return (true, await GetPartnerMultiDataAsync(client, ids)); }
+            try { return (true, await GetMultiDataAsync(client, ids)); }
             catch { return (false, null); }
         }
-        public async static Task<OLPartnerData[]?> GetPartnerMultiDataAsync(HttpClient client, params string[] ids)
+        public async static Task<OLPartnerData[]?> GetMultiDataAsync(HttpClient client, params string[] ids)
         {
             JObject root = JObject.Parse(await OpenLibraryUtility.RequestAsync
             (
