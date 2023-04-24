@@ -9,7 +9,7 @@ See the [docs folder](https://github.com/Luca3317/OpenLibrary.NET/tree/main/docs
 
 ## Installation
 ```console
-dotnet add package OpenLibrary.NET --version 0.0.3
+dotnet add package OpenLibrary.NET --version 0.1.0
 ```
 ***
 Currently, OpenLibrary.Net supports the following of OpenLibrary's APIs:
@@ -28,8 +28,4 @@ Currently, OpenLibrary.Net supports the following of OpenLibrary's APIs:
   * [Covers API](docs/Covers%20API.md)
   * [AuthorPhotos API](docs/Covers%20API.md)
 
-For now, the SearchInside API is unsupported.
-***
-Coming TODO:
-
-* Add support for the SearchInside API
+As it is still experimental, the SearchInside API is unsupported for now.
