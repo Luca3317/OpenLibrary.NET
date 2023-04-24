@@ -17,12 +17,5 @@ namespace OpenLibraryNET.Data
         [JsonExtensionData]
         [JsonProperty("extension_data")]
         protected Dictionary<string, JToken>? extensionData = null;
-
-        protected bool CompareExtensionData(Dictionary<string, JToken>? data)
-        {
-            if (extensionData == null && data == null) return true;
-            if (extensionData == null || data == null) return false;
-            return Enumerable.SequenceEqual(extensionData.Keys, data.Keys);
-        }
     }
 }

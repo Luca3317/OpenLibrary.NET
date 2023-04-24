@@ -42,7 +42,6 @@ namespace OpenLibraryNET.Data
         {
             return
                 data != null &&
-                CompareExtensionData(data.extensionData) &&
                 this.ID == data.ID &&
                 this.Kind == data.Kind &&
                 this.Author == data.Author &&

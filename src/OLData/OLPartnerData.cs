@@ -57,7 +57,6 @@ namespace OpenLibraryNET.Data
         {
             return
                 data != null &&
-                CompareExtensionData(data.extensionData) &&
                 this.Data == data.Data &&
                 this.Details == data.Details &&
                 GeneralUtility.SequenceEqual(this._items, data._items);

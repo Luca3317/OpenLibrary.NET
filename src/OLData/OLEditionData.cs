@@ -118,7 +118,6 @@ namespace OpenLibraryNET.Data
             {
                 return
                     data != null &&
-                    CompareExtensionData(data.extensionData) &&
                     GeneralUtility.SequenceEqual(this._goodreads, data._goodreads) &&
                     GeneralUtility.SequenceEqual(this._libraryThing, data._libraryThing);
             }
@@ -130,7 +129,6 @@ namespace OpenLibraryNET.Data
         {
             return
                 data != null &&
-                CompareExtensionData(data.extensionData) &&
                 this.Key == data.Key &&
                 this.Title == data.Title &&
                 this.Description == data.Description &&

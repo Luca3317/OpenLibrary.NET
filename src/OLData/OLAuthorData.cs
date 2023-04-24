@@ -38,7 +38,6 @@ namespace OpenLibraryNET.Data
         {
             return
                 data != null &&
-                CompareExtensionData(data.extensionData) &&
                 this.Key == data.Key &&
                 this.Name == data.Name &&
                 this.BirthDate == data.BirthDate &&

@@ -20,7 +20,6 @@ namespace OpenLibraryNET.Data
         public bool Equals(OLListData? data)
         {
             return data != null &&
-                CompareExtensionData(data.extensionData) &&
                 this.Name == data.Name &&
                 this.URL == data.URL &&
                 this.LastUpdate == data.LastUpdate;

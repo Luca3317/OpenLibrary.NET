@@ -30,7 +30,6 @@ namespace OpenLibraryNET.Data
         {
             return
                 data != null &&
-                CompareExtensionData(data.extensionData) &&
                 GeneralUtility.SequenceEqual(this.extensionData, data.extensionData) &&
                 GeneralUtility.SequenceEqual(this.Works, data.Works) &&
                 this.Name == data.Name &&

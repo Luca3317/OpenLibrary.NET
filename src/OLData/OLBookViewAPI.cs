@@ -19,12 +19,11 @@ namespace OpenLibraryNET.Data
         public bool Equals(OLBookViewAPI? viewAPI)
         {
             return
-                viewAPI != null &&
-                CompareExtensionData(viewAPI.extensionData) &&
-                this.Bibkey == viewAPI.Bibkey &&
-                this.InfoURL == viewAPI.InfoURL &&
-                this.Preview == viewAPI.Preview &&
-                this.ThumbnailURL == viewAPI.ThumbnailURL;
+                data != null &&
+                this.Bibkey == data.Bibkey &&
+                this.InfoURL == data.InfoURL &&
+                this.Preview == data.Preview &&
+                this.ThumbnailURL == data.ThumbnailURL;
         }
 
         public override int GetHashCode() => base.GetHashCode();

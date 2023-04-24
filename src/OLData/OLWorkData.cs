@@ -57,7 +57,6 @@ namespace OpenLibraryNET.Data
         {
             return
                 data != null &&
-                CompareExtensionData(data.extensionData) &&
                 this.Key == data.Key &&
                 this.Title == data.Title &&
                 this.Description == data.Description &&

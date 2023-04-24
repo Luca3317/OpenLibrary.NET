@@ -15,7 +15,6 @@ namespace OpenLibraryNET.Data
         public bool Equals(OLRatingsData? data)
         {
             return data != null &&
-                CompareExtensionData(data.extensionData) &&
                 this.Average == data.Average &&
                 this.Count == data.Count;
         }

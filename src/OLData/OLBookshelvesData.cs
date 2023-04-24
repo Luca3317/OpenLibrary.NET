@@ -17,7 +17,6 @@ namespace OpenLibraryNET.Data
         public bool Equals(OLBookshelvesData? data)
         {
             return data != null &&
-                CompareExtensionData(data.extensionData) &&
                 this.WantToRead == data.WantToRead &&
                 this.AlreadyRead == data.AlreadyRead &&
                 this.CurrentlyReading == data.CurrentlyReading;
