@@ -20,7 +20,7 @@ namespace OpenLibraryNET.Loader
         /// <param name="size">The size of the cover.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         public async Task<(bool, byte[]?)> TryGetCoverAsync(CoverIdType idType, string id, ImageSize size)
-            => await TryGetCoverAsync(idType.ToString(), id, size.GetString());
+            => await TryGetCoverAsync(idType.GetString(), id, size.GetString());
         /// <summary>
         /// Get cover by its ID.
         /// </summary>
@@ -33,7 +33,7 @@ namespace OpenLibraryNET.Loader
         /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
         /// <exception cref="System.ArgumentNullException"></exception>
         public async Task<byte[]> GetCoverAsync(CoverIdType idType, string id, ImageSize size)
-            => await GetCoverAsync(idType.ToString(), id, size.GetString());
+            => await GetCoverAsync(idType.GetString(), id, size.GetString());
 
         /// <summary>
         /// Attempt to get cover by its key.
@@ -85,7 +85,7 @@ namespace OpenLibraryNET.Loader
         /// <param name="size">The size of the photo.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         public async Task<(bool, byte[]?)> TryGetAuthorPhotoAsync(AuthorPhotoIdType idType, string id, ImageSize size)
-            => await TryGetAuthorPhotoAsync(idType.ToString(), id, size.GetString());
+            => await TryGetAuthorPhotoAsync(idType.GetString(), id, size.GetString());
         /// <summary>
         /// Get an author's photo by its ID.
         /// </summary>
@@ -98,7 +98,7 @@ namespace OpenLibraryNET.Loader
         /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
         /// <exception cref="System.ArgumentNullException"></exception>
         public async Task<byte[]> GetAuthorPhotoAsync(AuthorPhotoIdType idType, string id, ImageSize size)
-            => await GetAuthorPhotoAsync(idType.ToString(), id, size.GetString());
+            => await GetAuthorPhotoAsync(idType.GetString(), id, size.GetString());
 
         /// <summary>
         /// Attempt to get an author's photo by its key.
@@ -151,7 +151,7 @@ namespace OpenLibraryNET.Loader
         /// <param name="size">The size of the cover.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         public async static Task<(bool, byte[]?)> TryGetCoverAsync(HttpClient client, CoverIdType idType, string id, ImageSize size)
-            => await TryGetCoverAsync(client, idType.ToString(), id, size.GetString());
+            => await TryGetCoverAsync(client, idType.GetString(), id, size.GetString());
         /// <summary>
         /// Get cover by its ID.
         /// </summary>
@@ -165,7 +165,7 @@ namespace OpenLibraryNET.Loader
         /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
         /// <exception cref="System.ArgumentNullException"></exception>
         public async static Task<byte[]> GetCoverAsync(HttpClient client, CoverIdType idType, string id, ImageSize size)
-            => await GetCoverAsync(client, idType.ToString(), id, size.GetString());
+            => await GetCoverAsync(client, idType.GetString(), id, size.GetString());
 
         /// <summary>
         /// Attempt to get cover by its ID.
@@ -215,15 +215,11 @@ namespace OpenLibraryNET.Loader
         /// <exception cref="System.ArgumentNullException"></exception>
         public async static Task<byte[]> GetCoverAsync(HttpClient client, string key)
         {
-            return Encoding.ASCII.GetBytes
+            return await client.GetByteArrayAsync(OpenLibraryUtility.BuildCoversUri
             (
-                await OpenLibraryUtility.RequestAsync(client, OpenLibraryUtility.BuildCoversUri
-                (
-                    key,
-                    new KeyValuePair<string, string>("default", "false")
-                )
-                )
-            );
+                key,
+                new KeyValuePair<string, string>("default", "false")
+            ));
         }
 
         /// <summary>
@@ -235,7 +231,7 @@ namespace OpenLibraryNET.Loader
         /// <param name="size">The size of the photo.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         public async static Task<(bool, byte[]?)> TryGetAuthorPhotoAsync(HttpClient client, AuthorPhotoIdType idType, string id, ImageSize size)
-            => await TryGetAuthorPhotoAsync(client, idType.ToString(), id, size.GetString());
+            => await TryGetAuthorPhotoAsync(client, idType.GetString(), id, size.GetString());
         /// <summary>
         /// Get an author's photo by its ID.
         /// </summary>
@@ -249,7 +245,7 @@ namespace OpenLibraryNET.Loader
         /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
         /// <exception cref="System.ArgumentNullException"></exception>
         public async static Task<byte[]> GetAuthorPhotoAsync(HttpClient client, AuthorPhotoIdType idType, string id, ImageSize size)
-            => await GetAuthorPhotoAsync(client, idType.ToString(), id, size.GetString());
+            => await GetAuthorPhotoAsync(client, idType.GetString(), id, size.GetString());
 
         /// <summary>
         /// Attempt to get an author's photo by its ID.
@@ -299,15 +295,11 @@ namespace OpenLibraryNET.Loader
         /// <exception cref="System.ArgumentNullException"></exception>
         public async static Task<byte[]> GetAuthorPhotoAsync(HttpClient client, string key)
         {
-            return Encoding.ASCII.GetBytes
+            return await client.GetByteArrayAsync(OpenLibraryUtility.BuildAuthorPhotosUri
             (
-                await OpenLibraryUtility.RequestAsync(client, OpenLibraryUtility.BuildAuthorPhotosUri
-                (
-                    key,
-                    parameters: new KeyValuePair<string, string>("default", "false")
-                )
-                )
-            );
+                key,
+                new KeyValuePair<string, string>("default", "false")
+            ));
         }
     }
 
