@@ -6,14 +6,23 @@ using OpenLibraryNET.Utility;
 namespace OpenLibraryNET
 {
     /// <summary>
-    /// Represents an (OpenLibrary) author.
+    /// Composite storage of various data related to an author.
     /// </summary>
     public sealed record OLAuthor
     {
+        /// <summary>
+        /// The ID of the author.
+        /// </summary>
         [JsonProperty("id")]
         public string ID { get; init; } = "";
+        /// <summary>
+        /// Data about the author itself.
+        /// </summary>
         [JsonProperty("data")]
         public OLAuthorData? Data { get; init; } = null;
+        /// <summary>
+        /// Works by the author.
+        /// </summary>
         [JsonIgnore]
         public IReadOnlyList<OLWorkData>? Works
         {
@@ -24,13 +33,24 @@ namespace OpenLibraryNET
         [JsonProperty("works")]
         private OLWorkData[]? _works { get; init; } = null;
 
-        public bool Equals(OLAuthor? author)
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.<br/>
+        /// Compares purely by value, including collections.
+        /// </summary>
+        /// <param name="data">An object to compare with this object.</param>
+        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
+        public bool Equals(OLAuthor? data)
         {
-            return author != null &&
-                author.ID == ID &&
-                author.Data == Data &&
-                GeneralUtility.SequenceEqual(author._works, _works);
+            return data != null &&
+                data.ID == ID &&
+                data.Data == Data &&
+                GeneralUtility.SequenceEqual(data._works, _works);
         }
+
+        /// <summary>
+        /// Serves as the default hash function.
+        /// </summary>
+        /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode() => base.GetHashCode();
     }
 }

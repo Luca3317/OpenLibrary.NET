@@ -1,9 +1,9 @@
 ﻿namespace OpenLibraryNET
 {
     /// <summary>
-    /// Valid ID types for cover IDs.
+    /// Valid ID types for edition IDs.
     /// </summary>
-    public enum CoverIdType
+    public enum BookIdType
     {
         /// <summary>
         /// ISBN (10 and 13)
@@ -20,10 +20,6 @@
         /// <summary>
         /// OCLC (Online Computer Library Center)
         /// </summary>
-        OCLC,
-        /// <summary>
-        /// Generic ID
-        /// </summary>
-        ID
+        OCLC
     }
 }

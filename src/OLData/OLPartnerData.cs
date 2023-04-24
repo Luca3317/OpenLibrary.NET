@@ -4,13 +4,25 @@ using System.Collections.ObjectModel;
 
 namespace OpenLibraryNET.Data
 {
+    /// <summary>
+    /// Holds data about online-readable or borrowable books, along with corresponding <see cref="OLEditionData"/> and <see cref="OLBookViewAPI"/> entries.
+    /// </summary>
     public sealed record OLPartnerData : OLContainer
     {
+        /// <summary>
+        /// The corresponding <see cref="OLEditionData"/>.
+        /// </summary>
         [JsonProperty("data")]
         public OLEditionData? Data { get; init; } = null;
+        /// <summary>
+        /// The corresponding <see cref="OLBookViewAPI"/>.
+        /// </summary>
         [JsonProperty("details")]
         public OLBookViewAPI? Details { get; init; } = null;
 
+        /// <summary>
+        /// Matching or similar online-readable books.
+        /// </summary>
         [JsonIgnore]
         public IReadOnlyList<Item> Items
         {
@@ -21,38 +33,77 @@ namespace OpenLibraryNET.Data
         [JsonProperty("items")]
         private Item[] _items = Array.Empty<Item>();
 
+        /// <summary>
+        /// Holds data about an online-readable book.
+        /// </summary>
         public sealed record Item : OLContainer
         {
-            [JsonProperty("enumcron")]
-            public bool? Enumcron { get; init; } = null;
+            /// <summary>
+            /// The type of match. Either 'exact' or 'similar'.
+            /// </summary>
             [JsonProperty("match")]
             public string Match { get; init; } = "";
+            /// <summary>
+            /// Status of the book. Either 'lendable', 'full access', 'checked out' or 'restricted'.
+            /// </summary>
             [JsonProperty("status")]
             public string Status { get; init; } = "";
-            [JsonProperty("fromRecord")]
-            public string FromRecord { get; init; } = "";
+            /// <summary>
+            /// The OLID of the corresponding edition.
+            /// </summary>
             [JsonProperty("ol-edition-id")]
             public string OLEditionID { get; init; } = "";
+            /// <summary>
+            /// The OLID of the corresponding work.
+            /// </summary>
             [JsonProperty("ol-work-id")]
             public string OLWorkID { get; init; } = "";
-            [JsonProperty("publishData")]
-            public string PublishData { get; init; } = "";
+            /// <summary>
+            /// The date of publication.
+            /// </summary>
+            [JsonProperty("publishDate")]
+            public string PublishDate { get; init; } = "";
+            /// <summary>
+            /// The link pointin to either the online-readable scan or to a borrow page.
+            /// </summary>
             [JsonProperty("itemURL")]
             public string ItemURL { get; init; } = "";
+            /// <summary>
+            /// The cover URLs.
+            /// </summary>
             [JsonProperty("cover")]
             public CoverURL? Cover { get; init; } = null;
 
+            /// <summary>
+            /// Holds URLs to the cover of the corresponding <see cref="Item"/>.
+            /// </summary>
             public sealed record CoverURL : OLContainer
             {
+                /// <summary>
+                /// Link to the cover in small resolution.
+                /// </summary>
                 [JsonProperty("small")]
-                public string Small { get; init; } = ""; 
+                public string Small { get; init; } = "";
+                /// <summary>
+                /// Link to the cover in medium resolution.
+                /// </summary>
                 [JsonProperty("medium")]
-                public string Medium { get; init; } = ""; 
+                public string Medium { get; init; } = "";
+                /// <summary>
+                /// Link to the cover in large resolution.
+                /// </summary>
                 [JsonProperty("large")]
                 public string Large { get; init; } = "";
             }
         }
 
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.<br/>
+        /// Compares purely by value, including collections.<br/>
+        /// Does NOT consider extension data.
+        /// </summary>
+        /// <param name="data">An object to compare with this object.</param>
+        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
         public bool Equals(OLPartnerData? data)
         {
             return
@@ -62,6 +113,10 @@ namespace OpenLibraryNET.Data
                 GeneralUtility.SequenceEqual(this._items, data._items);
         }
 
+        /// <summary>
+        /// Serves as the default hash function.
+        /// </summary>
+        /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode() => base.GetHashCode();
     }
 }

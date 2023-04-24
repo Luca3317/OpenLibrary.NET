@@ -5,34 +5,60 @@ using OpenLibraryNET.Utility;
 namespace OpenLibraryNET.Data
 {
     /// <summary>
-    /// Represents an OpenLibrary Edition request.
+    /// Holds data about an edition.
     /// </summary>
     public sealed record OLEditionData : OLContainer
     {
+        /// <summary>
+        /// The edition's ID.
+        /// </summary>
         [JsonIgnore]
         public string ID => OpenLibraryUtility.ExtractIdFromKey(Key);
 
+        /// <summary>
+        /// The edition's key.
+        /// </summary>
         [JsonProperty("key")]
         public string Key { get; init; } = "";
+        /// <summary>
+        /// The edition's title.
+        /// </summary>
         [JsonProperty("title")]
         public string Title { get; init; } = "";
+        /// <summary>
+        /// The edition's description.
+        /// </summary>
         [JsonProperty("description")]
         [JsonConverter(typeof(OpenLibraryUtility.Serialization.DescriptionConverter))]
         public string Description { get; init; } = "";
+        /// <summary>
+        /// The edition's page count.
+        /// </summary>
         [JsonProperty("number_of_pages")]
         public int PageCount { get; init; } = -1;
+        /// <summary>
+        /// The edition's identifiers.
+        /// </summary>
         [JsonProperty("identifiers")]
         public OLEditionIdentifiers Identifiers { get; init; } = new OLEditionIdentifiers();
 
+        /// <summary>
+        /// The edition's ISBNs.
+        /// </summary>
         [JsonIgnore]
         public IReadOnlyList<string> ISBN => new ReadOnlyCollection<string>(new List<string>(_isbn10.Concat(_isbn13)));
-
+        /// <summary>
+        /// The edition's ISBN10s.
+        /// </summary>
         [JsonIgnore]
         public IReadOnlyList<string> ISBN10
         {
             get => new ReadOnlyCollection<string>(_isbn10);
             init => _isbn10 = value.ToArray();
         }
+        /// <summary>
+        /// The edition's ISBNs13s.
+        /// </summary>
         [JsonIgnore]
         public IReadOnlyList<string> ISBN13
         {
@@ -40,30 +66,45 @@ namespace OpenLibraryNET.Data
             init => _isbn13 = value.ToArray();
         }
 
+        /// <summary>
+        /// The edition's author keys.
+        /// </summary>
         [JsonIgnore]
         public IReadOnlyList<string> AuthorKeys
         {
             get => new ReadOnlyCollection<string>(_authors);
             init => _authors = value.ToArray();
         }
+        /// <summary>
+        /// The edition's covers IDs.
+        /// </summary>
         [JsonIgnore]
-        public IReadOnlyList<int> CoverKeys
+        public IReadOnlyList<int> CoverIDs
         {
             get => new ReadOnlyCollection<int>(_coverKeys);
             init => _coverKeys = value.ToArray();
         }
+        /// <summary>
+        /// The edition's work keys.
+        /// </summary>
         [JsonIgnore]
         public IReadOnlyList<string> WorkKeys
         {
             get => new ReadOnlyCollection<string>(_workKeys);
             init => _workKeys = value.ToArray();
         }
+        /// <summary>
+        /// The edition's subjects.
+        /// </summary>
         [JsonIgnore]
         public IReadOnlyList<string> Subjects
         {
             get => new ReadOnlyCollection<string>(_subjects);
             init => _subjects = value.ToArray();
         }
+        /// <summary>
+        /// The edition's publishers.
+        /// </summary>
         [JsonIgnore]
         public IReadOnlyList<string> Publishers
         {
@@ -96,12 +137,18 @@ namespace OpenLibraryNET.Data
         /// </summary>
         public sealed record OLEditionIdentifiers : OLContainer
         {
+            /// <summary>
+            /// The Goodreads identifiers of the corresponding edition.
+            /// </summary>
             [JsonIgnore]
             public IReadOnlyList<string> Goodreads
             {
                 get => new ReadOnlyCollection<string>(_goodreads);
                 init => _goodreads = value.ToArray();
             }
+            /// <summary>
+            /// The LibraryThing identifiers of the corresponding edition.
+            /// </summary>
             [JsonIgnore]
             public IReadOnlyList<string> LibraryThing
             {
@@ -114,6 +161,13 @@ namespace OpenLibraryNET.Data
             [JsonProperty("librarything")]
             private string[] _libraryThing { get; init; } = Array.Empty<string>();
 
+            /// <summary>
+            /// Indicates whether the current object is equal to another object of the same type.<br/>
+            /// Compares purely by value, including collections.<br/>
+            /// Does NOT consider extension data.
+            /// </summary>
+            /// <param name="data">An object to compare with this object.</param>
+            /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
             public bool Equals(OLEditionIdentifiers? data)
             {
                 return
@@ -122,9 +176,20 @@ namespace OpenLibraryNET.Data
                     GeneralUtility.SequenceEqual(this._libraryThing, data._libraryThing);
             }
 
+            /// <summary>
+            /// Serves as the default hash function.
+            /// </summary>
+            /// <returns>A hash code for the current object.</returns>
             public override int GetHashCode() => base.GetHashCode();
         }
 
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.<br/>
+        /// Compares purely by value, including collections.<br/>
+        /// Does NOT consider extension data.
+        /// </summary>
+        /// <param name="data">An object to compare with this object.</param>
+        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
         public bool Equals(OLEditionData? data)
         {
             return
@@ -143,6 +208,10 @@ namespace OpenLibraryNET.Data
                 GeneralUtility.SequenceEqual(this._publishers, data._publishers);
         }
 
+        /// <summary>
+        /// Serves as the default hash function.
+        /// </summary>
+        /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode() => base.GetHashCode();
     }
 }

@@ -8,58 +8,100 @@ using System.Collections.Immutable;
 
 namespace OpenLibraryNET.Utility
 {
+    /// <summary>
+    /// OpenLibraryNET specific utility classes and methods.
+    /// </summary>
     public static class OpenLibraryUtility
     {
         #region Constants
+        /// <summary>
+        /// The base URL for OpenLibrary requests.
+        /// </summary>
         public const string BaseURL = "openlibrary.org";
+        /// <summary>
+        /// The base URL for OpenLibrary image requests.
+        /// </summary>
         public const string BaseURL_Covers = "covers.openlibrary.org";
 
+        /// <summary>
+        /// The base Uri for OpenLibrary requests.
+        /// </summary>
         public static readonly Uri BaseUri = new Uri("https://" + BaseURL);
+        /// <summary>
+        /// The base Uri for OpenLibrary image requests.
+        /// </summary>
         public static readonly Uri BaseUri_Covers = new Uri("https://" + BaseURL_Covers);
         #endregion
 
         #region ID formatting helpers
         /// <summary>
-        /// Extracts the id from a valid key.</br>
+        /// Extracts the ID from a valid key.<br/>
         /// i.e. /works/OL8037381W => OL8037381W
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <param name="key">The key to extract ID from.</param>
+        /// <returns>Extracted ID, assuming the input key was valid.</returns>
         public static string ExtractIdFromKey(string key)
         {
             return Regex.Match(key, "[^/]+(?=/$|$)").Value;
         }
 
-        public static string GetRawBibkey(string id) => Regex.Match(id, "(?<=:)[^:]*$|^[^:]*$").ToString();
-        public static string GetBibkeyPrefix(string id) => Regex.Match(id, ".*(?=:)").ToString();
+        /// <summary>
+        /// Return the raw ID from a prefixed bibkey.<br/>
+        /// i.e. ISBN:0123456789 => 0123456789
+        /// </summary>
+        /// <param name="bibkey">The bibkey to extract raw ID from.</param>
+        /// <returns>Extracted ID, assuming input bibkey was valid.</returns>
+        public static string GetRawBibkey(string bibkey) => Regex.Match(bibkey, "(?<=:)[^:]*$|^[^:]*$").ToString();
+        /// <summary>
+        /// Return the prefix from a prefixed bibkey.<br/>
+        /// i.e. ISBN:0123456789 => ISBN
+        /// </summary>
+        /// <param name="bibkey">The bibkey to extract raw ID from.</param>
+        /// <returns>Extracted prefix, assuming input bibkey was valid.</returns>
+        public static string GetBibkeyPrefix(string bibkey) => Regex.Match(bibkey, ".*(?=:)").ToString();
 
         /// <summary>
-        /// Tries to ensure the bibkey prefix is set correctly.</br>
-        /// Will work on raw keys and incorrectly set prefixes.
-        /// <para>
-        /// Examples:<br/>
-        /// idType = ISBN, key = "012345" => "ISBN:012345"</br>
-        /// idType = LCCN, key = "OCLC:12312" => "LCCN:12312"</br>
-        /// idType = ISBN, key = "OCLC90000" => "ISBN:OCLC90000" (missing colon)</br>
-        /// </para>
+        /// Tries to ensure the bibkey prefix is set correctly.<br/>
+        /// Will work on raw keys and incorrectly set prefixes.<br/>
         /// </summary>
-        /// <param name="idType"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public static string SetBibkeyPrefix(EditionIdType idType, string key)
-            => SetBibkeyPrefix(idType.GetString(), key);
-        public static string SetBibkeyPrefix(PartnerIdType idType, string key)
-            => SetBibkeyPrefix(idType.GetString(), key);
-        public static string SetBibkeyPrefix(string idType, string key)
+        /// <param name="idType">Type of the ID.</param>
+        /// <param name="id">The ID to prefix.</param>
+        /// <returns>Prefixed bibkey, assuming the input ID was valid.</returns>
+        public static string SetBibkeyPrefix(BookIdType idType, string id)
+            => SetBibkeyPrefix(idType.GetString(), id);
+        /// <summary>
+        /// Tries to ensure the bibkey prefix is set correctly.<br/>
+        /// Will work on raw keys and incorrectly set prefixes.<br/>
+        /// </summary>
+        /// <param name="idType">Type of the ID.</param>
+        /// <param name="id">The ID to prefix.</param>
+        /// <returns>Prefixed bibkey, assuming the input ID was valid.</returns>
+        public static string SetBibkeyPrefix(PartnerIdType idType, string id)
+            => SetBibkeyPrefix(idType.GetString(), id);
+        /// <summary>
+        /// Tries to ensure the bibkey prefix is set correctly.<br/>
+        /// Will work on raw keys and incorrectly set prefixes.<br/>
+        /// </summary>
+        /// <param name="idType">Type of the ID.</param>
+        /// <param name="id">The ID to prefix.</param>
+        /// <returns>Prefixed bibkey, assuming the input ID was valid.</returns>
+        public static string SetBibkeyPrefix(string idType, string id)
         {
-            key = Regex.Replace(key, ".*:", "");
-            return idType + ":" + key;
+            id = Regex.Replace(id, ".*:", "");
+            return idType + ":" + id;
         }
         #endregion
 
         /* Helper functions for correctly formatting OpenLibrary request URLs. 
          */
         #region URL Builders Functions
+        /// <summary>
+        /// Build a Works API Uri.
+        /// </summary>
+        /// <param name="olid">OLID of the work.</param>
+        /// <param name="path">Path of the Uri.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A Works API Uri.</returns>
         public static Uri BuildWorksUri(string olid, string path = "", params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
@@ -70,6 +112,13 @@ namespace OpenLibraryNET.Utility
             );
         }
 
+        /// <summary>
+        /// Build an Editions API Uri.
+        /// </summary>
+        /// <param name="olid">OLID of the edition.</param>
+        /// <param name="path">Path of the Uri.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>An Editions API Uri.</returns>
         public static Uri BuildEditionsUri(string olid, string path = "", params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
@@ -80,6 +129,12 @@ namespace OpenLibraryNET.Utility
             );
         }
 
+        /// <summary>
+        /// Build an ISBN API Uri.
+        /// </summary>
+        /// <param name="isbn">ISBN of the edition.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>An ISBN API Uri.</returns>
         public static Uri BuildISBNUri(string isbn, params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
@@ -90,6 +145,13 @@ namespace OpenLibraryNET.Utility
             );
         }
 
+        /// <summary>
+        /// Build a Books API Uri.
+        /// </summary>
+        /// <param name="bibkeys">Bibkeys of the editions.</param>
+        /// <param name="path">Path of the Uri.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A Books API Uri.</returns>
         public static Uri BuildBooksUri(string bibkeys = "", string path = "", params KeyValuePair<string, string>[] parameters)
             => BuildUri
                 (
@@ -101,6 +163,13 @@ namespace OpenLibraryNET.Utility
 
                 );
 
+        /// <summary>
+        /// Build a Books API Uri.
+        /// </summary>
+        /// <param name="bibkeys">Bibkeys of the editions.</param>
+        /// <param name="path">Path of the Uri.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A Books API Uri.</returns>
         public static Uri BuildBooksUri(string[] bibkeys, string path = "", params KeyValuePair<string, string>[] parameters)
         {
             string bibkeysConcat = "";
@@ -119,6 +188,13 @@ namespace OpenLibraryNET.Utility
             );
         }
 
+        /// <summary>
+        /// Build an Authors API Uri.
+        /// </summary>
+        /// <param name="olid">OLID of the author.</param>
+        /// <param name="path">Path of the Uri.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>An Authors API Uri.</returns>
         public static Uri BuildAuthorsUri(string olid, string path = "", params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
@@ -129,6 +205,13 @@ namespace OpenLibraryNET.Utility
             );
         }
 
+        /// <summary>
+        /// Build a Subjects API Uri.
+        /// </summary>
+        /// <param name="subject">Name of the subject.</param>
+        /// <param name="path">Path of the Uri.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A Subjects API Uri.</returns>
         public static Uri BuildSubjectsUri(string subject, string path = "", params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
@@ -139,6 +222,13 @@ namespace OpenLibraryNET.Utility
             );
         }
 
+        /// <summary>
+        /// Build a Search API Uri.
+        /// </summary>
+        /// <param name="query">The search query.</param>
+        /// <param name="path">Path of the Uri.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A Search API Uri.</returns>
         public static Uri BuildSearchUri(string query = "", string path = "", params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
@@ -151,12 +241,42 @@ namespace OpenLibraryNET.Utility
             );
         }
 
+        /// <summary>
+        /// Build a RecentChanges API Uri.
+        /// </summary>
+        /// <param name="year">The year the change was made in.</param>
+        /// <param name="month">The month the change was made in.</param>
+        /// <param name="day">The day the change was made in.</param>
+        /// <param name="kind">The kind of change.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A RecentChanges API Uri.</returns>
         public static Uri BuildRecentChangesUri(string year, string month, string day, string kind = "", params KeyValuePair<string, string>[] parameters)
             => BuildRecentChangesUri(year + "/" + month + "/" + day + (string.IsNullOrWhiteSpace(kind) ? "" : "/" + kind), parameters);
+        /// <summary>
+        /// Build a RecentChanges API Uri.
+        /// </summary>
+        /// <param name="year">The year the change was made in.</param>
+        /// <param name="month">The month the change was made in.</param>
+        /// <param name="kind">The kind of change.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A RecentChanges API Uri.</returns>
         public static Uri BuildRecentChangesUri(string year, string month, string kind = "", params KeyValuePair<string, string>[] parameters)
             => BuildRecentChangesUri(year + "/" + month + (string.IsNullOrWhiteSpace(kind) ? "" : "/" + kind), parameters);
+        /// <summary>
+        /// Build a RecentChanges API Uri.
+        /// </summary>
+        /// <param name="year">The year the change was made in.</param>
+        /// <param name="kind">The kind of change.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A RecentChanges API Uri.</returns>
         public static Uri BuildRecentChangesUri(string year, string kind = "", params KeyValuePair<string, string>[] parameters)
             => BuildRecentChangesUri(year + (string.IsNullOrWhiteSpace(kind) ? "" : "/" + kind), parameters);
+        /// <summary>
+        /// Build a RecentChanges API Uri.
+        /// </summary>
+        /// <param name="kind">The kind of change.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A RecentChanges API Uri.</returns>
         public static Uri BuildRecentChangesUri(string kind = "", params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
@@ -168,6 +288,14 @@ namespace OpenLibraryNET.Utility
             );
         }
 
+        /// <summary>
+        /// Build a Lists API Uri.
+        /// </summary>
+        /// <param name="username">The user the list belongs to.</param>
+        /// <param name="id">The ID of the list.</param>
+        /// <param name="path">The path of the Uri.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A Lists API Uri.</returns>
         public static Uri BuildListsUri(string username, string? id = null, string? path = null, params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
@@ -181,10 +309,32 @@ namespace OpenLibraryNET.Utility
             );
         }
 
+        /// <summary>
+        /// Build a Covers API Uri.
+        /// </summary>
+        /// <param name="idType">The type of the ID.</param>
+        /// <param name="id">The ID of the cover.</param>
+        /// <param name="size">The size of the cover.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A Covers API Uri.</returns>
         public static Uri BuildCoversUri(CoverIdType idType, string id, ImageSize size, params KeyValuePair<string, string>[] parameters)
             => BuildCoversUri(idType.GetString(), id, size.GetString(), parameters);
+        /// <summary>
+        /// Build a Covers API Uri.
+        /// </summary>
+        /// <param name="idType">The type of the ID.</param>
+        /// <param name="id">The ID of the cover.</param>
+        /// <param name="size">The size of the cover.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A Covers API Uri.</returns>
         public static Uri BuildCoversUri(string idType, string id, string size, params KeyValuePair<string, string>[] parameters)
             => BuildCoversUri(idType + "/" + id + "-" + size, parameters);
+        /// <summary>
+        /// Build a Covers API Uri.
+        /// </summary>
+        /// <param name="key">The key of the cover.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A Covers API Uri.</returns>
         public static Uri BuildCoversUri(string key, params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
@@ -195,10 +345,32 @@ namespace OpenLibraryNET.Utility
             );
         }
 
+        /// <summary>
+        /// Build an AuthorPhotos API Uri.
+        /// </summary>
+        /// <param name="idType">The type of the ID.</param>
+        /// <param name="id">The ID of the AuthorPhoto.</param>
+        /// <param name="size">The size of the AuthorPhoto.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>An AuthorPhotos API Uri.</returns>
         public static Uri BuildAuthorPhotosUri(AuthorPhotoIdType idType, string id, ImageSize size, params KeyValuePair<string, string>[] parameters)
             => BuildAuthorPhotosUri(idType.GetString(), id, size.GetString(), parameters);
+        /// <summary>
+        /// Build an AuthorPhotos API Uri.
+        /// </summary>
+        /// <param name="idType">The type of the ID.</param>
+        /// <param name="id">The ID of the AuthorPhoto.</param>
+        /// <param name="size">The size of the AuthorPhoto.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>An AuthorPhotos API Uri.</returns>
         public static Uri BuildAuthorPhotosUri(string idType, string id, string size, params KeyValuePair<string, string>[] parameters)
             => BuildAuthorPhotosUri(idType + "/" + id + "-" + size, parameters);
+        /// <summary>
+        /// Build an AuthorPhotos API Uri.
+        /// </summary>
+        /// <param name="key">The key of the AuthorPhoto.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>An AuthorPhotos API Uri.</returns>
         public static Uri BuildAuthorPhotosUri(string key, params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
@@ -209,36 +381,67 @@ namespace OpenLibraryNET.Utility
             );
         }
 
+        /// <summary>
+        /// Build a Partner API Uri.
+        /// </summary>
+        /// <param name="idType">The type of the ID.</param>
+        /// <param name="id">The ID of the edition.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A Partner API Uri.</returns>
         public static Uri BuildPartnerUri(PartnerIdType idType, string id, params KeyValuePair<string, string>[] parameters)
             => BuildPartnerUri(idType.GetString(), id, parameters);
+        /// <summary>
+        /// Build a Partner API Uri.
+        /// </summary>
+        /// <param name="idType">The type of the ID.</param>
+        /// <param name="id">The ID of the edition.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A Partner API Uri.</returns>
         public static Uri BuildPartnerUri(string idType, string id, params KeyValuePair<string, string>[] parameters)
             => BuildPartnerUri(idType + "/" + id, parameters);
-        public static Uri BuildPartnerUri(string id, params KeyValuePair<string, string>[] parameters)
+        /// <summary>
+        /// Build a Partner API Uri.
+        /// </summary>
+        /// <param name="bibkey">The bibkey of the edition.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A Partner API Uri.</returns>
+        public static Uri BuildPartnerUri(string bibkey, params KeyValuePair<string, string>[] parameters)
         {
             return BuildUri
             (
                 BaseURL,
-                RequestTypePrefixMap[OLRequestAPI.Partner] + "/" + id + ".json",
+                RequestTypePrefixMap[OLRequestAPI.Partner] + "/" + bibkey + ".json",
                 parameters
             );
         }
 
-        public static Uri BuildPartnerMultiUri(params string[] ids)
-            => BuildPartnerMultiUri(ids, Array.Empty<KeyValuePair<string, string>>());
-        public static Uri BuildPartnerMultiUri(string[] ids, params KeyValuePair<string, string>[] parameters)
+        /// <summary>
+        /// Build a Partner API Uri.
+        /// </summary>
+        /// <param name="bibkeys">The bibkeys of the editions.</param>
+        /// <returns>A Partner API Uri.</returns>
+        public static Uri BuildPartnerMultiUri(params string[] bibkeys)
+            => BuildPartnerMultiUri(bibkeys, Array.Empty<KeyValuePair<string, string>>());
+        /// <summary>
+        /// Build a Partner API Uri.
+        /// </summary>
+        /// <param name="bibkeys">The bibkeys of the editions.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>A Partner API Uri.</returns>
+        public static Uri BuildPartnerMultiUri(string[] bibkeys, params KeyValuePair<string, string>[] parameters)
         {
             string concat;
-            if (ids.Length > 1)
+            if (bibkeys.Length > 1)
             {
                 StringBuilder stringBuilder = new StringBuilder();
-                foreach (string id in ids)
+                foreach (string id in bibkeys)
                     stringBuilder.Append(id + "|");
 
                 // Remove the trailing &
                 stringBuilder.Remove(stringBuilder.Length - 1, 1);
                 concat = stringBuilder.ToString();
             }
-            else concat = ids[0];
+            else concat = bibkeys[0];
 
             return BuildUri
             (
@@ -248,6 +451,13 @@ namespace OpenLibraryNET.Utility
             );
         }
 
+        /// <summary>
+        /// Build an OpenLibrary Uri.
+        /// </summary>
+        /// <param name="api">The OpenLibrary API the Uri will make a request to..</param>
+        /// <param name="path">The path of the Uri.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>The constructed OpenLibrary uri.</returns>
         public static Uri BuildUri(OLRequestAPI api, string path, params KeyValuePair<string, string>[] parameters)
         {
             // Remove leading prefix if it is there, to prevent duplication
@@ -272,7 +482,6 @@ namespace OpenLibraryNET.Utility
         /// </summary>
         /// <param name="host">The base address; since this function is private, this is ensured to always be BaseURL or BaseURL_Covers.</param>
         /// <param name="path">The absolute path; must already include prefix and file extension.</param>
-        /// <param name="fileExt"></param>
         /// <param name="parameters">Form the component of the Uri; either pass in array or use KeyValuePairToString.</param>
         /// <returns></returns>
         private static Uri BuildUri(string host, string path = "", params KeyValuePair<string, string>[] parameters)
@@ -286,14 +495,7 @@ namespace OpenLibraryNET.Utility
             return builder.Uri;
         }
 
-        /// <summary>
-        /// Ensures path will have the correct prefix prepended.
-        /// Passing in paths that already have a prefix is fine.
-        /// </summary>
-        /// <param name="api"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string SetPrefix(OLRequestAPI api, string path)
+        private static string SetPrefix(OLRequestAPI api, string path)
         {
             string prefix = RequestTypePrefixMap[api];
 
@@ -307,14 +509,7 @@ namespace OpenLibraryNET.Utility
             return prefix + "/" + path;
         }
 
-        /// <summary>
-        /// Ensures path will have the correct file extension.
-        /// Passing in paths that already have a file extension is fine.
-        /// </summary>
-        /// <param name="api"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string SetFileExtension(OLRequestAPI api, string path)
+        private static string SetFileExtension(OLRequestAPI api, string path)
         {
             path = Regex.Replace(path, "\\.([^.]*\\.?)$", "");
             if (api == OLRequestAPI.Covers || api == OLRequestAPI.AuthorPhotos)
@@ -345,13 +540,19 @@ namespace OpenLibraryNET.Utility
         /* Helper functions for requesting (and deserializing) data.
          */
         #region Requests
-        public async static Task<string> RequestAsync(Uri uri, HttpClient? client = null)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="client"></param>
+        /// <returns></returns>
+        internal async static Task<string> RequestAsync(HttpClient client, Uri uri)
         {
-            if (client == null) client = GetClient();
+            if (client == null) throw new System.ArgumentNullException("Passed in HttpClient was null");
             return await client.GetStringAsync(uri);
         }
 
-        public static T? Parse<T>(string serialized, string path = "")
+        internal static T? Parse<T>(string serialized, string path = "")
         {
             if (string.IsNullOrWhiteSpace(path))
                 return JsonConvert.DeserializeObject<T>(serialized);
@@ -362,9 +563,9 @@ namespace OpenLibraryNET.Utility
             }
         }
 
-        public async static Task<T?> LoadAsync<T>(Uri uri, string path = "", HttpClient? client = null)
+        internal async static Task<T?> LoadAsync<T>(HttpClient client, Uri uri, string path = "")
         {
-            string response = await RequestAsync(uri, client);
+            string response = await RequestAsync(client, uri);
             if (string.IsNullOrWhiteSpace(path))
                 return JsonConvert.DeserializeObject<T>(response);
             else
@@ -374,7 +575,7 @@ namespace OpenLibraryNET.Utility
             }
         }
 
-        public static HttpClient GetClient()
+        internal static HttpClient GetClient()
         {
             HttpClientHandler handler = new HttpClientHandler()
             {
@@ -389,7 +590,7 @@ namespace OpenLibraryNET.Utility
          * multiple data points come as various types (i.e., sometimes as KeyValuePair, sometimes as array)
          */
         #region Json Converters
-        public static class Serialization
+        internal static class Serialization
         {
             public class BioConverter : JsonConverter<string>
             {
@@ -650,9 +851,13 @@ namespace OpenLibraryNET.Utility
         #endregion
 
         /* These dictionaries map the various APIs to their valid "paths" and parameters.
-         * Helper data not used anywhere within the library itself.
+         * Purely helper data and not enforced anywhere within OpenLibraryNET itself.
+         * Not exhaustive.
          */
         #region Maps
+        /// <summary>
+        /// Maps each <see cref="OLRequestAPI"/> to its corresponding Uri prefix.
+        /// </summary>
         public static readonly ReadOnlyDictionary<OLRequestAPI, string> RequestTypePrefixMap = new ReadOnlyDictionary<OLRequestAPI, string>
         (
             new Dictionary<OLRequestAPI, string>()
@@ -672,6 +877,9 @@ namespace OpenLibraryNET.Utility
             }
         );
 
+        /// <summary>
+        /// Maps each <see cref="OLRequestAPI"/> to its corresponding path parameters map.
+        /// </summary>
         public static ReadOnlyDictionary<string, ImmutableArray<string>> GetPathParametersMap(OLRequestAPI api)
         {
             return api switch
@@ -690,6 +898,10 @@ namespace OpenLibraryNET.Utility
         }
 
         #region Books Maps
+        /// <summary>
+        /// Maps each of the valid Books API paths to its valid parameters.<br/>
+        /// Pure helper structure that is NOT exhaustive.
+        /// </summary>
         public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> BooksPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
             new Dictionary<string, ImmutableArray<string>>
@@ -700,6 +912,10 @@ namespace OpenLibraryNET.Utility
         #endregion
 
         #region Works Maps
+        /// <summary>
+        /// Maps each of the valid Works API paths to its valid parameters.<br/>
+        /// Pure helper structure that is NOT exhaustive.
+        /// </summary>
         public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> WorksPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
             new Dictionary<string, ImmutableArray<string>>
@@ -714,6 +930,10 @@ namespace OpenLibraryNET.Utility
         #endregion
 
         #region Authors Maps
+        /// <summary>
+        /// Maps each of the valid Authors API paths to its valid parameters.<br/>
+        /// Pure helper structure that is NOT exhaustive.
+        /// </summary>
         public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> AuthorsPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
             new Dictionary<string, ImmutableArray<string>>
@@ -725,6 +945,10 @@ namespace OpenLibraryNET.Utility
         #endregion
 
         #region Subjects Maps
+        /// <summary>
+        /// Maps each of the valid Subjects API paths to its valid parameters.<br/>
+        /// Pure helper structure that is NOT exhaustive.
+        /// </summary>
         public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> SubjectsPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
             new Dictionary<string, ImmutableArray<string>>
@@ -735,6 +959,10 @@ namespace OpenLibraryNET.Utility
         #endregion
 
         #region Search Maps
+        /// <summary>
+        /// Maps each of the valid Search API paths to its valid parameters.<br/>
+        /// Pure helper structure that is NOT exhaustive.
+        /// </summary>
         public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> SearchPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
             new Dictionary<string, ImmutableArray<string>>
@@ -748,6 +976,10 @@ namespace OpenLibraryNET.Utility
         #endregion
 
         #region Covers Maps
+        /// <summary>
+        /// Maps each of the valid Covers API paths to its valid parameters.<br/>
+        /// Pure helper structure that is NOT exhaustive.
+        /// </summary>
         public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> CoversPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
             new Dictionary<string, ImmutableArray<string>>
@@ -758,6 +990,10 @@ namespace OpenLibraryNET.Utility
         #endregion
 
         #region AuthorPhotos Maps
+        /// <summary>
+        /// Maps each of the valid AuthorPhotos API paths to its valid parameters.<br/>
+        /// Pure helper structure that is NOT exhaustive.
+        /// </summary>
         public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> AuthorPhotosPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
             new Dictionary<string, ImmutableArray<string>>
@@ -768,6 +1004,10 @@ namespace OpenLibraryNET.Utility
         #endregion
 
         #region Lists Maps
+        /// <summary>
+        /// Maps each of the valid Lists API paths to its valid parameters.<br/>
+        /// Pure helper structure that is NOT exhaustive.
+        /// </summary>
         public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> ListsPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
             new Dictionary<string, ImmutableArray<string>>
@@ -780,6 +1020,10 @@ namespace OpenLibraryNET.Utility
         #endregion
 
         #region RecentChanges Maps
+        /// <summary>
+        /// Maps each of the valid RecentChanges API paths to its valid parameters.<br/>
+        /// Pure helper structure that is NOT exhaustive.
+        /// </summary>
         public static readonly ReadOnlyDictionary<string, ImmutableArray<string>> RecentChangesPathParametersMap = new ReadOnlyDictionary<string, ImmutableArray<string>>
         (
             new Dictionary<string, ImmutableArray<string>>
@@ -789,6 +1033,5 @@ namespace OpenLibraryNET.Utility
         );
         #endregion
         #endregion
-
     }
 }

@@ -3,6 +3,9 @@ using OpenLibraryNET.Utility;
 
 namespace OpenLibraryNET.Loader   
 {
+    /// <summary>
+    /// Interface to OpenLibrary's Works API.
+    /// </summary>
     public class OLWorkLoader
     {
         internal OLWorkLoader(HttpClient client)
@@ -12,162 +15,380 @@ namespace OpenLibraryNET.Loader
 
         private readonly HttpClient _client;
 
-        public async Task<(bool, OLWorkData?)> TryGetDataAsync(string id)
-            => await TryGetDataAsync(_client, id);
-        public async Task<OLWorkData?> GetDataAsync(string id)
-            => await GetDataAsync(_client, id);
+        /// <summary>
+        /// Attempt to get data about a work.
+        /// </summary>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task<(bool, OLWorkData?)> TryGetDataAsync(string olid)
+            => await TryGetDataAsync(_client, olid);
+        /// <summary>
+        /// Get data about a work.
+        /// </summary>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async Task<OLWorkData?> GetDataAsync(string olid)
+            => await GetDataAsync(_client, olid);
 
-        public async Task<(bool, OLRatingsData?)> TryGetRatingsAsync(string id)
-            => await TryGetRatingsAsync(_client, id);
-        public async Task<OLRatingsData?> GetRatingsAsync(string id)
-            => await GetRatingsAsync(_client, id);
+        /// <summary>
+        /// Attempt to get ratings of a work.
+        /// </summary>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task<(bool, OLRatingsData?)> TryGetRatingsAsync(string olid)
+            => await TryGetRatingsAsync(_client, olid);
+        /// <summary>
+        /// Get ratings of a work.
+        /// </summary>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async Task<OLRatingsData?> GetRatingsAsync(string olid)
+            => await GetRatingsAsync(_client, olid);
 
-        public async Task<(bool, OLBookshelvesData?)> TryGetBookshelvesAsync(string id)
-            => await TryGetBookshelvesAsync(_client, id);
-        public async Task<OLBookshelvesData?> GetBookshelvesAsync(string id)
-            => await GetBookshelvesAsync(_client, id);
+        /// <summary>
+        /// Attempt to get bookshelves of a work.
+        /// </summary>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task<(bool, OLBookshelvesData?)> TryGetBookshelvesAsync(string olid)
+            => await TryGetBookshelvesAsync(_client, olid);
+        /// <summary>
+        /// Get bookshelves of a work.
+        /// </summary>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async Task<OLBookshelvesData?> GetBookshelvesAsync(string olid)
+            => await GetBookshelvesAsync(_client, olid);
 
-        public async Task<(bool, OLEditionData[]?)> TryGetEditionsAsync(string id, params KeyValuePair<string, string>[] parameters)
-            => await TryGetEditionsAsync(_client, id, parameters);
-        public async Task<OLEditionData[]?> GetEditionsAsync(string id, params KeyValuePair<string, string>[] parameters)
-            => await GetEditionsAsync(_client, id, parameters);
+        /// <summary>
+        /// Attempt to get editions of a work.
+        /// </summary>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task<(bool, OLEditionData[]?)> TryGetEditionsAsync(string olid, params KeyValuePair<string, string>[] parameters)
+            => await TryGetEditionsAsync(_client, olid, parameters);
+        /// <summary>
+        /// Get editions of a work.
+        /// </summary>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async Task<OLEditionData[]?> GetEditionsAsync(string olid, params KeyValuePair<string, string>[] parameters)
+            => await GetEditionsAsync(_client, olid, parameters);
 
-        public async Task<(bool, int?)> TryGetEditionsCountAsync(string id)
-            => await TryGetEditionsCountAsync(_client, id);
-        public async Task<int> GetEditionsCountAsync(string id)
-            => await GetEditionsCountAsync(_client, id);
+        /// <summary>
+        /// Attempt to get amount of editions of a work.
+        /// </summary>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task<(bool, int?)> TryGetEditionsCountAsync(string olid)
+            => await TryGetEditionsCountAsync(_client, olid);
+        /// <summary>
+        /// Get amount of editions of a work.
+        /// </summary>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async Task<int> GetEditionsCountAsync(string olid)
+            => await GetEditionsCountAsync(_client, olid);
 
-        public async Task<(bool, OLListData[]?)> TryGetListsAsync(string id, params KeyValuePair<string, string>[] parameters)
-            => await TryGetListsAsync(_client, id, parameters);
-        public async Task<OLListData[]?> GetListsAsync(string id, params KeyValuePair<string, string>[] parameters)
-            => await GetListsAsync(_client, id, parameters);
+        /// <summary>
+        /// Attempt to get lists including a work.
+        /// </summary>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task<(bool, OLListData[]?)> TryGetListsAsync(string olid, params KeyValuePair<string, string>[] parameters)
+            => await TryGetListsAsync(_client, olid, parameters);
+        /// <summary>
+        /// Get lists including a work.
+        /// </summary>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async Task<OLListData[]?> GetListsAsync(string olid, params KeyValuePair<string, string>[] parameters)
+            => await GetListsAsync(_client, olid, parameters);
 
-        public async Task<(bool, int?)> TryGetListsCountAsync(string id)
-            => await TryGetListsCountAsync(_client, id);
-        public async Task<int> GetListsCountAsync(string id)
-            => await GetListsCountAsync(_client, id);
+        /// <summary>
+        /// Attempt to get amount of lists including a work.
+        /// </summary>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task<(bool, int?)> TryGetListsCountAsync(string olid)
+            => await TryGetListsCountAsync(_client, olid);
+        /// <summary>
+        /// Get amount of lists including a work.
+        /// </summary>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async Task<int> GetListsCountAsync(string olid)
+            => await GetListsCountAsync(_client, olid);
 
-        public async static Task<(bool, OLWorkData?)> TryGetDataAsync(HttpClient client, string id)
+        /// <summary>
+        /// Attempt to get data about a work.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async static Task<(bool, OLWorkData?)> TryGetDataAsync(HttpClient client, string olid)
         {
-            try { return (true, await GetDataAsync(client, id)); }
+            try { return (true, await GetDataAsync(client, olid)); }
             catch { return (false, null); }
         }
-        public async static Task<OLWorkData?> GetDataAsync(HttpClient client, string id)
+        /// <summary>
+        /// Get data about a work.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async static Task<OLWorkData?> GetDataAsync(HttpClient client, string olid)
         {
             return await OpenLibraryUtility.LoadAsync<OLWorkData>
             (
-                OpenLibraryUtility.BuildWorksUri(id),
-                client: client
+                client,
+                OpenLibraryUtility.BuildWorksUri(olid)
             );
         }
 
-        public async static Task<(bool, OLRatingsData?)> TryGetRatingsAsync(HttpClient client, string id)
+        /// <summary>
+        /// Attempt to get ratings of a work.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async static Task<(bool, OLRatingsData?)> TryGetRatingsAsync(HttpClient client, string olid)
         {
-            try { return (true, await GetRatingsAsync(client, id)); }
+            try { return (true, await GetRatingsAsync(client, olid)); }
             catch { return (false, null); }
         }
-        public async static Task<OLRatingsData?> GetRatingsAsync(HttpClient client, string id)
+        /// <summary>
+        /// Get ratings of a work.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async static Task<OLRatingsData?> GetRatingsAsync(HttpClient client, string olid)
         {
             return await OpenLibraryUtility.LoadAsync<OLRatingsData>
             (
-                OpenLibraryUtility.BuildWorksUri(id, "ratings"),
-                "summary",
-                client: client
+                client,
+                OpenLibraryUtility.BuildWorksUri(olid, "ratings"),
+                "summary"
             );
         }
 
-        public async static Task<(bool, OLBookshelvesData?)> TryGetBookshelvesAsync(HttpClient client, string id)
+        /// <summary>
+        /// Attempt to get ratings of a work.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async static Task<(bool, OLBookshelvesData?)> TryGetBookshelvesAsync(HttpClient client, string olid)
         {
-            try { return (true, await GetBookshelvesAsync(client, id)); }
+            try { return (true, await GetBookshelvesAsync(client, olid)); }
             catch { return (false, null); }
         }
-        public async static Task<OLBookshelvesData?> GetBookshelvesAsync(HttpClient client, string id)
+        /// <summary>
+        /// Get ratings of a work.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async static Task<OLBookshelvesData?> GetBookshelvesAsync(HttpClient client, string olid)
         {
             return await OpenLibraryUtility.LoadAsync<OLBookshelvesData>
             (
-                OpenLibraryUtility.BuildWorksUri(id, "bookshelves"),
-                "counts",
-                client: client
+                client,
+                OpenLibraryUtility.BuildWorksUri(olid, "bookshelves"),
+                "counts"
             );
         }
 
-        public async static Task<(bool, OLEditionData[]?)> TryGetEditionsAsync(HttpClient client, string id, params KeyValuePair<string, string>[] parameters)
+        /// <summary>
+        /// Attempt to get editions of a work.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async static Task<(bool, OLEditionData[]?)> TryGetEditionsAsync(HttpClient client, string olid, params KeyValuePair<string, string>[] parameters)
         {
-            try { return (true, await GetEditionsAsync(client, id, parameters)); }
+            try { return (true, await GetEditionsAsync(client, olid, parameters)); }
             catch { return (false, null); }
         }
-        public async static Task<OLEditionData[]?> GetEditionsAsync(HttpClient client, string id, params KeyValuePair<string, string>[] parameters)
+        /// <summary>
+        /// Get editions of a work.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async static Task<OLEditionData[]?> GetEditionsAsync(HttpClient client, string olid, params KeyValuePair<string, string>[] parameters)
         {
             return await OpenLibraryUtility.LoadAsync<OLEditionData[]>
             (
+                client,
                 OpenLibraryUtility.BuildWorksUri
                 (
-                    id,
+                    olid,
                     "editions",
                     parameters
                 ),
-                "entries",
-                client: client
+                "entries"
             );
         }
 
-        public async static Task<(bool, int?)> TryGetEditionsCountAsync(HttpClient client, string id)
+        /// <summary>
+        /// Attempt to get amount of editions of a work.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async static Task<(bool, int?)> TryGetEditionsCountAsync(HttpClient client, string olid)
         {
-            try { return (true, await GetEditionsCountAsync(client, id)); }
+            try { return (true, await GetEditionsCountAsync(client, olid)); }
             catch { return (false, null); }
         }
-        public async static Task<int> GetEditionsCountAsync(HttpClient client, string id)
+        /// <summary>
+        /// Get amount of editions of a work.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async static Task<int> GetEditionsCountAsync(HttpClient client, string olid)
         {
             return await OpenLibraryUtility.LoadAsync<int>
             (
+                client,
                 OpenLibraryUtility.BuildWorksUri
                 (
-                    id,
+                    olid,
                     "editions",
                     new KeyValuePair<string, string>("limit", "0")
                 ),
-                "size",
-                client: client
+                "size"
             );
         }
 
-        public async static Task<(bool, OLListData[]?)> TryGetListsAsync(HttpClient client, string id, params KeyValuePair<string, string>[] parameters)
+        /// <summary>
+        /// Attempt to get lists including a work.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async static Task<(bool, OLListData[]?)> TryGetListsAsync(HttpClient client, string olid, params KeyValuePair<string, string>[] parameters)
         {
-            try { return (true, await GetListsAsync(client, id, parameters)); }
+            try { return (true, await GetListsAsync(client, olid, parameters)); }
             catch { return (false, null); }
         }
-        public async static Task<OLListData[]?> GetListsAsync(HttpClient client, string id, params KeyValuePair<string, string>[] parameters)
+        /// <summary>
+        /// Get lists including a work.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <param name="parameters">The query parameters.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async static Task<OLListData[]?> GetListsAsync(HttpClient client, string olid, params KeyValuePair<string, string>[] parameters)
         {
             return await OpenLibraryUtility.LoadAsync<OLListData[]>
             (
+                client,
                 OpenLibraryUtility.BuildWorksUri
                 (
-                    id,
+                    olid,
                     "lists",
                     parameters
                 ),
-                "entries",
-                client: client
+                "entries"
             );
         }
 
-        public async static Task<(bool, int?)> TryGetListsCountAsync(HttpClient client, string id)
+        /// <summary>
+        /// Attempt to get amount of lists including a work.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async static Task<(bool, int?)> TryGetListsCountAsync(HttpClient client, string olid)
         {
-            try { return (true, await GetListsCountAsync(client, id)); }
+            try { return (true, await GetListsCountAsync(client, olid)); }
             catch { return (false, null); }
         }
-        public async static Task<int> GetListsCountAsync(HttpClient client, string id)
+        /// <summary>
+        /// Get amount of lists including a work.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="olid">The OLID of the work.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async static Task<int> GetListsCountAsync(HttpClient client, string olid)
         {
             return await OpenLibraryUtility.LoadAsync<int>
             (
+                client,
                 OpenLibraryUtility.BuildWorksUri
                 (
-                    id,
+                    olid,
                     "lists",
                     new KeyValuePair<string, string>("limit", "0")
                 ),
-                "size",
-                client: client
+                "size"
             );
         }
     }

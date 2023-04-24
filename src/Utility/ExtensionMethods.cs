@@ -1,7 +1,16 @@
 ﻿namespace OpenLibraryNET.Utility
 {
+    /// <summary>
+    /// Extension methods for OpenLibrary.NET.
+    /// </summary>
     public static class ExtensionMethods
     {
+        /// <summary>
+        /// Get <see cref="ImageSize"/> as string.
+        /// </summary>
+        /// <param name="size">The image size.</param>
+        /// <returns>The image size as string.</returns>
+        /// <exception cref="System.ArgumentException"></exception>
         public static string GetString(this ImageSize size)
         {
             return size switch
@@ -9,59 +18,79 @@
                 ImageSize.Small => "S",
                 ImageSize.Medium => "M",
                 ImageSize.Large => "L",
-                _ => throw new System.NotImplementedException(),
+                _ => throw new System.ArgumentException(),
             };
         }
 
+        /// <summary>
+        /// Get <see cref="CoverIdType"/> as string.
+        /// </summary>
+        /// <param name="idType">The ID type.</param>
+        /// <returns>The ID type as string.</returns>
+        /// <exception cref="System.ArgumentException"></exception>
         public static string GetString(this CoverIdType idType)
         {
-            switch (idType)
+            return idType switch
             {
-                case CoverIdType.ISBN: return "ISBN";
-                case CoverIdType.OLID: return "OLID";
-                case CoverIdType.OCLC: return "OCLC";
-                case CoverIdType.LCCN: return "LCCN";
-                case CoverIdType.ID: return "ID";
-            }
-
-            throw new System.NotImplementedException();
+                CoverIdType.ISBN => "ISBN",
+                CoverIdType.OLID => "OLID",
+                CoverIdType.OCLC => "OCLC",
+                CoverIdType.LCCN => "LCCN",
+                CoverIdType.ID => "ID",
+                _ => throw new System.ArgumentException(),
+            };
         }
 
-        public static string GetString(this EditionIdType idType)
+        /// <summary>
+        /// Get <see cref="BookIdType"/> as string.
+        /// </summary>
+        /// <param name="idType">The ID type.</param>
+        /// <returns>The ID type as string.</returns>
+        /// <exception cref="System.ArgumentException"></exception>
+        public static string GetString(this BookIdType idType)
         {
-            switch (idType)
+            return idType switch
             {
-                case EditionIdType.ISBN: return "ISBN";
-                case EditionIdType.OLID: return "OLID";
-                case EditionIdType.OCLC: return "OCLC";
-                case EditionIdType.LCCN: return "LCCN";
-            }
-
-            throw new System.Exception();
+                BookIdType.ISBN => "ISBN",
+                BookIdType.OLID => "OLID",
+                BookIdType.OCLC => "OCLC",
+                BookIdType.LCCN => "LCCN",
+                _ => throw new System.ArgumentException(),
+            };
         }
 
+        /// <summary>
+        /// Get <see cref="AuthorPhotoIdType"/> as string.
+        /// </summary>
+        /// <param name="idType">The ID type.</param>
+        /// <returns>The ID type as string.</returns>
+        /// <exception cref="System.ArgumentException"></exception>
         public static string GetString(this AuthorPhotoIdType idType)
         {
-            switch (idType)
+            return idType switch
             {
-                case AuthorPhotoIdType.OLID: return "OLID";
-                case AuthorPhotoIdType.ID: return "ID";
-            }
-
-            throw new System.NotImplementedException();
+                AuthorPhotoIdType.OLID => "OLID",
+                AuthorPhotoIdType.ID => "ID",
+                _ => throw new System.ArgumentException(),
+            };
         }
 
+        /// <summary>
+        /// Get <see cref="PartnerIdType"/> as string.
+        /// </summary>
+        /// <param name="idType">The ID type.</param>
+        /// <returns>The ID type as string.</returns>
+        /// <exception cref="System.ArgumentException"></exception>
         public static string GetString(this PartnerIdType idType)
         {
-            switch (idType)
+            return idType switch
             {
-                case PartnerIdType.OLID: return "olid";
-                case PartnerIdType.ISBN: return "isbn";
-                case PartnerIdType.OCLC: return "oclc";
-                case PartnerIdType.LCCN: return "lccn";
-            }
-
-            throw new System.NotImplementedException();
+                PartnerIdType.OLID => "olid",
+                PartnerIdType.ISBN => "isbn",
+                PartnerIdType.OCLC => "oclc",
+                PartnerIdType.LCCN => "lccn",
+                _ => throw new System.ArgumentException(),
+            };
         }
     }
 }
