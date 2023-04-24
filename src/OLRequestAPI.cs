@@ -1,4 +1,4 @@
-﻿namespace OpenLibraryNET.Utility
+﻿namespace OpenLibraryNET
 {
     /// <summary>
     /// The APIs of OpenLibrary currently supported by OpenLibrary.NET
@@ -6,7 +6,7 @@
     public enum OLRequestAPI
     {
         /// <summary>
-        /// The Books API. Get data about individual books by bibkey (see <see cref="BookIdType"/>).
+        /// The Books API. Get data about individual books by bibkey (see <see cref="Utility.BookIdType"/>).
         /// </summary>
         Books,
         /// <summary>
@@ -34,15 +34,15 @@
         /// </summary>
         Search,
         /// <summary>
-        /// The Partner API. Get data about online-readable or borrowable books by bibkey (see <see cref="PartnerIdType"/>).
+        /// The Partner API. Get data about online-readable or borrowable books by bibkey (see <see cref="Utility.PartnerIdType"/>).
         /// </summary>
         Partner,
         /// <summary>
-        /// The Covers API. Get covers of books by ID (see <see cref="CoverIdType"/>).
+        /// The Covers API. Get covers of books by ID (see <see cref="Utility.CoverIdType"/>).
         /// </summary>
         Covers,
         /// <summary>
-        /// The AuthorPhotos API. Get photos of authors by ID (see <see cref="AuthorPhotoIdType"/>).
+        /// The AuthorPhotos API. Get photos of authors by ID (see <see cref="Utility.AuthorPhotoIdType"/>).
         /// </summary>
         AuthorPhotos,
         /// <summary>
