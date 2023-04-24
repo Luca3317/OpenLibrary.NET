@@ -1,4 +1,4 @@
-﻿namespace OpenLibraryNET
+﻿namespace OpenLibraryNET.Utility
 {
     /// <summary>
     /// Valid image sizes for covers and author photos.

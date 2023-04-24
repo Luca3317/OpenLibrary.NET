@@ -1,4 +1,4 @@
-﻿namespace OpenLibraryNET
+﻿namespace OpenLibraryNET.Utility
 {
     /// <summary>
     /// The APIs of OpenLibrary currently supported by OpenLibrary.NET

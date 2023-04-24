@@ -1,4 +1,4 @@
-﻿namespace OpenLibraryNET
+﻿namespace OpenLibraryNET.Utility
 {
     /// <summary>
     /// Valid ID types for cover IDs.

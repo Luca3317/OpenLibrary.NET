@@ -1,25 +1,25 @@
-﻿namespace OpenLibraryNET
+﻿namespace OpenLibraryNET.Utility
 {
     /// <summary>
-    /// Valid ID types for partner API requests.
+    /// Valid ID types for edition IDs.
     /// </summary>
-    public enum PartnerIdType
+    public enum BookIdType
     {
         /// <summary>
         /// ISBN (10 and 13)
         /// </summary>
         ISBN,
         /// <summary>
-        /// OCLC (Online Computer Library Center)
+        /// OpenLibrary ID
         /// </summary>
-        OCLC,
+        OLID,
         /// <summary>
         /// Library of Congress Control Number
         /// </summary>
         LCCN,
         /// <summary>
-        /// OpenLibrary ID
+        /// OCLC (Online Computer Library Center)
         /// </summary>
-        OLID
+        OCLC
     }
 }
