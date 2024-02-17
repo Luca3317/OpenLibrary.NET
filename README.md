@@ -24,6 +24,7 @@ Currently, OpenLibrary.Net supports the following of OpenLibrary's APIs:
 * [Lists API](docs/Lists%20API.md)
 * [RecentChanges API](docs/RecentChanges%20API.md)
 * [Partner API](docs/Partner%20API.md)
+* [MyBooks API](docs/MyBooks%20API.md)
 * Covers API
   * [Covers API](docs/Covers%20API.md)
   * [AuthorPhotos API](docs/Covers%20API.md)
