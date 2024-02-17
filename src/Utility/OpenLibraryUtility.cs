@@ -556,29 +556,27 @@ namespace OpenLibraryNET.Utility
          */
         #region Requests
         /// <summary>
-        /// 
+        /// Make a GET request and get the response as a string.<br/>
+        /// For now, this is simply a wrapper around <see cref="HttpClient.GetStringAsync(Uri?)"/>.
         /// </summary>
-        /// <param name="uri"></param>
-        /// <param name="client"></param>
+        /// <param name="client">The HTTPClient to make the request with.</param>
+        /// <param name="uri">The Uri to send the GET request to.</param>
         /// <returns></returns>
-        internal async static Task<string> RequestAsync(HttpClient client, Uri uri)
+        public async static Task<string> RequestAsync(HttpClient client, Uri uri)
         {
             if (client == null) throw new System.ArgumentNullException("Passed in HttpClient was null");
             return await client.GetStringAsync(uri);
         }
 
-        internal static T? Parse<T>(string serialized, string path = "")
-        {
-            if (string.IsNullOrWhiteSpace(path))
-                return JsonConvert.DeserializeObject<T>(serialized);
-            else
-            {
-                JToken token = JToken.Parse(serialized);
-                return token[path]!.ToObject<T>();
-            }
-        }
-
-        internal async static Task<T?> LoadAsync<T>(HttpClient client, Uri uri, string path = "")
+        /// <summary>
+        /// Make a GET request and get the deserialized response as the generic type.
+        /// </summary>
+        /// <typeparam name="T">The type of the object to deserialize to.</typeparam>
+        /// <param name="client">The HTTPClient to make the request with.</param>
+        /// <param name="uri">The Uri to send the the GET request to.</param>
+        /// <param name="path">The path of the desired object within the response body. Leave as default to get entire object.</param>
+        /// <returns>The deserialized object from the JSON string at the given <paramref name="path"/>.</returns>
+        public async static Task<T?> LoadAsync<T>(HttpClient client, Uri uri, string path = "")
         {
             string response = await RequestAsync(client, uri);
             if (string.IsNullOrWhiteSpace(path))
@@ -588,16 +586,6 @@ namespace OpenLibraryNET.Utility
                 JToken token = JToken.Parse(response);
                 return token[path]!.ToObject<T>();
             }
-        }
-
-        internal static HttpClient GetClient()
-        {
-            HttpClientHandler handler = new HttpClientHandler()
-            {
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-            };
-            HttpClient client = new HttpClient(handler);
-            return client;
         }
         #endregion
 
@@ -1043,7 +1031,7 @@ namespace OpenLibraryNET.Utility
         (
             new Dictionary<string, ImmutableArray<string>>
             {
-                {string.Empty, ImmutableArray.Create("limit", "offset", "bot") } 
+                {string.Empty, ImmutableArray.Create("limit", "offset", "bot") }
             }
         );
         #endregion

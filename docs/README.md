@@ -39,7 +39,7 @@ createdList = await client.TryCreateListAsync("My list", "My lists description")
 If you don't want to use the OpenLibraryClient, you can perform all of the GET requests using the corresponding OLLoader class (OpenLibraryClient merely wraps those functions for most of its methods).
 
 ```csharp
-HttpClient client = OpenLibraryUtility.GetClient();
+HttpClient client = new HttpClient();
 
 OLWork work = new OLWork()
 {

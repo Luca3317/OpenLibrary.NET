@@ -7,7 +7,6 @@ using OpenLibraryNET.Utility;
 using static OpenLibraryNET.Utility.OpenLibraryUtility;
 using System.Text;
 using Polly;
-using System.Formats.Asn1;
 
 #pragma warning disable 8604, 8602
 namespace Tests
@@ -209,7 +208,7 @@ namespace Tests
         [Trait("Category", "OLLoader")]
         public async Task OLRecentChangesLoaderTests()
         {
-            HttpClient client = GetClient();
+            HttpClient client = new HttpClient();
 
             OLRecentChangesData[]? changesData =
                 await OLRecentChangesLoader.GetRecentChangesAsync(client, parameters: new KeyValuePair<string, string>("limit", "10"));
@@ -230,7 +229,7 @@ namespace Tests
         [Trait("Category", "OLLoader")]
         public async Task OLListLoaderTests()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string username in Usernames)
             {
@@ -266,7 +265,7 @@ namespace Tests
                     _testOutputHelper.WriteLine($"Retry count {retryCnt}");
                 });
 
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in WorksIDs)
             {
@@ -289,7 +288,7 @@ namespace Tests
         [Trait("Category", "OLLoader")]
         public async Task OLEditionLoaderOLIDTests()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in EditionsIDs)
             {
@@ -307,7 +306,7 @@ namespace Tests
         [Trait("Category", "OLLoader")]
         public async Task OLEditionLoaderISBNTests()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string isbn in ISBNs)
             {
@@ -326,7 +325,7 @@ namespace Tests
         [Trait("Category", "OLLoader")]
         public async Task OLEditionLoaderBibkeyTests()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string lccn in LCCNs)
             {
@@ -370,7 +369,7 @@ namespace Tests
         [Trait("Category", "OLLoader")]
         public async Task OLAuthorLoaderTests()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in AuthorIDs)
             {
@@ -391,7 +390,7 @@ namespace Tests
         [Trait("Category", "OLLoader")]
         public async Task OLSubjectLoaderTests()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in Subjects)
             {
@@ -408,7 +407,7 @@ namespace Tests
         [Trait("Category", "OLLoader")]
         public async Task OLImageLoaderTests()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in CoverIDs)
             {
@@ -423,7 +422,7 @@ namespace Tests
         [Trait("Category", "OLLoader")]
         public async Task OLSearchLoaderrTests()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string query in SearchQueries)
             {
@@ -465,7 +464,7 @@ namespace Tests
         [Trait("Category", "OLLoader")]
         public async Task OLMyBooksLoaderTests()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             OLMyBooksData? data = await OLMyBooksLoader.GetAlreadyReadAsync(client, "luca3317");
             CheckOLMyBooksData(data);
@@ -539,7 +538,7 @@ namespace Tests
         [Trait("Category", "OpenLibaryClient")]
         public async Task OLWorkTests()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in WorksIDs)
             {
@@ -569,7 +568,7 @@ namespace Tests
         [Trait("Category", "OpenLibaryClient")]
         public async Task OLAuthorTests()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in AuthorIDs)
             {
@@ -591,7 +590,7 @@ namespace Tests
         [Trait("Category", "OpenLibaryClient")]
         public async Task OLEditionTests()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in EditionsIDs)
             {
@@ -633,7 +632,7 @@ namespace Tests
         [Trait("Category", "Serialization")]
         public async Task OLWorkDataSerializationTest()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in WorksIDs)
             {
@@ -650,7 +649,7 @@ namespace Tests
         [Trait("Category", "Serialization")]
         public async Task OLEditionDataSerializationTest()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in EditionsIDs)
             {
@@ -667,7 +666,7 @@ namespace Tests
         [Trait("Category", "Serialization")]
         public async Task OLAuthorDataSerializationTest()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in AuthorIDs)
             {
@@ -684,7 +683,7 @@ namespace Tests
         [Trait("Category", "Serialization")]
         public async Task OLRatingsDataSerializationTest()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in WorksIDs)
             {
@@ -701,7 +700,7 @@ namespace Tests
         [Trait("Category", "Serialization")]
         public async Task OLBookshelvesDataSerializationTest()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in WorksIDs)
             {
@@ -718,7 +717,7 @@ namespace Tests
         [Trait("Category", "Serialization")]
         public async Task OLSubjectDataSerializationTest()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in Subjects)
             {
@@ -735,7 +734,7 @@ namespace Tests
         [Trait("Category", "Serialization")]
         public async Task OLWorkSerializationTest()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in WorksIDs)
             {
@@ -760,7 +759,7 @@ namespace Tests
         [Trait("Category", "Serialization")]
         public async Task OLAuthorSerializationTest()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in AuthorIDs)
             {
@@ -783,7 +782,7 @@ namespace Tests
         [Trait("Category", "Serialization")]
         public async Task OLEditionSerializationTest()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
 
             foreach (string id in EditionsIDs)
             {
@@ -809,7 +808,7 @@ namespace Tests
         [Trait("Category", "Serialization")]
         public async Task OLRecentChangesSerializationTest()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
             var data = await OLRecentChangesLoader.GetRecentChangesAsync(client, year: "2020");
 
             string serialized = JsonConvert.SerializeObject(data);
@@ -823,7 +822,7 @@ namespace Tests
         [Trait("Category", "Serialization")]
         public async Task OLPartnerSerializationTest()
         {
-            HttpClient client = OpenLibraryUtility.GetClient();
+            HttpClient client = new HttpClient();
             var data = await OLPartnerLoader.GetMultiDataAsync(client, SetBibkeyPrefix("olid", EditionsIDs[0]), SetBibkeyPrefix("olid", EditionsIDs[1]));
 
             string serialized = JsonConvert.SerializeObject(data);
