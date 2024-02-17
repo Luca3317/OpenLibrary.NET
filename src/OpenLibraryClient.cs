@@ -1,7 +1,7 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
 using System.Text.RegularExpressions;
+using OpenLibraryNET.Data;
 using OpenLibraryNET.Loader;
 using OpenLibraryNET.Utility;
 
@@ -63,6 +63,10 @@ namespace OpenLibraryNET
         /// Interface to the Partner API
         /// </summary>
         public OLPartnerLoader Partner => _partner;
+        /// <summary>
+        /// Interface to the MyBooks API
+        /// </summary>
+        public OLMyBooksLoader MyBooks => _myBooks;
 
         /// <summary>
         /// Create a new instance of the OpenLibraryClient.<br/>
@@ -83,6 +87,7 @@ namespace OpenLibraryNET
             _subject = new OLSubjectLoader(_httpClient);
             _recentChanges = new OLRecentChangesLoader(_httpClient);
             _partner = new OLPartnerLoader(_httpClient);
+            _myBooks = new OLMyBooksLoader(_httpClient);
         }
 
         /// <summary>
@@ -154,6 +159,9 @@ namespace OpenLibraryNET
             Uri uri = new Uri(OpenLibraryUtility.BaseUri, "account/logout");
             var response = await _httpClient.PostAsync(uri, null);
             response.EnsureSuccessStatusCode();
+
+            // TODO better check if actually logged out=?
+            //if (ExtractUsernameFromSessionCookie(sessionCookie);)
 
             _loggedIn = false;
             _email = null;
@@ -342,6 +350,91 @@ namespace OpenLibraryNET
             response.EnsureSuccessStatusCode();
         }
 
+        /// <summary>
+        /// Attempt to get your Currently-Reading reading log.<br/>
+        /// Must be logged in to use.<br/>
+        /// If you want to get another account's reading logs, use the <see cref="MyBooks"/> property.
+        /// </summary>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task<(bool, OLMyBooksData?)> TryGetCurrentlyReadingAsync()
+        {
+            try { return (true, await GetCurrentlyReadingAsync()); }
+            catch { return (false, null); }
+        }
+        /// <summary>
+        /// Get your Currently-Reading reading log.<br/>
+        /// Must be logged in to use.<br/>
+        /// If you want to get another account's reading logs, use the <see cref="MyBooks"/> property.
+        /// </summary>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        public async Task<OLMyBooksData?> GetCurrentlyReadingAsync()
+        {
+            if (!_loggedIn) throw new System.InvalidOperationException("You are not logged in to an OpenLibrary account; you must either log in or provide the username of a public user");
+            return await _myBooks.GetCurrentlyReadingAsync(_username!);
+        }
+
+        /// <summary>
+        /// Attempt to get your Want-To-Read reading log.<br/>
+        /// Must be logged in to use.<br/>
+        /// If you want to get another account's reading logs, use the <see cref="MyBooks"/> property.
+        /// </summary>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        public async Task<(bool, OLMyBooksData?)> TryGetWantToReadAsync()
+        {
+            try { return (true, await GetWantToReadAsync()); }
+            catch { return (false, null); }
+        }
+        /// <summary>
+        /// Get your Want-To-Read reading log.<br/>
+        /// Must be logged in to use.<br/>
+        /// If you want to get another account's reading logs, use the <see cref="MyBooks"/> property.
+        /// </summary>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        public async Task<OLMyBooksData?> GetWantToReadAsync()
+        {
+            if (!_loggedIn) throw new System.InvalidOperationException("You are not logged in to an OpenLibrary account; you must either log in or provide the username of a public user");
+            return await _myBooks.GetWantToReadAsync(_username!);
+        }
+
+        /// <summary>
+        /// Attempt to get your Already-Read reading log.<br/>
+        /// Must be logged in to use.<br/>
+        /// If you want to get another account's reading logs, use the <see cref="MyBooks"/> property.
+        /// </summary>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        public async Task<(bool, OLMyBooksData?)> TryGetAlreadyReadAsync()
+        {
+            try { return (true, await GetAlreadyReadAsync()); }
+            catch { return (false, null); }
+        }
+        /// <summary>
+        /// Get your Already-Read reading log.<br/>
+        /// Must be logged in to use.<br/>
+        /// If you want to get another account's reading logs, use the <see cref="MyBooks"/> property.
+        /// </summary>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        public async Task<OLMyBooksData?> GetAlreadyReadAsync()
+        {
+            if (!_loggedIn) throw new System.InvalidOperationException("You are not logged in to an OpenLibrary account; you must either log in or provide the username of a public user");
+            return await _myBooks.GetAlreadyReadAsync(_username!);
+        }
+
+
         private readonly HttpClient _httpClient;
         private readonly HttpClientHandler _httpHandler;
 
@@ -358,6 +451,7 @@ namespace OpenLibraryNET
         private readonly OLSubjectLoader _subject;
         private readonly OLRecentChangesLoader _recentChanges;
         private readonly OLPartnerLoader _partner;
+        private readonly OLMyBooksLoader _myBooks;
 
         private static string ExtractUsernameFromSessionCookie(Cookie sessionCookie)
             => Regex.Match(sessionCookie.Value, "(?<=/people/).*?(?=%)").Value;

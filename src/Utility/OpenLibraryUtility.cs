@@ -310,6 +310,21 @@ namespace OpenLibraryNET.Utility
         }
 
         /// <summary>
+        /// Build a MyBooks API Uri.
+        /// </summary>
+        /// <param name="username">The user whose reading logs you want to get.</param>
+        /// <param name="path">The path of the Uri. Should be "want-to-read", "currently-reading" or "already-read".</param>
+        /// <returns>A MyBooks API Uri.</returns>
+        public static Uri BuildMyBooksUri(string username, string path)
+        {
+            return BuildUri
+            (
+                BaseURL,
+                "people/" + username + "/books/" + path + ".json"
+            );
+        }
+
+        /// <summary>
         /// Build a Covers API Uri.
         /// </summary>
         /// <param name="idType">The type of the ID.</param>

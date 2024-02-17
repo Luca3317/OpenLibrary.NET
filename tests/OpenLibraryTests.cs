@@ -7,6 +7,7 @@ using OpenLibraryNET.Utility;
 using static OpenLibraryNET.Utility.OpenLibraryUtility;
 using System.Text;
 using Polly;
+using System.Formats.Asn1;
 
 #pragma warning disable 8604, 8602
 namespace Tests
@@ -14,6 +15,9 @@ namespace Tests
     public class OpenLibraryTests
     {
         private readonly ITestOutputHelper _testOutputHelper;
+
+        private const string AccountEmail = "";
+        private const string AccountPassword = "";
 
         public OpenLibraryTests(ITestOutputHelper helper)
         {
@@ -290,8 +294,8 @@ namespace Tests
             foreach (string id in EditionsIDs)
             {
                 OLEditionData? data = await OLEditionLoader.GetDataByOLIDAsync(client, id);
-                OLEditionData? data2 = await OLEditionLoader.GetDataByBibkeyAsync(client, id, EditionIdType.OLID);
-                OLBookViewAPI? viewapi = await OLEditionLoader.GetViewAPIAsync(client, id, EditionIdType.OLID);
+                OLEditionData? data2 = await OLEditionLoader.GetDataByBibkeyAsync(client, id, BookIdType.OLID);
+                OLBookViewAPI? viewapi = await OLEditionLoader.GetViewAPIAsync(client, id, BookIdType.OLID);
 
                 CheckOLEditionData(data);
                 CheckOLEditionData(data2);
@@ -309,8 +313,8 @@ namespace Tests
             {
                 _testOutputHelper.WriteLine(isbn);
                 OLEditionData? data = await OLEditionLoader.GetDataByISBNAsync(client, isbn);
-                OLEditionData? data2 = await OLEditionLoader.GetDataByBibkeyAsync(client, isbn, EditionIdType.ISBN);
-                OLBookViewAPI? viewapi = await OLEditionLoader.GetViewAPIAsync(client, isbn, EditionIdType.ISBN);
+                OLEditionData? data2 = await OLEditionLoader.GetDataByBibkeyAsync(client, isbn, BookIdType.ISBN);
+                OLBookViewAPI? viewapi = await OLEditionLoader.GetViewAPIAsync(client, isbn, BookIdType.ISBN);
 
                 CheckOLEditionData(data);
                 CheckOLEditionData(data2);
@@ -326,8 +330,8 @@ namespace Tests
 
             foreach (string lccn in LCCNs)
             {
-                OLEditionData? data = await OLEditionLoader.GetDataByBibkeyAsync(client, lccn, EditionIdType.LCCN);
-                OLBookViewAPI? viewapi = await OLEditionLoader.GetViewAPIAsync(client, lccn, EditionIdType.LCCN);
+                OLEditionData? data = await OLEditionLoader.GetDataByBibkeyAsync(client, lccn, BookIdType.LCCN);
+                OLBookViewAPI? viewapi = await OLEditionLoader.GetViewAPIAsync(client, lccn, BookIdType.LCCN);
 
                 CheckOLEditionData(data);
                 CheckOLEditionViewAPI(viewapi);
@@ -335,8 +339,8 @@ namespace Tests
 
             foreach (string oclc in OCLCs)
             {
-                OLEditionData? data = await OLEditionLoader.GetDataByBibkeyAsync(client, oclc, EditionIdType.OCLC);
-                OLBookViewAPI? viewapi = await OLEditionLoader.GetViewAPIAsync(client, oclc, EditionIdType.OCLC);
+                OLEditionData? data = await OLEditionLoader.GetDataByBibkeyAsync(client, oclc, BookIdType.OCLC);
+                OLBookViewAPI? viewapi = await OLEditionLoader.GetViewAPIAsync(client, oclc, BookIdType.OCLC);
 
                 CheckOLEditionData(data);
                 CheckOLEditionViewAPI(viewapi);
@@ -424,7 +428,6 @@ namespace Tests
             foreach (string query in SearchQueries)
             {
                 OLWorkData[]? data = await OLSearchLoader.GetSearchResultsAsync(client, query);
-                _testOutputHelper.WriteLine(query);
                 Assert.NotEmpty(data);
                 foreach (OLWorkData work in data)
                     CheckOLWorkData(work);
@@ -457,6 +460,22 @@ namespace Tests
             OLContainer? container = await OLSearchLoader.GetInsideSearchResultsAsync(client, "Hello");
             Assert.NotEmpty(container.ExtensionData);
         }
+
+        [Fact]
+        [Trait("Category", "OLLoader")]
+        public async Task OLMyBooksLoaderTests()
+        {
+            HttpClient client = OpenLibraryUtility.GetClient();
+
+            OLMyBooksData? data = await OLMyBooksLoader.GetAlreadyReadAsync(client, "luca3317");
+            CheckOLMyBooksData(data);
+
+            OLMyBooksData? data1 = await OLMyBooksLoader.GetWantToReadAsync(client, "luca3317");
+            CheckOLMyBooksData(data1);
+
+            OLMyBooksData? data2 = await OLMyBooksLoader.GetCurrentlyReadingAsync(client, "luca3317");
+            CheckOLMyBooksData(data2);
+        }
         #endregion
 
         #region OpenLibraryClient Tests
@@ -478,9 +497,9 @@ namespace Tests
 
             var workO = await client.GetWorkAsync(WorksIDs[0], 10);
             var authorO = await client.GetAuthorAsync(AuthorIDs[0], 10);
-            //var editionO = await client.GetEditionAsync(EditionsIDs[0], EditionIdType.OLID, "S");
+            //var editionO = await client.GetEditionAsync(EditionsIDs[0], BookIdType.OLID, "S");
             var editionO = await client.GetEditionAsync(EditionsIDs[0], "OLID", "S");
-            var editionO2 = await client.GetEditionAsync(EditionsIDs[0], EditionIdType.OLID, ImageSize.Small);
+            var editionO2 = await client.GetEditionAsync(EditionsIDs[0], BookIdType.OLID, ImageSize.Small);
             Assert.Equal(editionO, editionO2);
 
             CheckOLWorkData(workO.Data);
@@ -501,7 +520,7 @@ namespace Tests
         {
             OpenLibraryClient client = new OpenLibraryClient();
 
-            await client.LoginAsync("lweist3317@gmail.com", "noriam3399"); // Email and password
+            await client.LoginAsync(AccountEmail, AccountPassword);
             await client.CreateListAsync("Test list", "Created this list as part of OpenLibrary.NET tests");
             OLListData[]? lists = await client.List.GetUserListsAsync(client.Username);
             foreach (var list in lists)
@@ -584,6 +603,27 @@ namespace Tests
                 };
                 CheckOLEditionData(edition.Data);
                 Assert.NotEmpty(edition.CoverS);
+            }
+        }
+
+        [Fact]
+        [Trait("Category", "OpenLibraryClient")]
+        public async Task OLMyBooksTests()
+        {
+            OpenLibraryClient client = new OpenLibraryClient();
+
+            bool logged = await client.TryLoginAsync(AccountEmail, AccountPassword);
+
+            Assert.True(logged);
+
+            CheckOLMyBooksData(await client.GetCurrentlyReadingAsync());
+            CheckOLMyBooksData(await client.GetAlreadyReadAsync());
+            CheckOLMyBooksData(await client.GetWantToReadAsync());
+
+            var l = await client.GetCurrentlyReadingAsync();
+            foreach (var item in l.ReadingLogEntries)
+            {
+                _testOutputHelper.WriteLine("Work: " + item.Work.Title + "; Logged on: " + item.LoggedDate + "; Edition: " + item.LoggedEdition);
             }
         }
         #endregion
@@ -957,8 +997,7 @@ namespace Tests
             Assert.NotNull(data);
             Assert.NotEqual("", data.ID);
             Assert.NotEqual("", data.Timestamp);
-            Assert.NotEqual("", data.Author);
-            Assert.NotEqual("", data.IP);
+            Assert.NotEqual("", data.AuthorKey);
             Assert.NotEqual("", data.Kind);
             Assert.NotEmpty(data.Changes);
             foreach (var change in data.Changes)
@@ -966,6 +1005,20 @@ namespace Tests
                 Assert.NotNull(change);
                 Assert.NotEqual(-1, change.Revision);
                 Assert.NotEqual("", change.Key);
+            }
+        }
+
+        void CheckOLMyBooksData(OLMyBooksData? data)
+        {
+            Assert.NotNull(data);
+            Assert.NotEqual(-1, data.Page);
+            if (data.ReadingLogEntries == null) return;
+
+            foreach (var entry in data.ReadingLogEntries)
+            {
+                Assert.NotNull(entry);
+                Assert.NotNull(entry.LoggedDate);
+                Assert.NotNull(entry.Work);
             }
         }
         #endregion
