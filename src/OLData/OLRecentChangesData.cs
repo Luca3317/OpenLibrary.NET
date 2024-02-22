@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using CodeGeneration_Attributes;
+using Newtonsoft.Json;
 using OpenLibraryNET.Utility;
 using System.Collections.ObjectModel;
 
@@ -7,7 +8,8 @@ namespace OpenLibraryNET.Data
     /// <summary>
     /// Holds data about recent changes made to OpenLibrary's data.
     /// </summary>
-    public sealed record OLRecentChangesData : OLContainer
+    [CollectionValueEquality]
+    public sealed partial record OLRecentChangesData : OLContainer
     {
         /// <summary>
         /// The ID of the change made.
@@ -52,7 +54,8 @@ namespace OpenLibraryNET.Data
         /// <summary>
         /// Holds data about the data entries that were changed.
         /// </summary>
-        public sealed record OLChangeData
+        [CollectionValueEquality]
+        public sealed partial record OLChangeData : OLContainer
         {
             /// <summary>
             /// The key of the object that was changed.
@@ -65,30 +68,5 @@ namespace OpenLibraryNET.Data
             [JsonProperty("revision")]
             public int Revision { get; init; } = -1;
         }
-
-        /// <summary>
-        /// Indicates whether the current object is equal to another object of the same type.<br/>
-        /// Compares purely by value, including collections.<br/>
-        /// Does NOT consider extension data.
-        /// </summary>
-        /// <param name="data">An object to compare with this object.</param>
-        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
-        public bool Equals(OLRecentChangesData? data)
-        {
-            return
-                data != null &&
-                this.ID == data.ID &&
-                this.Kind == data.Kind &&
-                this.AuthorKey == data.AuthorKey &&
-                this.Timestamp == data.Timestamp &&
-                this.Comment == data.Comment &&
-                GeneralUtility.SequenceEqual(this._changes, data._changes);
-        }
-
-        /// <summary>
-        /// Serves as the default hash function.
-        /// </summary>
-        /// <returns>A hash code for the current object.</returns>
-        public override int GetHashCode() => base.GetHashCode();
     }
 }

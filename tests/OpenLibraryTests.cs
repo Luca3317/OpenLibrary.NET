@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using OpenLibraryNET;
 using Xunit.Abstractions;
 using OpenLibraryNET.Loader;
@@ -7,6 +7,7 @@ using OpenLibraryNET.Utility;
 using static OpenLibraryNET.Utility.OpenLibraryUtility;
 using System.Text;
 using Polly;
+using System.Security.Cryptography;
 
 #pragma warning disable 8604, 8602
 namespace Tests
@@ -484,6 +485,7 @@ namespace Tests
         {
             OpenLibraryClient client = new OpenLibraryClient();
 
+
             CheckOLWorkData(await client.Work.GetDataAsync(WorksIDs[0]));
             CheckOLRatingsData(await client.Work.GetRatingsAsync(WorksIDs[0]));
             CheckOLBookshelvesData(await client.Work.GetBookshelvesAsync(WorksIDs[0]));
@@ -622,8 +624,240 @@ namespace Tests
             var l = await client.GetCurrentlyReadingAsync();
             foreach (var item in l.ReadingLogEntries)
             {
-                _testOutputHelper.WriteLine("Work: " + item.Work.Title + "; Logged on: " + item.LoggedDate + "; Edition: " + item.LoggedEdition);
+                _testOutputHelper.WriteLine("Work: " + item.Work.Title + "; Logged on: " + item.LoggedDate + "; Edition: " + item.LoggedEditionKey);
             }
+        }
+        #endregion
+
+        #region Equality / Code Generation Tests
+        [Fact]
+        [Trait("Category", "Equality")]
+        public async Task OLWorkEquality()
+        {
+            OpenLibraryClient client = new OpenLibraryClient();
+
+            var container0 = await client.GetWorkAsync(WorksIDs[0]);
+            var container1 = await client.GetWorkAsync(WorksIDs[0]);
+            var container2 = await client.GetWorkAsync(WorksIDs[1]);
+
+            Assert.True(container0 == container1);
+            Assert.True(container1 == container0);
+            Assert.True(container0 != container2);
+            Assert.True(container2 != container0);
+            Assert.True(container1 != container2);
+            Assert.True(container2 != container1);
+
+            EqualityTests(container0, container1, container2);
+        }
+
+        [Fact]
+        [Trait("Category", "Equality")]
+        public async Task OLAuthorEquality()
+        {
+            OpenLibraryClient client = new OpenLibraryClient();
+
+            var container0 = await client.GetAuthorAsync(AuthorIDs[0]);
+            var container1 = await client.GetAuthorAsync(AuthorIDs[0]);
+            var container2 = await client.GetAuthorAsync(AuthorIDs[1]);
+
+            Assert.True(container0 == container1);
+            Assert.True(container1 == container0);
+            Assert.True(container0 != container2);
+            Assert.True(container2 != container0);
+            Assert.True(container1 != container2);
+            Assert.True(container2 != container1);
+
+            EqualityTests(container0, container1, container2);
+        }
+
+        [Fact]
+        [Trait("Category", "Equality")]
+        public async Task OLEditionEquality()
+        {
+            OpenLibraryClient client = new OpenLibraryClient();
+
+            var container0 = await client.GetEditionAsync(EditionsIDs[0]);
+            var container1 = await client.GetEditionAsync(EditionsIDs[0]);
+            var container2 = await client.GetEditionAsync(EditionsIDs[1]);
+
+            Assert.True(container0 == container1);
+            Assert.True(container1 == container0);
+            Assert.True(container0 != container2);
+            Assert.True(container2 != container0);
+            Assert.True(container1 != container2);
+            Assert.True(container2 != container1);
+
+            EqualityTests(container0, container1, container2);
+        }
+
+        [Fact]
+        [Trait("Category", "Equality")]
+        public async Task OLWorkDataEquality()
+        {
+            OpenLibraryClient client = new OpenLibraryClient();
+
+            var container0 = await client.Work.GetDataAsync(WorksIDs[0]);
+            var container1 = await client.Work.GetDataAsync(WorksIDs[0]);
+            var container2 = await client.Work.GetDataAsync(WorksIDs[1]);
+
+            Assert.True(container0 == container1);
+            Assert.True(container1 == container0);
+            Assert.True(container0 != container2);
+            Assert.True(container2 != container0);
+            Assert.True(container1 != container2);
+            Assert.True(container2 != container1);
+
+            EqualityTests(container0, container1, container2);
+        }
+
+        [Fact]
+        [Trait("Category", "Equality")]
+        public async Task OLAuthorDataEquality()
+        {
+            OpenLibraryClient client = new OpenLibraryClient();
+
+            var container0 = await client.Author.GetDataAsync(AuthorIDs[0]);
+            var container1 = await client.Author.GetDataAsync(AuthorIDs[0]);
+            var container2 = await client.Author.GetDataAsync(AuthorIDs[1]);
+
+            Assert.True(container0 == container1);
+            Assert.True(container1 == container0);
+            Assert.True(container0 != container2);
+            Assert.True(container2 != container0);
+            Assert.True(container1 != container2);
+            Assert.True(container2 != container1);
+
+            EqualityTests(container0, container1, container2);
+        }
+
+        [Fact]
+        [Trait("Category", "Equality")]
+        public async Task OLEditionDataEquality()
+        {
+            OpenLibraryClient client = new OpenLibraryClient();
+
+            var container0 = await client.Edition.GetDataAsync(EditionsIDs[0]);
+            var container1 = await client.Edition.GetDataAsync(EditionsIDs[0]);
+            var container2 = await client.Edition.GetDataAsync(EditionsIDs[1]);
+
+            Assert.True(container0 == container1);
+            Assert.True(container1 == container0);
+            Assert.True(container0 != container2);
+            Assert.True(container2 != container0);
+            Assert.True(container1 != container2);
+            Assert.True(container2 != container1);
+
+            EqualityTests(container0, container1, container2);
+        }
+
+        [Fact]
+        [Trait("Category", "Equality")]
+        public async Task OLListEquality()
+        {
+            OpenLibraryClient client = new OpenLibraryClient();
+
+            var container0 = await client.List.GetListAsync("luca3317", "OL225359L");
+            var container1 = await client.List.GetListAsync("luca3317", "OL225359L");
+            var container2 = await client.List.GetListAsync("luca3317", "OL225360L");
+
+            Assert.True(container0 == container1);
+            Assert.True(container1 == container0);
+            Assert.True(container0 != container2);
+            Assert.True(container2 != container0);
+            Assert.True(container1 != container2);
+            Assert.True(container2 != container1);
+
+            EqualityTests(container0, container1, container2);
+        }
+
+        [Fact]
+        [Trait("Category", "Equality")]
+        public async Task OLMyBooksEquality()
+        {
+            OpenLibraryClient client = new OpenLibraryClient();
+
+            var container0 = await client.MyBooks.GetCurrentlyReadingAsync("luca3317");
+            var container1 = await client.MyBooks.GetCurrentlyReadingAsync("luca3317");
+            var container2 = await client.MyBooks.GetAlreadyReadAsync("luca3317");
+
+            Assert.True(container0 == container1);
+            Assert.True(container1 == container0);
+            Assert.True(container0 != container2);
+            Assert.True(container2 != container0);
+            Assert.True(container1 != container2);
+            Assert.True(container2 != container1);
+
+            EqualityTests(container0, container1, container2);
+        }
+
+        [Fact]
+        [Trait("Category", "Equality")]
+        public async Task OLRecentChangesEquality()
+        {
+            OpenLibraryClient client = new OpenLibraryClient();
+
+            var container0 = (await client.RecentChanges.GetRecentChangesAsync("2022"))[0];
+            var container1 = (await client.RecentChanges.GetRecentChangesAsync("2022"))[0];
+            var container2 = (await client.RecentChanges.GetRecentChangesAsync("2021"))[0];
+
+            Assert.True(container0 == container1);
+            Assert.True(container1 == container0);
+            Assert.True(container0 != container2);
+            Assert.True(container2 != container0);
+            Assert.True(container1 != container2);
+            Assert.True(container2 != container1);
+
+            EqualityTests(container0, container1, container2);
+        }
+
+        [Fact]
+        [Trait("Category", "Equality")]
+        public async Task OLSubjectDataEquality()
+        {
+            OpenLibraryClient client = new OpenLibraryClient();
+
+            var container0 = await client.Subject.GetDataAsync("magic");
+            var container1 = await client.Subject.GetDataAsync("magic");
+            var container2 = await client.Subject.GetDataAsync("fantasy");
+
+            Assert.True(container0 == container1);
+            Assert.True(container1 == container0);
+            Assert.True(container0 != container2);
+            Assert.True(container2 != container0);
+            Assert.True(container1 != container2);
+            Assert.True(container2 != container1);
+
+            EqualityTests(container0, container1, container2);
+        }
+
+        private void EqualityTests(object o, object equal, object unequal)
+        {
+            Assert.NotNull(o);
+            Assert.NotNull(equal);
+            Assert.NotNull(unequal);
+
+            Assert.True(o.Equals(o));
+            Assert.True(equal.Equals(equal));
+            Assert.True(unequal.Equals(unequal));
+            Assert.True(o.Equals(equal));
+            Assert.True(equal.Equals(o));
+            Assert.True(!o.Equals(unequal));
+            Assert.True(!unequal.Equals(o));
+            Assert.True(!equal.Equals(unequal));
+            Assert.True(!unequal.Equals(equal));
+
+            Assert.True(EqualityComparer<object>.Default.Equals(o, o));
+            Assert.True(EqualityComparer<object>.Default.Equals(equal, equal));
+            Assert.True(EqualityComparer<object>.Default.Equals(unequal, unequal));
+            Assert.True(EqualityComparer<object>.Default.Equals(o, equal));
+            Assert.True(EqualityComparer<object>.Default.Equals(equal, o));
+            Assert.False(EqualityComparer<object>.Default.Equals(o, unequal));
+            Assert.False(EqualityComparer<object>.Default.Equals(unequal, o));
+            Assert.False(EqualityComparer<object>.Default.Equals(unequal, equal));
+            Assert.False(EqualityComparer<object>.Default.Equals(equal, unequal));
+
+            Assert.Equal(o.GetHashCode(), equal.GetHashCode());
+            Assert.NotEqual(o.GetHashCode(), unequal.GetHashCode());
         }
         #endregion
 
@@ -844,7 +1078,7 @@ namespace Tests
                 new ("key", "value")
             };
 
-            string pstring = ".json?limit=10&key=value";
+            //string pstring = ".json?limit=10&key=value";
 
             string id = "OL1234W", path = "ratings";
 
@@ -986,9 +1220,9 @@ namespace Tests
         void CheckOLListData(OLListData? data)
         {
             Assert.NotNull(data);
-            Assert.NotEqual("", data.Name);
-            //Assert.NotEqual("", data.URL);
-            //Assert.NotEqual("", data.LastUpdate);
+            // None of the fields on list data seem to be guaranteed to be
+            // set depending on the source
+            // Checks on the extensiondata dont indicate different aliases
         }
 
         void CheckOLRecentChangesData(OLRecentChangesData? data)

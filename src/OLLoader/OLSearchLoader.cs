@@ -250,7 +250,7 @@ namespace OpenLibraryNET.Loader
         }
 
         /// <summary>
-        /// Attemtp to search inside books and get results.
+        /// Attempt to search inside books and get results.
         /// </summary>
         /// <param name="client">An HttpClient instance which will be used to make the request.</param>
         /// <param name="query">The search query.</param>

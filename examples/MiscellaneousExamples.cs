@@ -21,7 +21,7 @@ namespace OpenLibraryNET.examples
             // Get subject data for this subject
             OLSubjectData? subjectData = await OLSubjectLoader.GetDataAsync(client, subject);
 
-            // Get more detailled subject data for this subject
+            // Get more detailed subject data for this subject
             // This data will be accessible through the ExtensionData property
             // (as is all data without fields in the corresponding OL...Data record)
             OLSubjectData? subjectData2 = await OLSubjectLoader.GetDataAsync

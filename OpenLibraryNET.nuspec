@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>OpenLibrary.NET</id>
+		<title>OpenLibrary.NET</title>
+		<version>0.1.2</version>
+		<authors>Luca3317</authors>
+		<owners>Luca3317</owners>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <license type="expression">MIT</license>
+        <projectUrl>https://github.com/Luca3317/OpenLibrary.NET</projectUrl>
+        <description>A C# library for OpenLibrary by the InternetArchive</description>
+        <tags>internetarchive openlibrary library book isbn</tags>
+        <repository type="git" url="https://github.com/Luca3317/OpenLibrary.NET" />
+		<dependencies>
+			<group targetFramework="net8.0">
+				<dependency id="Newtonsoft.Json" version="13.0.3" />
+			</group>
+		</dependencies>
+
+	</metadata>
+	<files>
+		<file src="src\bin\Release\net8.0\OpenLibraryNET.dll" target="lib\net8.0" />
+		<file src="src\bin\Release\net8.0\OpenLibraryNET.xml" target="lib\net8.0" />
+	</files>
+</package>

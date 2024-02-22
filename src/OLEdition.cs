@@ -1,13 +1,15 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using OpenLibraryNET.Data;
+using CodeGeneration_Attributes;
 
 namespace OpenLibraryNET
 {
     /// <summary>
     /// Composite storage of various data related to an edition.
     /// </summary>
-    public sealed record OLEdition
+    [CollectionValueEquality]
+    public sealed partial record OLEdition
     {
         /// <summary>
         /// The ID of the edition.
@@ -54,23 +56,5 @@ namespace OpenLibraryNET
         private byte[]? _cover_M { get; init; } = null;
         [JsonProperty("cover_l")]
         private byte[]? _cover_L { get; init; } = null;
-
-        /// <summary>
-        /// Indicates whether the current object is equal to another object of the same type.<br/>
-        /// </summary>
-        /// <param name="data">An object to compare with this object.</param>
-        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
-        public bool Equals(OLEdition? data)
-        {
-            return data != null &&
-                data.ID == ID &&
-                data.Data == Data;
-        }
-
-        /// <summary>
-        /// Serves as the default hash function.
-        /// </summary>
-        /// <returns>A hash code for the current object.</returns>
-        public override int GetHashCode() => base.GetHashCode();
     }
 }

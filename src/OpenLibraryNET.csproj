@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<!--
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Version>0.1.2</Version>
+		<Title>OpenLibrary.NET</Title>
+		<RepositoryUrl>https://github.com/Luca3317/OpenLibrary.NET</RepositoryUrl>
+		<Description>A C# library for OpenLibrary by the InternetArchive</Description>
+		<Authors>Luca3317</Authors>
+		<PackageTags>internetarchive;openlibrary;library;book;isbn;</PackageTags>
+		<PackageProjectUrl>https://github.com/Luca3317/OpenLibrary.NET</PackageProjectUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Company />
+		<DocumentationFile></DocumentationFile>
+		-->
+
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CodeGen>$(SolutionDir)code generation\</CodeGen>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove=".editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="*" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="$(CodeGen)OpenLibraryNET.SourceGenerators\OpenLibraryNET.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="$(CodeGen)OpenLibraryNET.GeneratorAttributes\OpenLibraryNET.GeneratorAttributes.csproj" PrivateAssets="All" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Analyzer Include="$(CodeGen)OpenLibraryNET.Diagnostics\bin\$(Configuration)\netstandard2.0\OpenLibraryNET.Diagnostics.dll" />
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="Build">
+		<PropertyGroup>
+			<BuildCommand>"$(CodeGen)OpenLibraryNET.RemoveGeneratorAttributes\bin\$(Configuration)\net8.0\OpenLibraryNET.RemoveGeneratorAttributes.exe"</BuildCommand>
+			<Argument1>"$(TargetPath)"</Argument1>
+			<Argument2>"$(CodeGen)OpenLibraryNET.GeneratorAttributes\bin\$(Configuration)\netstandard2.0\OpenLibraryNET.GeneratorAttributes.dll"</Argument2>
+		</PropertyGroup>
+		<Exec Command="$(BuildCommand) $(Argument1) $(Argument2)" ConsoleToMSBuild="true" LogStandardErrorAsError="true" WorkingDirectory="$(ProjectDir)" />
+
+		<Copy SourceFiles="$(TargetPath).modified" DestinationFiles="$(TargetPath)" OverwriteReadOnlyFiles="true" />
+		
+	</Target>
+
+</Project>

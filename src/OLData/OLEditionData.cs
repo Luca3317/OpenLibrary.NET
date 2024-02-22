@@ -1,13 +1,15 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using OpenLibraryNET.Utility;
+using CodeGeneration_Attributes;
 
 namespace OpenLibraryNET.Data
 {
     /// <summary>
     /// Holds data about an edition.
     /// </summary>
-    public sealed record OLEditionData : OLContainer
+    [CollectionValueEquality]
+    public sealed partial record OLEditionData : OLContainer
     {
         /// <summary>
         /// The edition's ID.
@@ -135,7 +137,8 @@ namespace OpenLibraryNET.Data
         /// <summary>
         /// Holds the various identifiers of an edition.
         /// </summary>
-        public sealed record OLEditionIdentifiers : OLContainer
+        [CollectionValueEquality]
+        public sealed partial record OLEditionIdentifiers : OLContainer
         {
             /// <summary>
             /// The Goodreads identifiers of the corresponding edition.
@@ -160,58 +163,6 @@ namespace OpenLibraryNET.Data
             private string[] _goodreads { get; init; } = Array.Empty<string>();
             [JsonProperty("librarything")]
             private string[] _libraryThing { get; init; } = Array.Empty<string>();
-
-            /// <summary>
-            /// Indicates whether the current object is equal to another object of the same type.<br/>
-            /// Compares purely by value, including collections.<br/>
-            /// Does NOT consider extension data.
-            /// </summary>
-            /// <param name="data">An object to compare with this object.</param>
-            /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
-            public bool Equals(OLEditionIdentifiers? data)
-            {
-                return
-                    data != null &&
-                    GeneralUtility.SequenceEqual(this._goodreads, data._goodreads) &&
-                    GeneralUtility.SequenceEqual(this._libraryThing, data._libraryThing);
-            }
-
-            /// <summary>
-            /// Serves as the default hash function.
-            /// </summary>
-            /// <returns>A hash code for the current object.</returns>
-            public override int GetHashCode() => base.GetHashCode();
         }
-
-        /// <summary>
-        /// Indicates whether the current object is equal to another object of the same type.<br/>
-        /// Compares purely by value, including collections.<br/>
-        /// Does NOT consider extension data.
-        /// </summary>
-        /// <param name="data">An object to compare with this object.</param>
-        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
-        public bool Equals(OLEditionData? data)
-        {
-            return
-                data != null &&
-                this.Key == data.Key &&
-                this.Title == data.Title &&
-                this.Description == data.Description &&
-                this.PageCount == data.PageCount &&
-                this.Identifiers == data.Identifiers &&
-                GeneralUtility.SequenceEqual(this._isbn10, data._isbn10) &&
-                GeneralUtility.SequenceEqual(this._isbn13, data._isbn13) &&
-                GeneralUtility.SequenceEqual(this._authors, data._authors) &&
-                GeneralUtility.SequenceEqual(this._coverKeys, data._coverKeys) &&
-                GeneralUtility.SequenceEqual(this._workKeys, data._workKeys) &&
-                GeneralUtility.SequenceEqual(this._subjects, data._subjects) &&
-                GeneralUtility.SequenceEqual(this._publishers, data._publishers);
-        }
-
-        /// <summary>
-        /// Serves as the default hash function.
-        /// </summary>
-        /// <returns>A hash code for the current object.</returns>
-        public override int GetHashCode() => base.GetHashCode();
     }
 }

@@ -3,6 +3,9 @@ using OpenLibraryNET.Utility;
 
 namespace OpenLibraryNET.Loader
 {
+    /// <summary>
+    /// Interface to OpenLibrary's MyBooks API.
+    /// </summary>
     public class OLMyBooksLoader
     {
         internal OLMyBooksLoader(HttpClient client) => _client = client;
@@ -13,7 +16,6 @@ namespace OpenLibraryNET.Loader
         /// <summary>
         /// Attempt to get data about a user's Want-To-Read reading log.
         /// </summary>
-        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
         /// <param name="username">The user to get the reading log of.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         public async Task<(bool, OLMyBooksData?)> TryGetWantToReadAsync(string username)
@@ -25,7 +27,6 @@ namespace OpenLibraryNET.Loader
         /// <summary>
         /// Get data about a user's Want-To-Read reading log.
         /// </summary>
-        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
         /// <param name="username">The user to get the reading log of.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         /// <exception cref="System.InvalidOperationException"></exception>
@@ -44,7 +45,6 @@ namespace OpenLibraryNET.Loader
         /// <summary>
         /// Attempt to get data about a user's Currently-Reading reading log.
         /// </summary>
-        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
         /// <param name="username">The user to get the reading log of.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         public async Task<(bool, OLMyBooksData?)> TryGetCurrentlyReadingAsync(string username)
@@ -56,7 +56,6 @@ namespace OpenLibraryNET.Loader
         /// <summary>
         /// Get data about a user's Currently-Reading reading log.
         /// </summary>
-        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
         /// <param name="username">The user to get the reading log of.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         /// <exception cref="System.InvalidOperationException"></exception>
@@ -75,7 +74,6 @@ namespace OpenLibraryNET.Loader
         /// <summary>
         /// Attempt to get data about a user's Already-Read reading log.
         /// </summary>
-        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
         /// <param name="username">The user to get the reading log of.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         public async Task<(bool, OLMyBooksData?)> TryGetAlreadyReadAsync(string username)
@@ -87,7 +85,6 @@ namespace OpenLibraryNET.Loader
         /// <summary>
         /// Get data about a user's Already-Read reading log.
         /// </summary>
-        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
         /// <param name="username">The user to get the reading log of.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         /// <exception cref="System.InvalidOperationException"></exception>

@@ -564,7 +564,7 @@ namespace OpenLibraryNET.Utility
         /// <returns></returns>
         public async static Task<string> RequestAsync(HttpClient client, Uri uri)
         {
-            if (client == null) throw new System.ArgumentNullException("Passed in HttpClient was null");
+            if (client == null) throw new System.ArgumentNullException(nameof(client));
             return await client.GetStringAsync(uri);
         }
 

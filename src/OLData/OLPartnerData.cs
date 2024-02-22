@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using CodeGeneration_Attributes;
+using Newtonsoft.Json;
 using OpenLibraryNET.Utility;
 using System.Collections.ObjectModel;
 
@@ -7,7 +8,8 @@ namespace OpenLibraryNET.Data
     /// <summary>
     /// Holds data about online-readable or borrowable books, along with corresponding <see cref="OLEditionData"/> and <see cref="OLBookViewAPI"/> entries.
     /// </summary>
-    public sealed record OLPartnerData : OLContainer
+    [CollectionValueEquality]
+    public sealed partial record OLPartnerData : OLContainer
     {
         /// <summary>
         /// The corresponding <see cref="OLEditionData"/>.
@@ -36,7 +38,8 @@ namespace OpenLibraryNET.Data
         /// <summary>
         /// Holds data about an online-readable book.
         /// </summary>
-        public sealed record Item : OLContainer
+        [CollectionValueEquality]
+        public sealed partial record Item : OLContainer
         {
             /// <summary>
             /// The type of match. Either 'exact' or 'similar'.
@@ -77,7 +80,8 @@ namespace OpenLibraryNET.Data
             /// <summary>
             /// Holds URLs to the cover of the corresponding <see cref="Item"/>.
             /// </summary>
-            public sealed record CoverURL : OLContainer
+            [CollectionValueEquality]
+            public sealed partial record CoverURL : OLContainer
             {
                 /// <summary>
                 /// Link to the cover in small resolution.
@@ -96,27 +100,5 @@ namespace OpenLibraryNET.Data
                 public string Large { get; init; } = "";
             }
         }
-
-        /// <summary>
-        /// Indicates whether the current object is equal to another object of the same type.<br/>
-        /// Compares purely by value, including collections.<br/>
-        /// Does NOT consider extension data.
-        /// </summary>
-        /// <param name="data">An object to compare with this object.</param>
-        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
-        public bool Equals(OLPartnerData? data)
-        {
-            return
-                data != null &&
-                this.Data == data.Data &&
-                this.Details == data.Details &&
-                GeneralUtility.SequenceEqual(this._items, data._items);
-        }
-
-        /// <summary>
-        /// Serves as the default hash function.
-        /// </summary>
-        /// <returns>A hash code for the current object.</returns>
-        public override int GetHashCode() => base.GetHashCode();
     }
 }

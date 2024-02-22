@@ -2,13 +2,15 @@
 using System.Collections.ObjectModel;
 using OpenLibraryNET.Data;
 using OpenLibraryNET.Utility;
+using CodeGeneration_Attributes;
 
 namespace OpenLibraryNET
 {
     /// <summary>
     /// Composite storage of various data related to an author.
     /// </summary>
-    public sealed record OLAuthor
+    [CollectionValueEquality]
+    public sealed partial record OLAuthor
     {
         /// <summary>
         /// The ID of the author.
@@ -32,25 +34,5 @@ namespace OpenLibraryNET
 
         [JsonProperty("works")]
         private OLWorkData[]? _works { get; init; } = null;
-
-        /// <summary>
-        /// Indicates whether the current object is equal to another object of the same type.<br/>
-        /// Compares purely by value, including collections.
-        /// </summary>
-        /// <param name="data">An object to compare with this object.</param>
-        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
-        public bool Equals(OLAuthor? data)
-        {
-            return data != null &&
-                data.ID == ID &&
-                data.Data == Data &&
-                GeneralUtility.SequenceEqual(data._works, _works);
-        }
-
-        /// <summary>
-        /// Serves as the default hash function.
-        /// </summary>
-        /// <returns>A hash code for the current object.</returns>
-        public override int GetHashCode() => base.GetHashCode();
     }
 }

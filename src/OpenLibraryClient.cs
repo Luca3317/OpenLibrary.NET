@@ -10,7 +10,7 @@ namespace OpenLibraryNET
     /// <summary>
     /// The main interface to OpenLibrary.<br/>
     /// Instantiates HttpClient internally, as OpenLibraryClient uses cookies.<br/>
-    /// To re-use the backing HttpClient, re-use the OpenLibrary instance.
+    /// To reuse the backing HttpClient, reuse the OpenLibrary instance.
     /// </summary>
     public class OpenLibraryClient
     {
@@ -71,7 +71,7 @@ namespace OpenLibraryNET
         /// <summary>
         /// Create a new instance of the OpenLibraryClient.<br/>
         /// Instantiates HttpClient internally, as OpenLibraryClient uses cookies.<br/>
-        /// To re-use the backing HttpClient, re-use the OpenLibrary instance.
+        /// To reuse the backing HttpClient, reuse the OpenLibrary instance.
         /// </summary>
         public OpenLibraryClient()
         {

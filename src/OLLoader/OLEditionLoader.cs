@@ -137,7 +137,7 @@ namespace OpenLibraryNET.Loader
         /// Attempt to get an edition's ViewAPI with optional details.
         /// </summary>
         /// <param name="id">The ID of the edition.</param>
-        /// <param name="details">Indicates whether detals should be included in the returned <see cref="OLBookViewAPI"/>.</param>
+        /// <param name="details">Indicates whether details should be included in the returned <see cref="OLBookViewAPI"/>.</param>
         /// <param name="idType">The <see cref="BookIdType"/> of the edition.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         public async Task<(bool, OLBookViewAPI?)> TryGetViewAPIAsync(string id, bool details = false, BookIdType? idType = null)
@@ -146,7 +146,7 @@ namespace OpenLibraryNET.Loader
         /// Get an edition's ViewAPI with optional details.
         /// </summary>
         /// <param name="id">The ID of the edition.</param>
-        /// <param name="details">Indicates whether detals should be included in the returned <see cref="OLBookViewAPI"/>.</param>
+        /// <param name="details">Indicates whether details should be included in the returned <see cref="OLBookViewAPI"/>.</param>
         /// <param name="idType">The <see cref="BookIdType"/> of the edition.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         /// <exception cref="System.InvalidOperationException"></exception>
@@ -176,7 +176,7 @@ namespace OpenLibraryNET.Loader
             => await GetViewAPIAsync(_client, false, bibkeys);
 
         /// <summary>
-        /// Attempt to get detailled ViewAPIs of a variable amount of editions.
+        /// Attempt to get detailed ViewAPIs of a variable amount of editions.
         /// </summary>
         /// <param name="details">Indicates whether details should be included in the returned <see cref="OLBookViewAPI"/>s.</param>
         /// <param name="bibkeys">The editions' bibkeys. Must already be in bibkey format (see <see cref="OpenLibraryUtility.SetBibkeyPrefix(BookIdType, string)"/>.</param>
@@ -184,7 +184,7 @@ namespace OpenLibraryNET.Loader
         public async Task<(bool, OLBookViewAPI[]?)> TryGetViewAPIAsync(bool details, params string[] bibkeys)
             => await TryGetViewAPIAsync(_client, details, bibkeys);
         /// <summary>
-        /// Get detailled ViewAPIs of a variable amount of editions.
+        /// Get detailed ViewAPIs of a variable amount of editions.
         /// </summary>
         /// <param name="details">Indicates whether details should be included in the returned <see cref="OLBookViewAPI"/>s.</param>
         /// <param name="bibkeys">The editions' bibkeys. Must already be in bibkey format (see <see cref="OpenLibraryUtility.SetBibkeyPrefix(BookIdType, string)"/>.</param>

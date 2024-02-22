@@ -1,13 +1,15 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using OpenLibraryNET.Utility;
+using CodeGeneration_Attributes;
 
 namespace OpenLibraryNET.Data
 {
     /// <summary>
     /// Holds data about a work.
     /// </summary>
-    public sealed record OLWorkData : OLContainer
+    [CollectionValueEquality]
+    public sealed partial record OLWorkData : OLContainer
     {
         /// <summary>
         /// The ID of the work.
@@ -73,30 +75,5 @@ namespace OpenLibraryNET.Data
         private string[] _subjectsSubjects { init => _subjects = value; }
         //[JsonProperty("cover_id")]
         //private int subjectsCover { init => coverKeys.Add(value); }
-
-        /// <summary>
-        /// Indicates whether the current object is equal to another object of the same type.<br/>
-        /// Compares purely by value, including collections.<br/>
-        /// Does NOT consider extension data.
-        /// </summary>
-        /// <param name="data">An object to compare with this object.</param>
-        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
-        public bool Equals(OLWorkData? data)
-        {
-            return
-                data != null &&
-                this.Key == data.Key &&
-                this.Title == data.Title &&
-                this.Description == data.Description &&
-                GeneralUtility.SequenceEqual(this._subjects, data._subjects) &&
-                GeneralUtility.SequenceEqual(this._coverKeys, data._coverKeys) &&
-                GeneralUtility.SequenceEqual(this._authors, data._authors);
-        }
-
-        /// <summary>
-        /// Serves as the default hash function.
-        /// </summary>
-        /// <returns>A hash code for the current object.</returns>
-        public override int GetHashCode() => base.GetHashCode();
     }
 }

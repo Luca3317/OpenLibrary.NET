@@ -43,6 +43,6 @@ In addition to its data, you can also get an edition's [viewapi](https://openlib
 
 OLViewAPIData viewAPI = await client.Edition.GetViewAPIAsync(httpClient, "OL7826547M", BookIdType.LCCN);
 
-// To get a more detailled response
+// To get a more detailed response
 OLViewAPIData viewAPI = await client.Edition.GetViewAPIAsync(httpClient, "OL7826547M", details: true, BookIdType.LCCN);
 ```
