@@ -9,7 +9,7 @@ See the [docs folder](https://github.com/Luca3317/OpenLibrary.NET/tree/main/docs
 
 ## Installation
 ```console
-dotnet add package OpenLibrary.NET --version 0.1.0
+dotnet add package OpenLibrary.NET
 ```
 ***
 Currently, OpenLibrary.Net supports the following of OpenLibrary's APIs:
@@ -30,3 +30,7 @@ Currently, OpenLibrary.Net supports the following of OpenLibrary's APIs:
   * [AuthorPhotos API](docs/Covers%20API.md)
 
 As it is still experimental, the SearchInside API is unsupported for now.
+
+***
+
+If you want to work with the source files directly, see the [Code Generation docs](docs/ProjectDocs/README.md) for documentation about the source generators and the relevant attributes.
