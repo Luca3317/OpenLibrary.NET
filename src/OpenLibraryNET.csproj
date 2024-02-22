@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
@@ -46,7 +46,7 @@
 
 	<Target Name="PostBuild" AfterTargets="Build">
 		<PropertyGroup>
-			<BuildCommand>"$(CodeGen)OpenLibraryNET.RemoveGeneratorAttributes\bin\$(Configuration)\net8.0\OpenLibraryNET.RemoveGeneratorAttributes.exe"</BuildCommand>
+			<BuildCommand>"$(CodeGen)OpenLibraryNET.RemoveGeneratorAttributes\bin\$(Configuration)\net6.0\OpenLibraryNET.RemoveGeneratorAttributes.exe"</BuildCommand>
 			<Argument1>"$(TargetPath)"</Argument1>
 			<Argument2>"$(CodeGen)OpenLibraryNET.GeneratorAttributes\bin\$(Configuration)\netstandard2.0\OpenLibraryNET.GeneratorAttributes.dll"</Argument2>
 		</PropertyGroup>

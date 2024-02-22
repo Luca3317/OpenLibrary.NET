@@ -13,14 +13,14 @@
         <tags>internetarchive openlibrary library book isbn</tags>
         <repository type="git" url="https://github.com/Luca3317/OpenLibrary.NET" />
 		<dependencies>
-			<group targetFramework="net8.0">
+			<group targetFramework="net6.0">
 				<dependency id="Newtonsoft.Json" version="13.0.3" />
 			</group>
 		</dependencies>
 
 	</metadata>
 	<files>
-		<file src="src\bin\Release\net8.0\OpenLibraryNET.dll" target="lib\net8.0" />
-		<file src="src\bin\Release\net8.0\OpenLibraryNET.xml" target="lib\net8.0" />
+		<file src="src\bin\Release\net6.0\OpenLibraryNET.dll" target="lib\net6.0" />
+		<file src="src\bin\Release\net6.0\OpenLibraryNET.xml" target="lib\net6.0" />
 	</files>
 </package>
