@@ -21,11 +21,7 @@ namespace OpenLibraryNET
         /// <summary>
         /// The username of the currently logged in account. Null if not logged in.
         /// </summary>
-        public string? Username => _username;
-        /// <summary>
-        /// The e-mail of the currently logged in account. Null if not logged in.
-        /// </summary>
-        public string? Email => _email;
+        public string? Username => ExtractUsernameFromSessionCookie(_httpHandler.CookieContainer.GetCookies(OpenLibraryUtility.BaseUri).Single(cookie => cookie.Name == "session"));
 
         /// <summary>
         /// Interface to the Works API
@@ -67,6 +63,11 @@ namespace OpenLibraryNET
         /// Interface to the MyBooks API
         /// </summary>
         public OLMyBooksLoader MyBooks => _myBooks;
+
+        /// <summary>
+        /// <see cref="HttpClient"/> instance created by this OpenLibraryClient instance.
+        /// </summary>
+        public HttpClient BackingClient => _httpClient;
 
         /// <summary>
         /// Create a new instance of the OpenLibraryClient.<br/>
@@ -124,16 +125,13 @@ namespace OpenLibraryNET
             FormUrlEncodedContent content = new FormUrlEncodedContent(loginData);
 
             var response = await _httpClient.PostAsync(uri, content);
+            response.EnsureSuccessStatusCode();
 
             // Check that there is now a session cookie present
-            try
+            if (!LoggedIn)
             {
-                Cookie sessionCookie = _httpHandler.CookieContainer.GetCookies(OpenLibraryUtility.BaseUri).Single(cookie => cookie.Name == "session");
-                _loggedIn = true;
-                _email = email;
-                _username = ExtractUsernameFromSessionCookie(sessionCookie);
+                throw new System.Net.Http.HttpRequestException("Failed to authenticate; did you correctly input your email and password?");
             }
-            catch { throw new System.Net.Http.HttpRequestException("Failed to authenticate; did you correctly input your email and password?"); }
         }
 
         /// <summary>
@@ -160,12 +158,10 @@ namespace OpenLibraryNET
             var response = await _httpClient.PostAsync(uri, null);
             response.EnsureSuccessStatusCode();
 
-            // TODO better check if actually logged out=?
-            //if (ExtractUsernameFromSessionCookie(sessionCookie);)
-
-            _loggedIn = false;
-            _email = null;
-            _username = null;
+            if (LoggedIn)
+            {
+                throw new System.Net.Http.HttpRequestException("Failed to log out of logged in account for unknown reasons");
+            }
         }
 
         /// <summary>
@@ -310,9 +306,10 @@ namespace OpenLibraryNET
         /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
         public async Task CreateListAsync(string listName, string listDescription = "", IEnumerable<string>? listSeeds = null, IEnumerable<string>? listTags = null)
         {
-            if (!_loggedIn) throw new System.InvalidOperationException("Creating a list requires the OpenLibraryClient instance to be logged in to an OpenLibrary account");
+            string? username = Username;
+            if (username == null) throw new System.InvalidOperationException("Creating a list requires the OpenLibraryClient instance to be logged in to an OpenLibrary account");
 
-            Uri uri = new Uri("https://openlibrary.org/people/" + _username!.ToLower() + "/lists.json");
+            Uri uri = new Uri("https://openlibrary.org/people/" + username.ToLower() + "/lists.json");
             var response = await _httpClient.PostAsJsonAsync(uri, new
             {
                 name = listName,
@@ -343,9 +340,10 @@ namespace OpenLibraryNET
         /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
         public async Task DeleteListAsync(string listID)
         {
-            if (!_loggedIn) throw new System.InvalidOperationException("Deleting a list requires the OpenLibraryClient instance to be logged in to an OpenLibrary account");
+            string? username = Username;
+            if (username == null) throw new System.InvalidOperationException("Deleting a list requires the OpenLibraryClient instance to be logged in to an OpenLibrary account");
 
-            Uri uri = new Uri("https://openlibrary.org/people/" + _username!.ToLower() + "/lists/" + listID + "/delete.json");
+            Uri uri = new Uri("https://openlibrary.org/people/" + username.ToLower() + "/lists/" + listID + "/delete.json");
             var response = await _httpClient.PostAsync(uri, null);
             response.EnsureSuccessStatusCode();
         }
@@ -372,8 +370,9 @@ namespace OpenLibraryNET
         /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
         public async Task<OLMyBooksData?> GetCurrentlyReadingAsync()
         {
-            if (!_loggedIn) throw new System.InvalidOperationException("You are not logged in to an OpenLibrary account; you must either log in or provide the username of a public user");
-            return await _myBooks.GetCurrentlyReadingAsync(_username!);
+            string? username = Username;
+            if (username == null) throw new System.InvalidOperationException("You are not logged in to an OpenLibrary account; you must either log in or provide the username of a public user");
+            return await _myBooks.GetCurrentlyReadingAsync(username);
         }
 
         /// <summary>
@@ -401,8 +400,9 @@ namespace OpenLibraryNET
         /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
         public async Task<OLMyBooksData?> GetWantToReadAsync()
         {
-            if (!_loggedIn) throw new System.InvalidOperationException("You are not logged in to an OpenLibrary account; you must either log in or provide the username of a public user");
-            return await _myBooks.GetWantToReadAsync(_username!);
+            string? username = Username;
+            if (username == null) throw new System.InvalidOperationException("You are not logged in to an OpenLibrary account; you must either log in or provide the username of a public user");
+            return await _myBooks.GetWantToReadAsync(username);
         }
 
         /// <summary>
@@ -430,17 +430,14 @@ namespace OpenLibraryNET
         /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
         public async Task<OLMyBooksData?> GetAlreadyReadAsync()
         {
-            if (!_loggedIn) throw new System.InvalidOperationException("You are not logged in to an OpenLibrary account; you must either log in or provide the username of a public user");
-            return await _myBooks.GetAlreadyReadAsync(_username!);
+            string? username = Username;
+            if (username == null) throw new System.InvalidOperationException("You are not logged in to an OpenLibrary account; you must either log in or provide the username of a public user");
+            return await _myBooks.GetAlreadyReadAsync(username);
         }
 
 
         private readonly HttpClient _httpClient;
         private readonly HttpClientHandler _httpHandler;
-
-        private bool _loggedIn = false;
-        private string? _username = null;
-        private string? _email = null;
 
         private readonly OLWorkLoader _work;
         private readonly OLAuthorLoader _author;
