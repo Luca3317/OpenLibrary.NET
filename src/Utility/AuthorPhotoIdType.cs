@@ -8,10 +8,10 @@
         /// <summary>
         /// OpenLibrary ID
         /// </summary>
-        OLID,
+        OLID = 0,
         /// <summary>
         /// Generic ID
         /// </summary>
-        ID
+        ID = 40
     }
 }

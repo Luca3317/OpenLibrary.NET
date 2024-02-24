@@ -8,22 +8,22 @@
         /// <summary>
         /// ISBN (10 and 13)
         /// </summary>
-        ISBN,
+        ISBN = 10,
         /// <summary>
         /// OpenLibrary ID
         /// </summary>
-        OLID,
+        OLID = 0,
         /// <summary>
         /// Library of Congress Control Number
         /// </summary>
-        LCCN,
+        LCCN = 20,
         /// <summary>
         /// OCLC (Online Computer Library Center)
         /// </summary>
-        OCLC,
+        OCLC = 30,
         /// <summary>
         /// Generic ID
         /// </summary>
-        ID
+        ID = 40
     }
 }

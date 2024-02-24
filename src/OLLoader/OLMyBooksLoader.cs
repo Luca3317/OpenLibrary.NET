@@ -100,6 +100,40 @@ namespace OpenLibraryNET.Loader
             );
         }
 
+        /// <summary>
+        /// Attempt to get data about a user's specified reading log.
+        /// </summary>
+        /// <param name="username">The user to get the reading log of.</param>
+        /// <param name="id">The bookshelf id of the desired reading log.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task<(bool, OLMyBooksData?)> TryGetReadingLogAsync(string username, BookshelfID id)
+        {
+            try { return (true, await GetReadingLogAsync(username, id)); }
+            catch { return (false, null); }
+        }
+
+        /// <summary>
+        /// Get data about a user's specified reading log.
+        /// </summary>
+        /// <param name="username">The user to get the reading log of.</param>
+        /// <param name="id">The bookshelf id of the desired reading log.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.ArgumentException"></exception>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async Task<OLMyBooksData?> GetReadingLogAsync(string username, BookshelfID id)
+        {
+            switch (id)
+            {
+                case BookshelfID.WantToRead: return await GetWantToReadAsync(username);
+                case BookshelfID.CurrentlyReading: return await GetCurrentlyReadingAsync(username);
+                case BookshelfID.AlreadyRead: return await GetAlreadyReadAsync(username);
+                default: throw new System.ArgumentException(nameof(id));
+            }
+        }
+
 
 
         /// <summary>
@@ -193,6 +227,42 @@ namespace OpenLibraryNET.Loader
                 client,
                 OpenLibraryUtility.BuildMyBooksUri(username, "already-read")
             );
+        }
+
+        /// <summary>
+        /// Attempt to get data about a user's specified reading log.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="username">The user to get the reading log of.</param>
+        /// <param name="id">The bookshelf id of the desired reading log.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async static Task<(bool, OLMyBooksData?)> TryGetReadingLogAsync(HttpClient client, string username, BookshelfID id)
+        {
+            try { return (true, await GetReadingLogAsync(client, username, id)); }
+            catch { return (false, null); }
+        }
+
+        /// <summary>
+        /// Get data about a user's specified reading log.
+        /// </summary>
+        /// <param name="client">An HttpClient instance which will be used to make the request.</param>
+        /// <param name="username">The user to get the reading log of.</param>
+        /// <param name="id">The bookshelf id of the desired reading log.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.ArgumentException"></exception>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public async static Task<OLMyBooksData?> GetReadingLogAsync(HttpClient client, string username, BookshelfID id)
+        {
+            switch (id)
+            {
+                case BookshelfID.WantToRead: return await GetWantToReadAsync(client, username);
+                case BookshelfID.CurrentlyReading: return await GetCurrentlyReadingAsync(client, username);
+                case BookshelfID.AlreadyRead: return await GetAlreadyReadAsync(client, username);
+                default: throw new System.ArgumentException(nameof(id));
+            }
         }
     }
 }
