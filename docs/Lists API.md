@@ -22,17 +22,27 @@ You can also get all lists of a user
 ```csharp
 await client.List.GetUserListsAsync("username");
 ```
-or get the editions contained in a list
+or get the editions, subjects, or just general seeds of a list
 ```csharp
 var parameters = new List<KeyValuePair<string,string>>() { ... };
 await client.List.GetListEditionsAsync("username", "listID", parameters);
+await client.List.GetListSubjectsAsync("username", "listID", parameters);
+await client.List.GetListSeedsAsync("username", "listID");
 ```
 For valid parameters, see the link above.
 Alternatively, see [OpenLibraryUtility's Maps](https://github.com/Luca3317/OpenLibrary.NET/blob/main/docs/Utilities.md#Maps).
 ***
 When using the OpenLibraryClient, you may also create or delete lists (after logging in).
 ```csharp
-await client.CreateListAsync("listName", "listDescription");
-await client.DeleteListAsync("listID");
+string listID = await client.CreateListAsync("listName", "listDescription");
+await client.DeleteListAsync(listID);
 ```
-You can of course only delete lists that belong to your account.
+You can also edit a list:
+```csharp
+await client.AddEditionsToListAsync(listID, "OL7427011M", "OL29479385M");
+await client.AddSubjectsToListAsync(listID, "place:japan", "fiction");
+await client.AddSeedsToListAsync(listID, "/subject/psychological", "/works/OL2045111W", "/books/OL5282569M");
+
+await client.RemoveSeedsFromListAsync(listID, "/subjects/place:japan", "/subjects/psychological", "/books/OL5282569M", "/works/OL2045111W");
+```
+You can of course only delete and edit lists that belong to your account.
