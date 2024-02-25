@@ -1,6 +1,9 @@
-﻿using System.Net;
+﻿using System.Formats.Asn1;
+using System.Net;
 using System.Net.Http.Json;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OpenLibraryNET.Data;
 using OpenLibraryNET.Loader;
 using OpenLibraryNET.Utility;
@@ -83,14 +86,15 @@ namespace OpenLibraryNET
             _author = new OLAuthorLoader(_httpClient);
             _edition = new OLEditionLoader(_httpClient);
             _image = new OLImageLoader(_httpClient);
-            _list = new OLListLoader(_httpClient);
+            _list = new OLListLoader(this);
             _search = new OLSearchLoader(_httpClient);
             _subject = new OLSubjectLoader(_httpClient);
             _recentChanges = new OLRecentChangesLoader(_httpClient);
             _partner = new OLPartnerLoader(_httpClient);
-            _myBooks = new OLMyBooksLoader(_httpClient);
+            _myBooks = new OLMyBooksLoader(this);
         }
 
+        #region LogIn/LogOut
         /// <summary>
         /// Attempt to login to an OpenLibrary account.
         /// </summary>
@@ -163,7 +167,9 @@ namespace OpenLibraryNET
                 throw new System.Net.Http.HttpRequestException("Failed to log out of logged in account for unknown reasons");
             }
         }
+        #endregion
 
+        #region Get Requests
         /// <summary>
         /// Get a work with all its information.<br/>
         /// Makes multiple web requests (up to 4).
@@ -279,7 +285,9 @@ namespace OpenLibraryNET
 
             return edition;
         }
+        #endregion
 
+        #region Post Requests
         /// <summary>
         /// Attempt to create a new list.
         /// </summary>
@@ -288,10 +296,10 @@ namespace OpenLibraryNET
         /// <param name="listSeeds">Seeds to include in the new list</param>
         /// <param name="listTags">Tags for the new list</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
-        public async Task<bool> TryCreateListAsync(string listName, string listDescription, IEnumerable<string>? listSeeds = null, IEnumerable<string>? listTags = null)
+        public async Task<(bool, string)> TryCreateListAsync(string listName, string listDescription, IEnumerable<string>? listSeeds = null, IEnumerable<string>? listTags = null)
         {
-            try { await CreateListAsync(listName, listDescription, listSeeds, listTags); return true; }
-            catch { return false; }
+            try { return (true, await CreateListAsync(listName, listDescription, listSeeds, listTags)); }
+            catch { return (false, ""); }
         }
         /// <summary>
         /// Create a new list.
@@ -304,7 +312,7 @@ namespace OpenLibraryNET
         /// <exception cref="System.InvalidOperationException"></exception>
         /// <exception cref="System.Net.Http.HttpRequestException"></exception>
         /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
-        public async Task CreateListAsync(string listName, string listDescription = "", IEnumerable<string>? listSeeds = null, IEnumerable<string>? listTags = null)
+        public async Task<string> CreateListAsync(string listName, string listDescription = "", IEnumerable<string>? listSeeds = null, IEnumerable<string>? listTags = null)
         {
             string? username = Username;
             if (username == null) throw new System.InvalidOperationException("Creating a list requires the OpenLibraryClient instance to be logged in to an OpenLibrary account");
@@ -318,6 +326,9 @@ namespace OpenLibraryNET
                 seeds = listSeeds ?? new List<string>()
             });
             response.EnsureSuccessStatusCode();
+
+            JToken token = JToken.Parse(await response.Content.ReadAsStringAsync());
+            return OpenLibraryUtility.ExtractIdFromKey(token["key"]!.ToObject<string>()!);
         }
 
         /// <summary>
@@ -349,92 +360,341 @@ namespace OpenLibraryNET
         }
 
         /// <summary>
-        /// Attempt to get your Currently-Reading reading log.<br/>
-        /// Must be logged in to use.<br/>
-        /// If you want to get another account's reading logs, use the <see cref="MyBooks"/> property.
+        /// Attempt to add editions to a list.
         /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="editionOlids">The OLIDs of the editions.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
-        public async Task<(bool, OLMyBooksData?)> TryGetCurrentlyReadingAsync()
+        public async Task<bool> TryAddEditionsToListAsync(string listOlid, params string[] editionOlids)
         {
-            try { return (true, await GetCurrentlyReadingAsync()); }
-            catch { return (false, null); }
+            try { await AddEditionsToListAsync(listOlid, editionOlids); return true; }
+            catch { return false; };
         }
         /// <summary>
-        /// Get your Currently-Reading reading log.<br/>
-        /// Must be logged in to use.<br/>
-        /// If you want to get another account's reading logs, use the <see cref="MyBooks"/> property.
+        /// Add editions to a list.
         /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="editionOlids">The OLIDs of the editions.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         /// <exception cref="System.InvalidOperationException"></exception>
         /// <exception cref="System.Net.Http.HttpRequestException"></exception>
         /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
-        public async Task<OLMyBooksData?> GetCurrentlyReadingAsync()
+        public async Task AddEditionsToListAsync(string listOlid, params string[] editionOlids)
         {
             string? username = Username;
-            if (username == null) throw new System.InvalidOperationException("You are not logged in to an OpenLibrary account; you must either log in or provide the username of a public user");
-            return await _myBooks.GetCurrentlyReadingAsync(username);
+            if (username == null) throw new System.InvalidOperationException("Adding editions to a list requires the OpenLibraryClient instance to be logged in to an OpenLibrary account");
+
+            Uri posturi = new Uri(OpenLibraryUtility.BaseUri + $"people/{username.ToLower()}/lists/{listOlid}/seeds.json");
+
+            var requestData = new
+            {
+                add = editionOlids.Select(olid => new { key = "/books/" + OpenLibraryUtility.ExtractIdFromKey(olid) })
+            };
+
+            var jsonContent = new StringContent(
+                JsonConvert.SerializeObject(requestData),
+                System.Text.Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await _httpClient.PostAsync(posturi, jsonContent);
+            response.EnsureSuccessStatusCode();
         }
 
         /// <summary>
-        /// Attempt to get your Want-To-Read reading log.<br/>
-        /// Must be logged in to use.<br/>
-        /// If you want to get another account's reading logs, use the <see cref="MyBooks"/> property.
+        /// Attempt to remove editions from a list.
         /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="editionOlids">The OLIDs of the editions.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
-        public async Task<(bool, OLMyBooksData?)> TryGetWantToReadAsync()
+        public async Task<bool> TryRemoveEditionsFromListAsync(string listOlid, params string[] editionOlids)
         {
-            try { return (true, await GetWantToReadAsync()); }
-            catch { return (false, null); }
+            try { await RemoveEditionsFromListAsync(listOlid, editionOlids); return true; }
+            catch { return false; };
         }
         /// <summary>
-        /// Get your Want-To-Read reading log.<br/>
-        /// Must be logged in to use.<br/>
-        /// If you want to get another account's reading logs, use the <see cref="MyBooks"/> property.
+        /// Remove editions from a list.
         /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="editionOlids">The OLIDs of the editions.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         /// <exception cref="System.InvalidOperationException"></exception>
         /// <exception cref="System.Net.Http.HttpRequestException"></exception>
         /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
-        public async Task<OLMyBooksData?> GetWantToReadAsync()
+        public async Task RemoveEditionsFromListAsync(string listOlid, params string[] editionOlids)
         {
             string? username = Username;
-            if (username == null) throw new System.InvalidOperationException("You are not logged in to an OpenLibrary account; you must either log in or provide the username of a public user");
-            return await _myBooks.GetWantToReadAsync(username);
+            if (username == null) throw new System.InvalidOperationException("Removing editions from a list requires the OpenLibraryClient instance to be logged in to an OpenLibrary account");
+
+            Uri posturi = new Uri(OpenLibraryUtility.BaseUri + $"people/{username.ToLower()}/lists/{listOlid}/seeds.json");
+
+            var requestData = new
+            {
+                remove = editionOlids.Select(olid => new { key = "/books/" + OpenLibraryUtility.ExtractIdFromKey(olid) })
+            };
+
+            var jsonContent = new StringContent(
+                JsonConvert.SerializeObject(requestData),
+                System.Text.Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await _httpClient.PostAsync(posturi, jsonContent);
+            response.EnsureSuccessStatusCode();
         }
 
         /// <summary>
-        /// Attempt to get your Already-Read reading log.<br/>
-        /// Must be logged in to use.<br/>
-        /// If you want to get another account's reading logs, use the <see cref="MyBooks"/> property.
+        /// Attempt to add works to a list.
         /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="workOlids">The OLIDs of the works.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
-        public async Task<(bool, OLMyBooksData?)> TryGetAlreadyReadAsync()
+        public async Task<bool> TryAddWorksToListAsync(string listOlid, params string[] workOlids)
         {
-            try { return (true, await GetAlreadyReadAsync()); }
-            catch { return (false, null); }
+            try { await AddWorksToListAsync(listOlid, workOlids); return true; }
+            catch { return false; };
         }
         /// <summary>
-        /// Get your Already-Read reading log.<br/>
-        /// Must be logged in to use.<br/>
-        /// If you want to get another account's reading logs, use the <see cref="MyBooks"/> property.
+        /// Add works to a list.
         /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="workOlids">The OLIDs of the works.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         /// <exception cref="System.InvalidOperationException"></exception>
         /// <exception cref="System.Net.Http.HttpRequestException"></exception>
         /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
-        public async Task<OLMyBooksData?> GetAlreadyReadAsync()
+        public async Task AddWorksToListAsync(string listOlid, params string[] workOlids)
         {
             string? username = Username;
-            if (username == null) throw new System.InvalidOperationException("You are not logged in to an OpenLibrary account; you must either log in or provide the username of a public user");
-            return await _myBooks.GetAlreadyReadAsync(username);
+            if (username == null) throw new System.InvalidOperationException("Adding works to a list requires the OpenLibraryClient instance to be logged in to an OpenLibrary account");
+
+            Uri posturi = new Uri(OpenLibraryUtility.BaseUri + $"people/{username.ToLower()}/lists/{listOlid}/seeds.json");
+
+            var requestData = new
+            {
+                add = workOlids.Select(olid => new { key = "/works/" + OpenLibraryUtility.ExtractIdFromKey(olid) })
+            };
+
+            var jsonContent = new StringContent(
+                JsonConvert.SerializeObject(requestData),
+                System.Text.Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await _httpClient.PostAsync(posturi, jsonContent);
+            response.EnsureSuccessStatusCode();
         }
 
+        /// <summary>
+        /// Attempt to remove works from a list.
+        /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="workOlids">The OLIDs of the works.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task<bool> TryRemoveWorksFromListAsync(string listOlid, params string[] workOlids)
+        {
+            try { await RemoveWorksFromListAsync(listOlid, workOlids); return true; }
+            catch { return false; };
+        }
+        /// <summary>
+        /// Remove works from a list.
+        /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="workOlids">The OLIDs of the works.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        public async Task RemoveWorksFromListAsync(string listOlid, params string[] workOlids)
+        {
+            string? username = Username;
+            if (username == null) throw new System.InvalidOperationException("Removing works from a list requires the OpenLibraryClient instance to be logged in to an OpenLibrary account");
+
+            Uri posturi = new Uri(OpenLibraryUtility.BaseUri + $"people/{username.ToLower()}/lists/{listOlid}/seeds.json");
+
+            var requestData = new
+            {
+                remove = workOlids.Select(olid => new { key = "/works/" + OpenLibraryUtility.ExtractIdFromKey(olid) })
+            };
+
+            var jsonContent = new StringContent(
+                JsonConvert.SerializeObject(requestData),
+                System.Text.Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await _httpClient.PostAsync(posturi, jsonContent);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Attempt to add subjects to a list.
+        /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="subjects">The subjects.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task<bool> TryAddSubjectsToListAsync(string listOlid, params string[] subjects)
+        {
+            try { await AddSubjectsToListAsync(listOlid, subjects); return true; }
+            catch { return false; };
+        }
+        /// <summary>
+        /// Add subjects to a list.
+        /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="subjects">The subjects.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        public async Task AddSubjectsToListAsync(string listOlid, params string[] subjects)
+        {
+            string? username = Username;
+            if (username == null) throw new System.InvalidOperationException("Adding subjects to a list requires the OpenLibraryClient instance to be logged in to an OpenLibrary account");
+
+            Uri posturi = new Uri(OpenLibraryUtility.BaseUri + $"people/{username.ToLower()}/lists/{listOlid}/seeds.json");
+
+            var requestData = new
+            {
+                add = subjects.Select(olid => new { key = "/subjects/" + OpenLibraryUtility.ExtractIdFromKey(olid) })
+            };
+
+            var jsonContent = new StringContent(
+                JsonConvert.SerializeObject(requestData),
+                System.Text.Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await _httpClient.PostAsync(posturi, jsonContent);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Attempt to remove subjects from a list.
+        /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="subjects">The subjects.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task<bool> TryRemoveSubjectsFromListAsync(string listOlid, params string[] subjects)
+        {
+            try { await RemoveSubjectsFromListAsync(listOlid, subjects); return true; }
+            catch { return false; };
+        }
+        /// <summary>
+        /// Remove subjects from a list.
+        /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="subjects">The subjects.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        public async Task RemoveSubjectsFromListAsync(string listOlid, params string[] subjects)
+        {
+            string? username = Username;
+            if (username == null) throw new System.InvalidOperationException("Removing subjects from a list requires the OpenLibraryClient instance to be logged in to an OpenLibrary account");
+
+            Uri posturi = new Uri(OpenLibraryUtility.BaseUri + $"people/{username.ToLower()}/lists/{listOlid}/seeds.json");
+
+            var requestData = new
+            {
+                remove = subjects.Select(olid => new { key = "/subjects/" + OpenLibraryUtility.ExtractIdFromKey(olid) })
+            };
+
+            var jsonContent = new StringContent(
+                JsonConvert.SerializeObject(requestData),
+                System.Text.Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await _httpClient.PostAsync(posturi, jsonContent);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Add seeds to a list.
+        /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="seeds">The seeds. Must be in key format, e.g. "/works/OL123W", "/subjects/place:los_angeles"</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        public async Task<bool> TryAddSeedsToListAsync(string listOlid, params string[] seeds)
+        {
+            try { await AddSeedsToListAsync(listOlid, seeds); return true; }
+            catch { return false; };
+        }
+        /// <summary>
+        /// Attempt to add seeds to a list.
+        /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="seeds">The seeds. Must be in key format, e.g. "/works/OL123W", "/subjects/place:los_angeles"</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task AddSeedsToListAsync(string listOlid, params string[] seeds)
+        {
+            string? username = Username;
+            if (username == null) throw new System.InvalidOperationException("Adding seeds to a list requires the OpenLibraryClient instance to be logged in to an OpenLibrary account");
+
+            Uri posturi = new Uri(OpenLibraryUtility.BaseUri + $"people/{username.ToLower()}/lists/{listOlid}/seeds.json");
+
+            var requestData = new
+            {
+                add = seeds.Select(seed => new { key = seed })
+            };
+
+            var jsonContent = new StringContent(
+                JsonConvert.SerializeObject(requestData),
+                System.Text.Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await _httpClient.PostAsync(posturi, jsonContent);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Attempt to remove seeds from a list.
+        /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="seeds">The seeds. Must be in key format, e.g. "/works/OL123W", "/subjects/place:los_angeles"</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task<bool> TryRemoveSeedsFromListAsync(string listOlid, params string[] seeds)
+        {
+            try { await RemoveSeedsFromListAsync(listOlid, seeds); return true; }
+            catch { return false; };
+        }
+        /// <summary>
+        /// Remove seeds from a list.
+        /// </summary>
+        /// <param name="listOlid">The OLID of the list.</param>
+        /// <param name="seeds">The seeds. Must be in key format, e.g. "/works/OL123W", "/subjects/place:los_angeles"</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        public async Task RemoveSeedsFromListAsync(string listOlid, params string[] seeds)
+        {
+            string? username = Username;
+            if (username == null) throw new System.InvalidOperationException("Removing seeds from a list requires the OpenLibraryClient instance to be logged in to an OpenLibrary account");
+
+            Uri posturi = new Uri(OpenLibraryUtility.BaseUri + $"people/{username.ToLower()}/lists/{listOlid}/seeds.json");
+
+            var requestData = new
+            {
+                remove = seeds.Select(seed => new { key = seed })
+            };
+
+            var jsonContent = new StringContent(
+                JsonConvert.SerializeObject(requestData),
+                System.Text.Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await _httpClient.PostAsync(posturi, jsonContent);
+            response.EnsureSuccessStatusCode();
+        }
+        #endregion
 
         private readonly HttpClient _httpClient;
         private readonly HttpClientHandler _httpHandler;

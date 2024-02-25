@@ -8,6 +8,7 @@ using static OpenLibraryNET.Utility.OpenLibraryUtility;
 using System.Text;
 using Polly;
 using System.Security.Cryptography;
+using OpenLibraryNET.OLData;
 
 #pragma warning disable 8604, 8602
 namespace Tests
@@ -251,6 +252,20 @@ namespace Tests
             {
                 OLListData? listData = await OLListLoader.GetListAsync(client, username, ListIDs[username]);
                 CheckOLListData(listData);
+            }
+
+            foreach (string username in ListIDs.Keys)
+            {
+                OLSeedData[]? seedDatas = await OLListLoader.GetListSeedsAsync(client, username, ListIDs[username]);
+                Assert.NotEmpty(seedDatas);
+                foreach (OLSeedData data in seedDatas) CheckOLSeedData(data);
+            }
+
+            foreach (string username in ListIDs.Keys)
+            {
+                OLSubjectData[]? subjectDatas = await OLListLoader.GetListSubjectsAsync(client, username, ListIDs[username]);
+                if (subjectDatas.Length == 0) _testOutputHelper.WriteLine("Empty for list " +  username + "/" + ListIDs[username]);
+                foreach (OLSubjectData data in subjectDatas) CheckOLSubjectData(data);
             }
         }
 
@@ -617,15 +632,9 @@ namespace Tests
 
             Assert.True(logged);
 
-            CheckOLMyBooksData(await client.GetCurrentlyReadingAsync());
-            CheckOLMyBooksData(await client.GetAlreadyReadAsync());
-            CheckOLMyBooksData(await client.GetWantToReadAsync());
-
-            var l = await client.GetCurrentlyReadingAsync();
-            foreach (var item in l.ReadingLogEntries)
-            {
-                _testOutputHelper.WriteLine("Work: " + item.Work.Title + "; Logged on: " + item.LoggedDate + "; Edition: " + item.LoggedEditionKey);
-            }
+            CheckOLMyBooksData(await client.MyBooks.GetCurrentlyReadingAsync());
+            CheckOLMyBooksData(await client.MyBooks.GetAlreadyReadAsync());
+            CheckOLMyBooksData(await client.MyBooks.GetWantToReadAsync());
         }
         #endregion
 
@@ -1253,6 +1262,14 @@ namespace Tests
                 Assert.NotNull(entry.LoggedDate);
                 Assert.NotNull(entry.Work);
             }
+        }
+
+        void CheckOLSeedData(OLSeedData? data)
+        {
+            Assert.NotNull(data);
+            Assert.NotEqual("", data.Title);
+            Assert.NotEqual("", data.Type);
+            Assert.NotEqual("", data.Key);
         }
         #endregion
     }
