@@ -17,59 +17,33 @@ namespace OpenLibraryNET
     /// </summary>
     public class OpenLibraryClient
     {
-        /// <summary>
-        /// Does this instance hold a session token?
-        /// </summary>
+        ///<inheritdoc/>
         public bool LoggedIn => _httpHandler.CookieContainer.GetCookies(OpenLibraryUtility.BaseUri).SingleOrDefault(cookie => cookie.Name == "session") != null;
-        /// <summary>
-        /// The username of the currently logged in account. Null if not logged in.
-        /// </summary>
+        ///<inheritdoc/>
         public string? Username => ExtractUsernameFromSessionCookie(_httpHandler.CookieContainer.GetCookies(OpenLibraryUtility.BaseUri).Single(cookie => cookie.Name == "session"));
 
-        /// <summary>
-        /// Interface to the Works API
-        /// </summary>
+        ///<inheritdoc/>
         public OLWorkLoader Work => _work;
-        /// <summary>
-        /// Interface to the Authors API
-        /// </summary>
+        ///<inheritdoc/>
         public OLAuthorLoader Author => _author;
-        /// <summary>
-        /// Interface to the Edition/ISBN/Works API
-        /// </summary>
+        ///<inheritdoc/>
         public OLEditionLoader Edition => _edition;
-        /// <summary>
-        /// Interface to the Covers/AuthorPhotos API
-        /// </summary>
+        ///<inheritdoc/>
         public OLImageLoader Image => _image;
-        /// <summary>
-        /// Interface to the Lists API
-        /// </summary>
+        ///<inheritdoc/>
         public OLListLoader List => _list;
-        /// <summary>
-        /// Interface to the Search API
-        /// </summary>
+        ///<inheritdoc/>
         public OLSearchLoader Search => _search;
-        /// <summary>
-        /// Interface to the Subjects API
-        /// </summary>
+        ///<inheritdoc/>
         public OLSubjectLoader Subject => _subject;
-        /// <summary>
-        /// Interface to the RecentChanges API
-        /// </summary>
+        ///<inheritdoc/>
         public OLRecentChangesLoader RecentChanges => _recentChanges;
-        /// <summary>
-        /// Interface to the Partner API
-        /// </summary>
+        ///<inheritdoc/>
         public OLPartnerLoader Partner => _partner;
-        /// <summary>
-        /// Interface to the MyBooks API
-        /// </summary>
+        ///<inheritdoc/>
         public OLMyBooksLoader MyBooks => _myBooks;
 
-        /// <summary>
-        /// <see cref="HttpClient"/> instance created by this OpenLibraryClient instance.
-        /// </summary>
+        ///<inheritdoc/>
         public HttpClient BackingClient => _httpClient;
 
         /// <summary>
@@ -95,26 +69,13 @@ namespace OpenLibraryNET
         }
 
         #region LogIn/LogOut
-        /// <summary>
-        /// Attempt to login to an OpenLibrary account.
-        /// </summary>
-        /// <param name="email">The email of the account to login with</param>
-        /// <param name="password">The password of the account to login with</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
+        ///<inheritdoc/>
         public async Task<bool> TryLoginAsync(string email, string password)
         {
             try { await LoginAsync(email, password); return true; }
             catch { return false; }
         }
-        /// <summary>
-        /// Login to an OpenLibrary account.
-        /// </summary>
-        /// <param name="email">The email of the account to login with</param>
-        /// <param name="password">The password of the account to login with</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task LoginAsync(string email, string password)
         {
             await LogoutAsync();
@@ -138,22 +99,13 @@ namespace OpenLibraryNET
             }
         }
 
-        /// <summary>
-        /// Attempt to logout of the currently logged in OpenLibrary account.
-        /// </summary>
-        /// <returns>The task object representing the asynchronous operation.</returns>
+        ///<inheritdoc/>
         public async Task<bool> TryLogoutAsync()
         {
             try { await LogoutAsync(); return true; }
             catch { return false; }
         }
-        /// <summary>
-        /// Logout of the currently logged in OpenLibrary account.
-        /// </summary>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task LogoutAsync()
         {
             if (!LoggedIn) return;
@@ -170,16 +122,7 @@ namespace OpenLibraryNET
         #endregion
 
         #region Get Requests
-        /// <summary>
-        /// Get a work with all its information.<br/>
-        /// Makes multiple web requests (up to 4).
-        /// </summary>
-        /// <param name="id">The OLID of the work</param>
-        /// <param name="editionsCount">The amount of editions to load</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task<OLWork> GetWorkAsync(string id, int editionsCount = 0)
         {
             return new OLWork()
@@ -194,16 +137,7 @@ namespace OpenLibraryNET
         }
 
 
-        /// <summary>
-        /// Get an author with all their information.<br/>
-        /// Makes multiple web requests (up to 2).
-        /// </summary>
-        /// <param name="id">The OLID of the author</param>
-        /// <param name="worksCount">The amount of works to load</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task<OLAuthor> GetAuthorAsync(string id, int worksCount = 0)
         {
             return new OLAuthor()
@@ -215,39 +149,12 @@ namespace OpenLibraryNET
             };
         }
 
-        /// <summary>
-        /// Get an edition.
-        /// </summary>
-        /// <param name="id">The id of the edition. Should be in bibkey format</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task<OLEdition> GetEditionAsync(string id) => await GetEditionAsync(id, (string?)null, (string?)null);
-        /// <summary>
-        /// Get an edition and its cover.<br/>
-        /// Makes multiple web requests (up to 2).
-        /// </summary>
-        /// <param name="id">The id of the edition</param>
-        /// <param name="idType">The type of the id</param>
-        /// <param name="coverSize">The size of the cover. Leave empty if you dont want to load the cover</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task<OLEdition> GetEditionAsync(string id, BookIdType? idType = null, ImageSize? coverSize = null)
             => await GetEditionAsync(id, idType == null ? "" : idType.Value.GetString(), coverSize == null ? "" : coverSize.Value.GetString());
-        /// <summary>
-        /// Get an edition and its cover.<br/>
-        /// Makes multiple web requests (up to 2).
-        /// </summary>
-        /// <param name="id">The id of the edition</param>
-        /// <param name="idType">The type of the id</param>
-        /// <param name="coverSize">The size of the cover. Leave empty if you dont want to load the cover</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task<OLEdition> GetEditionAsync(string id, string? idType = null, string? coverSize = null)
         {
             string bibkey;
@@ -288,30 +195,13 @@ namespace OpenLibraryNET
         #endregion
 
         #region Post Requests
-        /// <summary>
-        /// Attempt to create a new list.
-        /// </summary>
-        /// <param name="listName">Name of the new list</param>
-        /// <param name="listDescription">Description of the new list</param>
-        /// <param name="listSeeds">Seeds to include in the new list</param>
-        /// <param name="listTags">Tags for the new list</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
+        ///<inheritdoc/>
         public async Task<(bool, string)> TryCreateListAsync(string listName, string listDescription, IEnumerable<string>? listSeeds = null, IEnumerable<string>? listTags = null)
         {
             try { return (true, await CreateListAsync(listName, listDescription, listSeeds, listTags)); }
             catch { return (false, ""); }
         }
-        /// <summary>
-        /// Create a new list.
-        /// </summary>
-        /// <param name="listName">Name of the new list</param>
-        /// <param name="listDescription">Description of the new list</param>
-        /// <param name="listSeeds">Seeds to include in the new list</param>
-        /// <param name="listTags">Tags for the new list</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task<string> CreateListAsync(string listName, string listDescription = "", IEnumerable<string>? listSeeds = null, IEnumerable<string>? listTags = null)
         {
             string? username = Username;
@@ -331,24 +221,13 @@ namespace OpenLibraryNET
             return OpenLibraryUtility.ExtractIdFromKey(token["key"]!.ToObject<string>()!);
         }
 
-        /// <summary>
-        /// Attempt to delete a list.
-        /// </summary>
-        /// <param name="listID">The id of the list to be deleted.</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
+        ///<inheritdoc/>
         public async Task<bool> TryDeleteListAsync(string listID)
         {
             try { await DeleteListAsync(listID); return true; }
             catch { return false; };
         }
-        /// <summary>
-        /// Delete a list.
-        /// </summary>
-        /// <param name="listID">The ID of the list to be deleted.</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task DeleteListAsync(string listID)
         {
             string? username = Username;
@@ -359,26 +238,13 @@ namespace OpenLibraryNET
             response.EnsureSuccessStatusCode();
         }
 
-        /// <summary>
-        /// Attempt to add editions to a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="editionOlids">The OLIDs of the editions.</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
+        ///<inheritdoc/>
         public async Task<bool> TryAddEditionsToListAsync(string listOlid, params string[] editionOlids)
         {
             try { await AddEditionsToListAsync(listOlid, editionOlids); return true; }
             catch { return false; };
         }
-        /// <summary>
-        /// Add editions to a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="editionOlids">The OLIDs of the editions.</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task AddEditionsToListAsync(string listOlid, params string[] editionOlids)
         {
             string? username = Username;
@@ -401,26 +267,13 @@ namespace OpenLibraryNET
             response.EnsureSuccessStatusCode();
         }
 
-        /// <summary>
-        /// Attempt to remove editions from a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="editionOlids">The OLIDs of the editions.</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
+        ///<inheritdoc/>
         public async Task<bool> TryRemoveEditionsFromListAsync(string listOlid, params string[] editionOlids)
         {
             try { await RemoveEditionsFromListAsync(listOlid, editionOlids); return true; }
             catch { return false; };
         }
-        /// <summary>
-        /// Remove editions from a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="editionOlids">The OLIDs of the editions.</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task RemoveEditionsFromListAsync(string listOlid, params string[] editionOlids)
         {
             string? username = Username;
@@ -443,26 +296,13 @@ namespace OpenLibraryNET
             response.EnsureSuccessStatusCode();
         }
 
-        /// <summary>
-        /// Attempt to add works to a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="workOlids">The OLIDs of the works.</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
+        ///<inheritdoc/>
         public async Task<bool> TryAddWorksToListAsync(string listOlid, params string[] workOlids)
         {
             try { await AddWorksToListAsync(listOlid, workOlids); return true; }
             catch { return false; };
         }
-        /// <summary>
-        /// Add works to a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="workOlids">The OLIDs of the works.</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task AddWorksToListAsync(string listOlid, params string[] workOlids)
         {
             string? username = Username;
@@ -485,26 +325,13 @@ namespace OpenLibraryNET
             response.EnsureSuccessStatusCode();
         }
 
-        /// <summary>
-        /// Attempt to remove works from a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="workOlids">The OLIDs of the works.</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
+        ///<inheritdoc/>
         public async Task<bool> TryRemoveWorksFromListAsync(string listOlid, params string[] workOlids)
         {
             try { await RemoveWorksFromListAsync(listOlid, workOlids); return true; }
             catch { return false; };
         }
-        /// <summary>
-        /// Remove works from a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="workOlids">The OLIDs of the works.</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task RemoveWorksFromListAsync(string listOlid, params string[] workOlids)
         {
             string? username = Username;
@@ -527,26 +354,13 @@ namespace OpenLibraryNET
             response.EnsureSuccessStatusCode();
         }
 
-        /// <summary>
-        /// Attempt to add subjects to a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="subjects">The subjects.</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
+        ///<inheritdoc/>
         public async Task<bool> TryAddSubjectsToListAsync(string listOlid, params string[] subjects)
         {
             try { await AddSubjectsToListAsync(listOlid, subjects); return true; }
             catch { return false; };
         }
-        /// <summary>
-        /// Add subjects to a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="subjects">The subjects.</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task AddSubjectsToListAsync(string listOlid, params string[] subjects)
         {
             string? username = Username;
@@ -569,26 +383,13 @@ namespace OpenLibraryNET
             response.EnsureSuccessStatusCode();
         }
 
-        /// <summary>
-        /// Attempt to remove subjects from a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="subjects">The subjects.</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
+        ///<inheritdoc/>
         public async Task<bool> TryRemoveSubjectsFromListAsync(string listOlid, params string[] subjects)
         {
             try { await RemoveSubjectsFromListAsync(listOlid, subjects); return true; }
             catch { return false; };
         }
-        /// <summary>
-        /// Remove subjects from a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="subjects">The subjects.</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task RemoveSubjectsFromListAsync(string listOlid, params string[] subjects)
         {
             string? username = Username;
@@ -611,26 +412,13 @@ namespace OpenLibraryNET
             response.EnsureSuccessStatusCode();
         }
 
-        /// <summary>
-        /// Add seeds to a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="seeds">The seeds. Must be in key format, e.g. "/works/OL123W", "/subjects/place:los_angeles"</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task<bool> TryAddSeedsToListAsync(string listOlid, params string[] seeds)
         {
             try { await AddSeedsToListAsync(listOlid, seeds); return true; }
             catch { return false; };
         }
-        /// <summary>
-        /// Attempt to add seeds to a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="seeds">The seeds. Must be in key format, e.g. "/works/OL123W", "/subjects/place:los_angeles"</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
+        ///<inheritdoc/>
         public async Task AddSeedsToListAsync(string listOlid, params string[] seeds)
         {
             string? username = Username;
@@ -653,26 +441,13 @@ namespace OpenLibraryNET
             response.EnsureSuccessStatusCode();
         }
 
-        /// <summary>
-        /// Attempt to remove seeds from a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="seeds">The seeds. Must be in key format, e.g. "/works/OL123W", "/subjects/place:los_angeles"</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
+        ///<inheritdoc/>
         public async Task<bool> TryRemoveSeedsFromListAsync(string listOlid, params string[] seeds)
         {
             try { await RemoveSeedsFromListAsync(listOlid, seeds); return true; }
             catch { return false; };
         }
-        /// <summary>
-        /// Remove seeds from a list.
-        /// </summary>
-        /// <param name="listOlid">The OLID of the list.</param>
-        /// <param name="seeds">The seeds. Must be in key format, e.g. "/works/OL123W", "/subjects/place:los_angeles"</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
-        /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-        /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
+        ///<inheritdoc/>
         public async Task RemoveSeedsFromListAsync(string listOlid, params string[] seeds)
         {
             string? username = Username;
