@@ -18,6 +18,7 @@ public interface IOpenLibraryClient
     /// Does this instance hold a session token?
     /// </summary>
     public bool LoggedIn { get; }
+
     /// <summary>
     /// The username of the currently logged in account. Null if not logged in.
     /// </summary>
@@ -26,43 +27,52 @@ public interface IOpenLibraryClient
     /// <summary>
     /// Interface to the Works API
     /// </summary>
-    public OLWorkLoader Work { get; }
+    public IOLWorkLoader Work { get; }
+
     /// <summary>
     /// Interface to the Authors API
     /// </summary>
-    public OLAuthorLoader Author { get; }
+    public IOLAuthorLoader Author { get; }
+
     /// <summary>
     /// Interface to the Edition/ISBN/Works API
     /// </summary>
-    public OLEditionLoader Edition { get; }
+    public IOLEditionLoader Edition { get; }
+
     /// <summary>
     /// Interface to the Covers/AuthorPhotos API
     /// </summary>
-    public OLImageLoader Image { get; }
+    public IOLImageLoader Image { get; }
+
     /// <summary>
     /// Interface to the Lists API
     /// </summary>
-    public OLListLoader List { get; }
+    public IOLListLoader List { get; }
+
     /// <summary>
     /// Interface to the Search API
     /// </summary>
-    public OLSearchLoader Search { get; }
+    public IOLSearchLoader Search { get; }
+
     /// <summary>
     /// Interface to the Subjects API
     /// </summary>
-    public OLSubjectLoader Subject { get; }
+    public IOLSubjectLoader Subject { get; }
+
     /// <summary>
     /// Interface to the RecentChanges API
     /// </summary>
-    public OLRecentChangesLoader RecentChanges { get; }
+    public IOLRecentChangesLoader RecentChanges { get; }
+
     /// <summary>
     /// Interface to the Partner API
     /// </summary>
-    public OLPartnerLoader Partner { get; }
+    public IOLPartnerLoader Partner { get; }
+
     /// <summary>
     /// Interface to the MyBooks API
     /// </summary>
-    public OLMyBooksLoader MyBooks { get; }
+    public IOLMyBooksLoader MyBooks { get; }
 
     /// <summary>
     /// <see cref="HttpClient"/> instance created by this OpenLibraryClient instance.
@@ -76,6 +86,7 @@ public interface IOpenLibraryClient
     /// <param name="password">The password of the account to login with</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public Task<bool> TryLoginAsync(string email, string password);
+
     /// <summary>
     /// Login to an OpenLibrary account.
     /// </summary>
@@ -86,11 +97,13 @@ public interface IOpenLibraryClient
     /// <exception cref="System.Net.Http.HttpRequestException"></exception>
     /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
     public Task LoginAsync(string email, string password);
+
     /// <summary>
     /// Attempt to logout of the currently logged in OpenLibrary account.
     /// </summary>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public Task<bool> TryLogoutAsync();
+
     /// <summary>
     /// Logout of the currently logged in OpenLibrary account.
     /// </summary>
@@ -133,6 +146,7 @@ public interface IOpenLibraryClient
     /// <exception cref="System.Net.Http.HttpRequestException"></exception>
     /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
     public Task<OLEdition> GetEditionAsync(string id);
+
     /// <summary>
     /// Get an edition and its cover.<br/>
     /// Makes multiple web requests (up to 2).
@@ -144,7 +158,12 @@ public interface IOpenLibraryClient
     /// <exception cref="System.InvalidOperationException"></exception>
     /// <exception cref="System.Net.Http.HttpRequestException"></exception>
     /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
-    public Task<OLEdition> GetEditionAsync(string id, BookIdType? idType = null, ImageSize? coverSize = null);
+    public Task<OLEdition> GetEditionAsync(
+        string id,
+        BookIdType? idType = null,
+        ImageSize? coverSize = null
+    );
+
     /// <summary>
     /// Get an edition and its cover.<br/>
     /// Makes multiple web requests (up to 2).
@@ -156,7 +175,11 @@ public interface IOpenLibraryClient
     /// <exception cref="System.InvalidOperationException"></exception>
     /// <exception cref="System.Net.Http.HttpRequestException"></exception>
     /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
-    public Task<OLEdition> GetEditionAsync(string id, string? idType = null, string? coverSize = null);
+    public Task<OLEdition> GetEditionAsync(
+        string id,
+        string? idType = null,
+        string? coverSize = null
+    );
 
     /// <summary>
     /// Attempt to create a new list.
@@ -166,7 +189,13 @@ public interface IOpenLibraryClient
     /// <param name="listSeeds">Seeds to include in the new list</param>
     /// <param name="listTags">Tags for the new list</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public Task<(bool, string)> TryCreateListAsync(string listName, string listDescription, IEnumerable<string>? listSeeds = null, IEnumerable<string>? listTags = null);
+    public Task<(bool, string)> TryCreateListAsync(
+        string listName,
+        string listDescription,
+        IEnumerable<string>? listSeeds = null,
+        IEnumerable<string>? listTags = null
+    );
+
     /// <summary>
     /// Create a new list.
     /// </summary>
@@ -178,7 +207,12 @@ public interface IOpenLibraryClient
     /// <exception cref="System.InvalidOperationException"></exception>
     /// <exception cref="System.Net.Http.HttpRequestException"></exception>
     /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
-    public Task<string> CreateListAsync(string listName, string listDescription = "", IEnumerable<string>? listSeeds = null, IEnumerable<string>? listTags = null);
+    public Task<string> CreateListAsync(
+        string listName,
+        string listDescription = "",
+        IEnumerable<string>? listSeeds = null,
+        IEnumerable<string>? listTags = null
+    );
 
     /// <summary>
     /// Attempt to delete a list.
@@ -186,6 +220,7 @@ public interface IOpenLibraryClient
     /// <param name="listID">The id of the list to be deleted.</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public Task<bool> TryDeleteListAsync(string listID);
+
     /// <summary>
     /// Delete a list.
     /// </summary>
@@ -203,6 +238,7 @@ public interface IOpenLibraryClient
     /// <param name="editionOlids">The OLIDs of the editions.</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public Task<bool> TryAddEditionsToListAsync(string listOlid, params string[] editionOlids);
+
     /// <summary>
     /// Add editions to a list.
     /// </summary>
@@ -240,6 +276,7 @@ public interface IOpenLibraryClient
     /// <param name="workOlids">The OLIDs of the works.</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public Task<bool> TryAddWorksToListAsync(string listOlid, params string[] workOlids);
+
     /// <summary>
     /// Add works to a list.
     /// </summary>
@@ -258,6 +295,7 @@ public interface IOpenLibraryClient
     /// <param name="workOlids">The OLIDs of the works.</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public Task<bool> TryRemoveWorksFromListAsync(string listOlid, params string[] workOlids);
+
     /// <summary>
     /// Remove works from a list.
     /// </summary>
@@ -276,6 +314,7 @@ public interface IOpenLibraryClient
     /// <param name="subjects">The subjects.</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public Task<bool> TryAddSubjectsToListAsync(string listOlid, params string[] subjects);
+
     /// <summary>
     /// Add subjects to a list.
     /// </summary>
@@ -294,6 +333,7 @@ public interface IOpenLibraryClient
     /// <param name="subjects">The subjects.</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public Task<bool> TryRemoveSubjectsFromListAsync(string listOlid, params string[] subjects);
+
     /// <summary>
     /// Remove subjects from a list.
     /// </summary>
@@ -315,6 +355,7 @@ public interface IOpenLibraryClient
     /// <exception cref="System.Net.Http.HttpRequestException"></exception>
     /// <exception cref="System.Threading.Tasks.TaskCanceledException"></exception>
     public Task<bool> TryAddSeedsToListAsync(string listOlid, params string[] seeds);
+
     /// <summary>
     /// Attempt to add seeds to a list.
     /// </summary>
@@ -330,6 +371,7 @@ public interface IOpenLibraryClient
     /// <param name="seeds">The seeds. Must be in key format, e.g. "/works/OL123W", "/subjects/place:los_angeles"</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public Task<bool> TryRemoveSeedsFromListAsync(string listOlid, params string[] seeds);
+
     /// <summary>
     /// Remove seeds from a list.
     /// </summary>
