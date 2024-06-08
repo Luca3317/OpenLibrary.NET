@@ -15,7 +15,7 @@ namespace OpenLibraryNET
     /// Instantiates HttpClient internally, as OpenLibraryClient uses cookies.<br/>
     /// To reuse the backing HttpClient, reuse the OpenLibrary instance.
     /// </summary>
-    public class OpenLibraryClient
+    public class OpenLibraryClient : IOpenLibraryClient
     {
         ///<inheritdoc/>
         public bool LoggedIn => _httpHandler.CookieContainer.GetCookies(OpenLibraryUtility.BaseUri).SingleOrDefault(cookie => cookie.Name == "session") != null;
@@ -23,25 +23,25 @@ namespace OpenLibraryNET
         public string? Username => ExtractUsernameFromSessionCookie(_httpHandler.CookieContainer.GetCookies(OpenLibraryUtility.BaseUri).Single(cookie => cookie.Name == "session"));
 
         ///<inheritdoc/>
-        public OLWorkLoader Work => _work;
+        public IOLWorkLoader Work => _work;
         ///<inheritdoc/>
-        public OLAuthorLoader Author => _author;
+        public IOLAuthorLoader Author => _author;
         ///<inheritdoc/>
-        public OLEditionLoader Edition => _edition;
+        public IOLEditionLoader Edition => _edition;
         ///<inheritdoc/>
-        public OLImageLoader Image => _image;
+        public IOLImageLoader Image => _image;
         ///<inheritdoc/>
-        public OLListLoader List => _list;
+        public IOLListLoader List => _list;
         ///<inheritdoc/>
-        public OLSearchLoader Search => _search;
+        public IOLSearchLoader Search => _search;
         ///<inheritdoc/>
-        public OLSubjectLoader Subject => _subject;
+        public IOLSubjectLoader Subject => _subject;
         ///<inheritdoc/>
-        public OLRecentChangesLoader RecentChanges => _recentChanges;
+        public IOLRecentChangesLoader RecentChanges => _recentChanges;
         ///<inheritdoc/>
-        public OLPartnerLoader Partner => _partner;
+        public IOLPartnerLoader Partner => _partner;
         ///<inheritdoc/>
-        public OLMyBooksLoader MyBooks => _myBooks;
+        public IOLMyBooksLoader MyBooks => _myBooks;
 
         ///<inheritdoc/>
         public HttpClient BackingClient => _httpClient;
