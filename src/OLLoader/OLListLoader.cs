@@ -8,7 +8,7 @@ namespace OpenLibraryNET.Loader
     /// <summary>
     /// Interface to OpenLibrary's Lists API.
     /// </summary>
-    public class OLListLoader
+    public class OLListLoader : IOLListLoader
     {
         internal OLListLoader(OpenLibraryClient client) => _client = client;
 

@@ -7,7 +7,7 @@ namespace OpenLibraryNET.Loader
     /// <summary>
     /// Interface to OpenLibrary's Partner API.
     /// </summary>
-    public class OLPartnerLoader
+    public class OLPartnerLoader : IOLPartnerLoader
     {
         internal OLPartnerLoader(HttpClient client) => _client = client;
 

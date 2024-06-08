@@ -6,7 +6,7 @@ namespace OpenLibraryNET.Loader
     /// <summary>
     /// Interface to OpenLibrary's Works API.
     /// </summary>
-    public class OLWorkLoader
+    public class OLWorkLoader : IOLWorkLoader
     {
         internal OLWorkLoader(HttpClient client)
         {

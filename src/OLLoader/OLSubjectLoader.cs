@@ -6,7 +6,7 @@ namespace OpenLibraryNET.Loader
     /// <summary>
     /// Interface to OpenLibrary's Subjects API.
     /// </summary>
-    public class OLSubjectLoader
+    public class OLSubjectLoader : IOLSubjectLoader
     {
         internal OLSubjectLoader(HttpClient client) => _client = client;
 
