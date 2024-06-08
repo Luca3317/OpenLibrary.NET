@@ -6,7 +6,7 @@ namespace OpenLibraryNET.Loader
     /// <summary>
     /// Interface to OpenLibrary's Authors API.
     /// </summary>
-    public class OLAuthorLoader
+    public class OLAuthorLoader : IOLAuthorLoader
     {
         internal OLAuthorLoader(HttpClient client) => _client = client;
 

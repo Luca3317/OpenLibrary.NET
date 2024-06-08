@@ -6,7 +6,7 @@ namespace OpenLibraryNET.Loader
     /// <summary>
     /// Interface to OpenLibrary's Authors API.
     /// </summary>
-    public class OLSearchLoader
+    public class OLSearchLoader : IOLSearchLoader
     {
         internal OLSearchLoader(HttpClient client) => _client = client;
 

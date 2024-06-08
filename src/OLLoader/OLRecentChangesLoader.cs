@@ -6,7 +6,7 @@ namespace OpenLibraryNET.Loader
     /// <summary>
     /// Interface to OpenLibrary's RecentChanges API.
     /// </summary>
-    public class OLRecentChangesLoader
+    public class OLRecentChangesLoader : IOLRecentChangesLoader
     {
         internal OLRecentChangesLoader(HttpClient client) => _client = client;
 

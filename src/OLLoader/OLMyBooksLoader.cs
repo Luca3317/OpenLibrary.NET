@@ -6,7 +6,7 @@ namespace OpenLibraryNET.Loader
     /// <summary>
     /// Interface to OpenLibrary's MyBooks API.
     /// </summary>
-    public class OLMyBooksLoader
+    public class OLMyBooksLoader : IOLMyBooksLoader
     {
         internal OLMyBooksLoader(OpenLibraryClient client) => _client = client;
 

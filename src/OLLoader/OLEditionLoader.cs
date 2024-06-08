@@ -7,7 +7,7 @@ namespace OpenLibraryNET.Loader
     /// <summary>
     /// Interface to OpenLibrary's Editions API.
     /// </summary>
-    public class OLEditionLoader
+    public class OLEditionLoader : IOLEditionLoader
     {
         internal OLEditionLoader(HttpClient client) => _client = client;
 

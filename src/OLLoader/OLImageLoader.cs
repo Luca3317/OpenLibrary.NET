@@ -6,7 +6,7 @@ namespace OpenLibraryNET.Loader
     /// <summary>
     /// Interface to OpenLibrary's Covers and AuthorPhotos API.
     /// </summary>
-    public class OLImageLoader
+    public class OLImageLoader : IOLImageLoader
     {
         internal OLImageLoader(HttpClient client) => _client = client;
 
